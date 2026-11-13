@@ -1,0 +1,11 @@
+transaction_id,transaction_date,customer_ref,amount,payment_mode,status
+TXN-PTM-100234,2026-11-01 08:34:12,rahul.reddy@paytm,245.0,UPI,SUCCESS
+TXN-PTM-100235,2026-11-01 09:12:45,priya.sharma@okhdfcbank,88.0,UPI,SUCCESS
+TXN-PTM-100236,2026-11-01 11:20:01,karthik.iyer@ybl,145.0,UPI,SUCCESS
+TXN-PTM-100237,2026-11-01 13:45:22,anand.patel@paytm,520.0,CARD,SUCCESS
+TXN-PTM-100238,2026-11-01 17:15:30,sneha.rao@paytm,320.0,UPI,SUCCESS
+TXN-PTM-100239,2026-11-01 18:05:14,suresh.gupta@ibl,95.0,UPI,SUCCESS
+TXN-PTM-100240,2026-11-01 19:22:50,vikram.singh@okaxis,450.0,UPI,SUCCESS
+TXN-PTM-100241,2026-11-01 19:55:10,pooja.kumar@paytm,1200.0,UPI,SUCCESS
+TXN-PTM-100242,2026-11-01 20:30:15,arjun.nair@paytm,180.0,CASH,SUCCESS
+TXN-PTM-100243,2026-11-02 08:15:20,manish.choudhary@okhdfcbank,68.0,UPI,SUCCESS

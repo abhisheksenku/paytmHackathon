@@ -3,7 +3,7 @@ import json
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 from app.core.config import settings
-from app.models.models import Merchant, Conversation, Message
+from app.models.models import Merchant, Conversation, Message, Product
 from app.analytics.sales_engine import compute_overview, compute_peak_hours
 from app.analytics.customer_engine import compute_customer_cohorts
 from app.analytics.credit_engine import compute_paytm_loan_readiness
@@ -205,6 +205,66 @@ def generate_multilingual_response(
                 f"• **Daily Average Floor:** ₹12,000+\n\n"
                 f"📈 **How to unlock higher limit:**\n"
                 f"Paytm Soundbox se steady UPI acceptance aapke loan approval ko 2x fast karta hai!"
+            )
+
+    elif intent == "stock_inventory":
+        total_skus = data.get("total_skus", 35)
+        low_items = data.get("low_stock_items", [])
+        
+        if low_items:
+            items_text_en = "\n".join([f"• ⚠️ **{it['name']}**: Only `{it['stock_qty']} units` left (Safety buffer: {it['reorder_level']})" for it in low_items[:4]])
+            items_text_hi = "\n".join([f"• ⚠️ **{it['name']}**: केवल `{it['stock_qty']} पैकेट` बचे हैं (रीऑर्डर सीमा: {it['reorder_level']})" for it in low_items[:4]])
+            items_text_te = "\n".join([f"• ⚠️ **{it['name']}**: కేవలం `{it['stock_qty']} యూనిట్లు` మాత్రమే మిగిలి ఉన్నాయి (కనీస నిల్వ: {it['reorder_level']})" for it in low_items[:4]])
+            items_text_ta = "\n".join([f"• ⚠️ **{it['name']}**: வெறும் `{it['stock_qty']} அலகுகள்` மட்டுமே உள்ளன (மறுவரிசை: {it['reorder_level']})" for it in low_items[:4]])
+            items_text_kn = "\n".join([f"• ⚠️ **{it['name']}**: ಕೇವಲ `{it['stock_qty']} ಯೂನಿಟ್‌ಗಳು` ಉಳಿದಿವೆ (ಮರುಆದೇಶ ಮಿತಿ: {it['reorder_level']})" for it in low_items[:4]])
+        else:
+            items_text_en = "• ✅ All fast-moving staples (Milk, Bread, Atta, Oil, Sugar) are healthy in stock."
+            items_text_hi = "• ✅ सभी जरूरी सामान (दूध, ब्रेड, आटा, तेल, चीनी) पर्याप्त स्टॉक में हैं।"
+            items_text_te = "• ✅ అన్ని నిత్యావసర సరుకులు (పాలు, బ్రెడ్, నూనె, పిండి) తగినంత నిల్వ ఉన్నాయి."
+            items_text_ta = "• ✅ பால், ரொட்டி, எண்ணெய் உள்ளிட்ட அனைத்து அத்தியாவசிய பொருட்களும் போதுமான அளவில் உள்ளன."
+            items_text_kn = "• ✅ ಹಾಲು, ಬ್ರೆಡ್, ಎಣ್ಣೆ ಸೇರಿದಂತೆ ಎಲ್ಲಾ ಅಗತ್ಯ ವಸ್ತುಗಳು ಸಾಕಷ್ಟು ದಾಸ್ತಾನು ಇವೆ."
+
+        if lang == "Hindi":
+            return (
+                f"📦 **{business_name} के लिए स्टॉक व इन्वेंटरी स्थिति:**\n\n"
+                f"आपकी दुकान में कुल **{total_skus} जरूरी FMCG प्रोडक्ट्स** ट्रैक हो रहे हैं।\n\n"
+                f"{items_text_hi}\n\n"
+                f"💡 **सलाह:** शाम के 7:00 PM पीक रश से पहले कम स्टॉक वाले सामान को डिस्ट्रीब्यूटर से तुरंत रिऑर्डर कर लें ताकि बिक्री का नुकसान न हो!"
+            )
+        elif lang == "Telugu":
+            return (
+                f"📦 **{business_name} స్టాక్ & ఇన్వెಂಟరీ నివేదిక:**\n\n"
+                f"మీ దుకాణంలో మొత్తం **{total_skus} రకాల వస్తువులు** ట్రాక్ చేయబడుతున్నాయి.\n\n"
+                f"{items_text_te}\n\n"
+                f"💡 **సూచన:** సాయంత్రం 7 గంటల రద్దీకి ముందే తక్కువగా ఉన్న వస్తువులను రీ-ఆర్డర్ చేసుకోండి!"
+            )
+        elif lang == "Tamil":
+            return (
+                f"📦 **{business_name} சரக்கு & இருப்பு அறிக்கை:**\n\n"
+                f"உங்கள் கடையில் மொத்தம் **{total_skus} பொருட்கள்** கண்காணிக்கப்படுகின்றன.\n\n"
+                f"{items_text_ta}\n\n"
+                f"💡 **ஆலோசனை:** மாலை நேர கூட்டத்திற்கு முன் அத்தியாவசிய பொருட்களை உடனே ஆர்டர் செய்யவும்!"
+            )
+        elif lang == "Kannada":
+            return (
+                f"📦 **{business_name} ದಾಸ್ತಾನು & ಸ್ಟಾಕ್ ವರದಿ:**\n\n"
+                f"ನಿಮ್ಮ ಅಂಗಡಿಯಲ್ಲಿ ಒಟ್ಟು **{total_skus} ಅಗತ್ಯ ವಸ್ತುಗಳನ್ನು** ಟ್ರ್ಯಾಕ್ ಮಾಡಲಾಗುತ್ತಿದೆ.\n\n"
+                f"{items_text_kn}\n\n"
+                f"💡 **ಸಲಹೆ:** ಸಂಜೆಯ ಗರಿಷ್ಠ ವ್ಯಾಪಾರಕ್ಕೆ ಮುನ್ನ ಅಗತ್ಯ ವಸ್ತುಗಳನ್ನು ರೀಆರ್ಡರ್ ಮಾಡಿ!"
+            )
+        elif lang == "English":
+            return (
+                f"📦 **Stock & Inventory Health Report for {business_name}:**\n\n"
+                f"Currently tracking **{total_skus} active SKUs** across your store catalog.\n\n"
+                f"{items_text_en}\n\n"
+                f"💡 **Operational Recommendation:** Reorder depleted items before the 7:00 PM evening rush to prevent lost walk-away sales!"
+            )
+        else: # Hinglish
+            return (
+                f"📦 **Stock & Inventory Status for {business_name}:**\n\n"
+                f"Aapki dukaan mein total **{total_skus} SKUs** track ho rahe hain.\n\n"
+                f"{items_text_en}\n\n"
+                f"💡 **Actionable Tip:** Shaam ke 7 PM rush se pehle depleted items restock kar lein taaki koi customer empty-handed na laute!"
             )
 
     elif intent == "customers":
@@ -432,10 +492,36 @@ def run_agentic_query(db: Session, merchant_id: str, query: str, language: str =
         "ಕೊಡುಗೆ", "ರಿಯಾಯಿತಿ", "ಪ್ರಚಾರ"
     ]
 
+    stock_keywords = [
+        "stock", "inventory", "maal", "item", "product", "milk", "bread", "saman", "khatam", "bacha", "shortage", "reorder", "curd", "sugar", "oil", "sku",
+        "स्टॉक", "माल", "सामान", "खत्म", "बचा", "आइटम", "दूध", "ब्रेड",
+        "స్టాక్", "సరుకు", "వస్తు", "అయిపో", "మిగిలి", "కొరత", "పాలు",
+        "ஸ்டாக்", "சரக்கு", "பொருள்", "முடிந்தது", "இருப்பு",
+        "ಸ್ಟಾಕ್", "ದಾಸ್ತಾನು", "ವಸ್ತು", "ಖಾಲಿಯಾಗಿದೆ", "ಉಳಿದಿದೆ"
+    ]
+
     if any(k in query_lower for k in sales_keywords):
         intent = "sales_overview"
         tool_executed = "compare_sales_periods(timeframe='30d')"
         tool_data = compute_overview(db, merchant_id, timeframe="30d")
+
+    elif any(k in query_lower for k in stock_keywords):
+        intent = "stock_inventory"
+        tool_executed = "check_inventory_levels()"
+        low_items = db.query(Product).filter(
+            Product.merchant_id == merchant_id,
+            Product.stock_qty <= Product.reorder_level
+        ).all()
+        if not low_items:
+            low_items = db.query(Product).filter(Product.merchant_id == merchant_id).order_by(Product.stock_qty.asc()).limit(2).all()
+        total_skus = db.query(Product).filter(Product.merchant_id == merchant_id).count()
+        tool_data = {
+            "total_skus": total_skus,
+            "low_stock_items": [
+                {"name": p.name, "stock_qty": p.stock_qty, "reorder_level": p.reorder_level, "unit_price": p.unit_price}
+                for p in low_items
+            ]
+        }
 
     elif any(k in query_lower for k in rush_keywords):
         intent = "peak_hours"

@@ -38,36 +38,42 @@ const WELCOME_MESSAGES: Record<string, string> = {
 const SUGGESTIONS_BY_LANG: Record<string, string[]> = {
   Hindi: [
     "पिछले महीने से तुलना करके बताएं व्यापार कैसा है?",
+    "दुकान में कौन सा सामान या स्टॉक कम हो रहा है?",
     "मेरी दुकान का सबसे व्यस्त समय (Peak Hours) कौन सा है?",
     "Paytm वर्किंग कैपिटल लोन के लिए मेरा स्कोर क्या है?",
     "पुराने ग्राहकों के लिए WhatsApp ऑफर बनाओ।",
   ],
   Telugu: [
     "గత నెలతో పోలిస్తే నా వ్యాపార కలెక్షన్ ఎలా ఉంది?",
+    "దుకాణంలో ఏ సరుకులు లేదా స్టాక్ తక్కువగా ఉంది?",
     "నా దుకాణంలో రద్దీ ఎక్కువగా ఉండే పీక్ అవర్స్ ఏవి?",
     "Paytm లోన్ కోసం నా క్రెడిట్ స్కోరు ఎంత?",
     "పాత కస్టమర్ల కోసం ఆఫర్ తయారు చేయి.",
   ],
   Tamil: [
     "கடந்த மாதத்தை விட இன்றைய விற்பனை எப்படி உள்ளது?",
+    "கடையில் எந்த பொருள் ஸ்டாக் குறைவாக உள்ளது?",
     "எனது கடையின் பீக் ஹவர்ஸ் எது?",
     "Paytm கடனுக்கான எனது கிரெடிட் ஸ்கோர் என்ன?",
     "பழைய வாடிக்கையாளர்களுக்கு சலுகை உருவாக்கு.",
   ],
   Kannada: [
     "ಕಳೆದ ತಿಂಗಳಿಗೆ ಹೋಲಿಸಿದರೆ ನನ್ನ ವ್ಯಾಪಾರ ಹೇಗಿದೆ?",
+    "ಅಂಗಡಿಯಲ್ಲಿ ಯಾವ ಸಾಮಾನುಗಳ ಸ್ಟಾಕ್ ಕಡಿಮೆಯಾಗಿದೆ?",
     "ನನ್ನ ಅಂಗಡಿಯ ಗರಿಷ್ಠ ವ್ಯಾಪಾರದ ಸಮಯ ಯಾವುದು?",
     "Paytm ಸಾಲಕ್ಕಾಗಿ ನನ್ನ ಕ್ರೆಡಿಟ್ ಸ್ಕೋರ್ ಎಷ್ಟು?",
     "ಹಳೆಯ ಗ್ರಾಹಕರಿಗಾಗಿ ಆಫರ್ ರಚಿಸಿ.",
   ],
   English: [
     "How does my sales compare to last month?",
+    "Which products are running low on stock?",
     "What are my top rush hours today?",
     "What is my Paytm working capital loan readiness score?",
     "Create a discount offer for inactive regular customers.",
   ],
   Hinglish: [
     "Pichle hafte se compare karke batao business kaisa hai?",
+    "Konsa saman ya stock khatam hone wala hai?",
     "Mera sabse bheed wala time (peak hours) kaun sa hai?",
     "Paytm working capital loan ke liye mera score kya hai?",
     "Inactive grahakon ke liye WhatsApp offer banao.",

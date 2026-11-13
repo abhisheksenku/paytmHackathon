@@ -25,6 +25,7 @@ import {
 } from "recharts";
 import { formatINR, formatCompactINR } from "@/lib/utils";
 import { OverviewSummary, RevenueTrendPoint } from "@/lib/types";
+import { LoanModal } from "./LoanModal";
 
 interface OverviewTabProps {
   overview: OverviewSummary | null;
@@ -60,6 +61,7 @@ const OVERVIEW_CONTENT: Record<string, {
   loanRepayment: string;
   growthTip: React.ReactNode;
   btnCampaign: string;
+  btnApplyLoan: string;
 }> = {
   Hindi: {
     tag: "Paytm साउंडबॉक्स इंटेलिजेंस सक्रिय",
@@ -86,6 +88,7 @@ const OVERVIEW_CONTENT: Record<string, {
     loanRepayment: "साउंडबॉक्स UPI सेटलमेंट के माध्यम से दैनिक आसान किस्तों में भुगतान।",
     growthTip: <><strong>💡 ग्रोथ टिप:</strong> अगले 12 दिनों तक ₹15,000+ की दैनिक बिक्री बनाए रखें और <strong>₹3,50,000</strong> की लोन लिमिट अनलॉक करें!</>,
     btnCampaign: "व्हाट्सएप ऑफर से बिक्री बढ़ाएं",
+    btnApplyLoan: "प्री-अप्रूव्ड लोन आवेदन देखें (₹2.5L)",
   },
   Telugu: {
     tag: "Paytm సౌండ్‌బాక్స్ ఇంటెలిజెన్స్ యాక్టివ్",
@@ -112,6 +115,7 @@ const OVERVIEW_CONTENT: Record<string, {
     loanRepayment: "సౌండ్‌బాక్స్ UPI సెటిల్మెంట్ల ద్వారా రోజువారీ సులభ కిస్తీలు.",
     growthTip: <><strong>💡 వృద్ధి చిట్కా:</strong> మరో 12 రోజులు ₹15,000+ రోజువారీ సేల్స్ కొనసాగించండి, <strong>₹3,50,000</strong> లోన్ లిమిట్ అన్‌లాక్ చేయండి!</>,
     btnCampaign: "వాట్సాప్ ఆఫర్‌తో అమ్మకాలు పెంచండి",
+    btnApplyLoan: "ప్రీ-అప్రూవ్డ్ లోన్ దరఖాస్తు చేయండి (₹2.5L)",
   },
   Tamil: {
     tag: "Paytm சவுண்ட்பாக்ஸ் நுண்ணறிவு செயலில் உள்ளது",
@@ -138,6 +142,7 @@ const OVERVIEW_CONTENT: Record<string, {
     loanRepayment: "சவுண்ட்பாக்ஸ் UPI தீர்வுகள் மூலம் தினசரி எளிதான தவணைகள்.",
     growthTip: <><strong>💡 வளர்ச்சி உதவிக்குறிப்பு:</strong> அடுத்த 12 நாட்களுக்கு ₹15,000+ தினசரி விற்பனையைத் தக்கவைத்து <strong>₹3,50,000</strong> கடன் வரம்பைப் பெறுங்கள்!</>,
     btnCampaign: "வாட்ஸ்அப் சலுகை மூலம் விற்பனையை அதிகரிக்கவும்",
+    btnApplyLoan: "முன்-அங்கீகரிக்கப்பட்ட கடன் பெறுங்கள் (₹2.5L)",
   },
   Kannada: {
     tag: "Paytm ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಇಂಟೆಲಿಜೆನ್ಸ್ ಸಕ್ರಿಯವಾಗಿದೆ",
@@ -164,6 +169,7 @@ const OVERVIEW_CONTENT: Record<string, {
     loanRepayment: "ಸೌಂಡ್‌ಬಾಕ್ಸ್ UPI ಮೂಲಕ ಸುಲಭ ದೈನಂದಿನ ಮರುಪಾವತಿ.",
     growthTip: <><strong>💡 ಬೆಳವಣಿಗೆಯ ಸಲಹೆ:</strong> ಮುಂದಿನ 12 ದಿನಗಳಲ್ಲಿ ₹15,000+ ಸರಾಸರಿ ಕಾಯ್ದುಕೊಳ್ಳಿ, <strong>₹3,50,000</strong> ಸಾಲದ ಮಿತಿ ಪಡೆಯಿರಿ!</>,
     btnCampaign: "ವಾಟ್ಸಾಪ್ ಆಫರ್‌ನೊಂದಿಗೆ ಮಾರಾಟ ಹೆಚ್ಚಿಸಿ",
+    btnApplyLoan: "ಪೂರ್ವ-ಅನುಮೋದಿತ ಸಾಲ ಪಡೆಯಿರಿ (₹2.5L)",
   },
   English: {
     tag: "Paytm Soundbox Intelligence Active",
@@ -190,6 +196,7 @@ const OVERVIEW_CONTENT: Record<string, {
     loanRepayment: "Eligible for daily micro-repayment via Soundbox UPI settlements.",
     growthTip: <><strong>💡 Growth Tip:</strong> Maintain ₹15,000+ daily average for 12 more days to unlock the <strong>₹3,50,000</strong> loan bracket!</>,
     btnCampaign: "Boost Sales with WhatsApp Offer",
+    btnApplyLoan: "Apply for ₹2,50,000 Loan (Instant)",
   },
   Hinglish: {
     tag: "Paytm Soundbox Intelligence Active",
@@ -216,6 +223,7 @@ const OVERVIEW_CONTENT: Record<string, {
     loanRepayment: "Soundbox UPI settlements ke zariye rozana aasan micro-repayment.",
     growthTip: <><strong>💡 Growth Tip:</strong> Agle 12 din ₹15,000+ daily average maintain karein aur <strong>₹3,50,000</strong> loan bracket unlock karein!</>,
     btnCampaign: "WhatsApp Offer se Sales Badhayein",
+    btnApplyLoan: "Apply for ₹2.5L Pre-Approved Loan",
   },
 };
 
@@ -229,6 +237,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
 }) => {
   const content = OVERVIEW_CONTENT[language] || OVERVIEW_CONTENT.Hinglish;
   const [timeframe, setTimeframe] = useState<"7d" | "30d" | "90d">("30d");
+  const [isLoanModalOpen, setIsLoanModalOpen] = useState<boolean>(false);
 
   const totalRev = overview?.total_revenue ?? 482500;
   const revGrowth = overview?.revenue_growth_pct ?? 14.2;
@@ -493,13 +502,23 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           </div>
 
           <button
-            onClick={onOpenCampaigns}
-            className="mt-6 w-full rounded-xl bg-[#002E6E] py-2.5 text-xs font-bold text-white hover:bg-[#002456] transition-all shadow-sm active:scale-95"
+            onClick={() => setIsLoanModalOpen(true)}
+            className="mt-6 w-full rounded-xl bg-gradient-to-r from-[#002E6E] via-[#004098] to-[#00BAF2] py-3 text-xs font-black text-white hover:brightness-110 transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
           >
-            {content.btnCampaign}
+            <ShieldCheck className="h-4 w-4" />
+            {content.btnApplyLoan}
           </button>
         </div>
       </div>
+
+      {/* Interactive Loan Disbursal & Daily Micro-Repayment Flow Modal */}
+      <LoanModal
+        isOpen={isLoanModalOpen}
+        onClose={() => setIsLoanModalOpen(false)}
+        loanScore={loanScore}
+        maxLimit={loanLimit}
+        language={language}
+      />
     </div>
   );
 };

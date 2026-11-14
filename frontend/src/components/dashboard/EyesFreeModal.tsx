@@ -166,6 +166,20 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
   }, [language]);
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
     return () => {
       stopSpeech();
     };
@@ -253,54 +267,58 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-      <div className="relative w-full max-w-3xl rounded-[28px] bg-gradient-to-b from-[#09152B] via-[#0B1A35] to-[#060D1A] border border-cyan-500/30 text-white shadow-2xl shadow-[#002E6E]/60 overflow-hidden my-4 sm:my-6">
-        
-        {/* Subtle Ambient Backlight Glow */}
-        <div className="absolute -top-24 -left-24 h-56 w-56 rounded-full bg-[#00BAF2]/15 blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 -right-24 h-56 w-56 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-
+    <div
+      onClick={handleClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-3xl rounded-3xl bg-white border border-slate-200 text-slate-900 shadow-2xl overflow-hidden my-4 sm:my-6 animate-in fade-in zoom-in-95 duration-200"
+      >
         {/* Top Header */}
-        <div className="relative border-b border-slate-800/80 bg-gradient-to-r from-[#001D4A] via-[#002E6E] to-[#0A1120] p-5 sm:p-6">
+        <div className="relative bg-[#002E6E] p-5 sm:p-6 text-white border-b border-[#001D4A]">
+          {/* Prominent High-Contrast Close Button */}
           <button
+            type="button"
             onClick={handleClose}
-            className="absolute top-4 right-4 sm:top-5 sm:right-5 h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition cursor-pointer"
+            className="absolute top-4 right-4 sm:top-5 sm:right-5 h-10 w-10 rounded-full bg-white/15 hover:bg-white text-white hover:text-[#002E6E] flex items-center justify-center transition-all shadow-md cursor-pointer border border-white/30 active:scale-95 z-20 group"
             title="Close Accessibility Demo"
+            aria-label="Close"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5 stroke-[2.5] transition-transform group-hover:rotate-90 duration-200" />
           </button>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-2xs">
-              <EyeOff className="h-3.5 w-3.5 text-amber-400" />
+          <div className="flex flex-wrap items-center gap-2 pr-12">
+            <span className="rounded-full bg-amber-400 text-slate-950 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-xs">
+              <EyeOff className="h-3.5 w-3.5" />
               Bharat Accessibility • 100% Screen-Free Voice Copilot
             </span>
-            <span className="rounded-full bg-cyan-400/10 text-cyan-300 border border-cyan-400/20 px-2.5 py-0.5 text-[10px] font-semibold">
+            <span className="rounded-full bg-white/15 text-white/90 border border-white/20 px-2.5 py-0.5 text-[10px] font-semibold">
               Low-Vision & Elderly Merchant Mode
             </span>
           </div>
 
-          <h2 className="mt-2 text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+          <h2 className="mt-2.5 text-xl sm:text-2xl font-black text-white tracking-tight">
             Paytm Soundbox 4G: Spoken Operating Copilot
           </h2>
-          <p className="mt-1 text-xs text-slate-300 max-w-xl leading-relaxed">
+          <p className="mt-1 text-xs text-sky-100/90 max-w-xl leading-relaxed">
             Designed for elderly, cataract-affected, and visually impaired shopkeepers who cannot read mobile screens during busy store hours. Run accounts & customer retention through pure voice!
           </p>
 
           {/* Store Persona & Language Pill Bar */}
-          <div className="mt-4 rounded-2xl bg-slate-900/80 border border-slate-700/80 p-3 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="mt-4 rounded-2xl bg-white/10 border border-white/15 p-3 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div className="flex items-center space-x-3">
-              <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white font-extrabold text-sm shadow-md">
+              <div className="h-10 w-10 rounded-2xl bg-amber-400 text-[#002E6E] flex items-center justify-center font-extrabold text-sm shadow-md">
                 VJ
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-sm font-bold text-white">{data.merchantName}</span>
-                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-1.5 py-0.5 rounded font-semibold">
+                  <span className="text-[10px] bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 px-1.5 py-0.5 rounded font-semibold">
                     Verified Merchant
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 font-medium">
+                <p className="text-[11px] text-sky-200 font-medium">
                   {data.storeName} • 100% Voice Operated
                 </p>
               </div>
@@ -319,8 +337,8 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
                   }}
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
                     activeLang === lang.id
-                      ? "bg-[#00BAF2] text-[#0A1120] shadow-sm"
-                      : "bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white"
+                      ? "bg-white text-[#002E6E] shadow-sm"
+                      : "bg-white/10 text-white/80 hover:bg-white/20 hover:text-white"
                   }`}
                 >
                   {lang.label}
@@ -331,10 +349,9 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 sm:p-6 space-y-6">
-
+        <div className="p-5 sm:p-6 space-y-5 bg-white">
           {/* Soundbox 4G Hardware Live Simulator Bar */}
-          <div className="rounded-2xl border border-cyan-500/30 bg-gradient-to-r from-[#002E6E]/70 via-[#0A1120] to-[#002E6E]/70 p-4 shadow-inner flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="rounded-2xl border border-slate-200 bg-slate-900 text-white p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center space-x-3">
               {/* Soundbox LED Indicator Icon */}
               <div className="relative">
@@ -383,7 +400,7 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
             </div>
 
             {/* Dancing Equalizer Audio Waves */}
-            <div className="flex items-center gap-1.5 bg-slate-900/90 px-3 py-2 rounded-xl border border-slate-700/60 self-stretch sm:self-auto justify-center">
+            <div className="flex items-center gap-1.5 bg-slate-800/90 px-3 py-2 rounded-xl border border-slate-700 self-stretch sm:self-auto justify-center">
               {[4, 8, 12, 16, 14, 9, 6].map((h, i) => (
                 <span
                   key={i}
@@ -407,37 +424,37 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
 
           {/* 4-Step Interactive Conversation Dialogue */}
           <div className="space-y-3.5">
-
             {/* Step 1: Merchant Voice Query */}
             <div
-              className={`rounded-2xl border p-4 transition-all duration-300 ${
+              className={`rounded-2xl border p-4 transition-all duration-200 ${
                 currentStep === 1
-                  ? "bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border-amber-400/80 shadow-md shadow-amber-950/40 ring-1 ring-amber-400/40"
-                  : "bg-slate-900/50 border-slate-800/80 hover:border-slate-700"
+                  ? "border-amber-400 bg-amber-50/90 shadow-sm ring-2 ring-amber-200"
+                  : "border-slate-200 bg-slate-50/60 hover:bg-slate-50"
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-                  <span className="h-5 w-5 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center text-[10px] font-black border border-amber-400/40">
+                <span className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                  <span className="h-5 w-5 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center text-[10px] font-black border border-amber-300">
                     1
                   </span>
                   Step 1: Venkat-ji Speaks Aloud (Zero Screen Touch)
                 </span>
                 <button
+                  type="button"
                   onClick={() => handleStep1(false)}
                   disabled={isPlayingAudio}
-                  className="rounded-lg bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-[11px] font-bold px-2.5 py-1 transition flex items-center gap-1 cursor-pointer border border-amber-400/30"
+                  className="rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold px-2.5 py-1 transition flex items-center gap-1 cursor-pointer border border-amber-300 active:scale-95"
                 >
-                  <Volume2 className="h-3 w-3" />
+                  <Volume2 className="h-3.5 w-3.5 text-amber-800" />
                   <span>Listen Step 1</span>
                 </button>
               </div>
 
               <div className="pl-6">
-                <p className="text-base sm:text-lg font-extrabold text-white tracking-wide">
+                <p className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
                   &ldquo;{data.query}&rdquo;
                 </p>
-                <p className="mt-0.5 text-xs text-amber-200/70 italic font-mono">
+                <p className="mt-0.5 text-xs text-amber-800/80 italic font-mono">
                   Phonetic: ({data.queryPhonetic})
                 </p>
               </div>
@@ -445,38 +462,39 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
 
             {/* Step 2: Soundbox Spoken Store Intelligence */}
             <div
-              className={`rounded-2xl border p-4 transition-all duration-300 ${
+              className={`rounded-2xl border p-4 transition-all duration-200 ${
                 currentStep === 2
-                  ? "bg-gradient-to-r from-blue-950/50 via-slate-900 to-slate-900 border-[#00BAF2] shadow-md shadow-blue-950/50 ring-1 ring-[#00BAF2]/40"
+                  ? "border-[#00BAF2] bg-sky-50/90 shadow-sm ring-2 ring-sky-200"
                   : currentStep > 2
-                  ? "bg-slate-900/60 border-slate-800/80"
-                  : "bg-slate-900/30 border-slate-800/40 opacity-50"
+                  ? "border-slate-200 bg-slate-50/70"
+                  : "border-slate-200 bg-slate-50/40 opacity-70"
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-[#00BAF2] flex items-center gap-1.5">
-                  <span className="h-5 w-5 rounded-full bg-cyan-400/20 text-cyan-300 flex items-center justify-center text-[10px] font-black border border-cyan-400/40">
+                <span className="text-xs font-bold text-[#002E6E] flex items-center gap-1.5">
+                  <span className="h-5 w-5 rounded-full bg-sky-200 text-[#002E6E] flex items-center justify-center text-[10px] font-black border border-sky-300">
                     2
                   </span>
                   Step 2: Paytm Soundbox Speaks Back (Live Database Verified)
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">
+                  <span className="text-[10px] font-mono text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full font-bold">
                     ✓ 85 Txns • ₹9,420
                   </span>
                   <button
+                    type="button"
                     onClick={() => handleStep2(false)}
                     disabled={isPlayingAudio}
-                    className="rounded-lg bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-300 text-[11px] font-bold px-2.5 py-1 transition flex items-center gap-1 cursor-pointer border border-cyan-400/30"
+                    className="rounded-lg bg-sky-100 hover:bg-sky-200 text-[#002E6E] text-[11px] font-bold px-2.5 py-1 transition flex items-center gap-1 cursor-pointer border border-sky-300 active:scale-95"
                   >
-                    <Volume2 className="h-3 w-3" />
+                    <Volume2 className="h-3.5 w-3.5 text-[#002E6E]" />
                     <span>Listen Step 2</span>
                   </button>
                 </div>
               </div>
 
               <div className="pl-6">
-                <p className="text-sm sm:text-base font-semibold text-slate-100 leading-relaxed">
+                <p className="text-sm sm:text-base font-semibold text-slate-800 leading-relaxed">
                   {data.response}
                 </p>
               </div>
@@ -484,41 +502,42 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
 
             {/* Step 3: Proactive Afternoon Slump Prompt */}
             <div
-              className={`rounded-2xl border p-4 transition-all duration-300 ${
+              className={`rounded-2xl border p-4 transition-all duration-200 ${
                 currentStep === 3
-                  ? "bg-gradient-to-r from-purple-950/40 via-slate-900 to-slate-900 border-purple-400 shadow-md shadow-purple-950/50 ring-1 ring-purple-400/40"
+                  ? "border-purple-400 bg-purple-50/90 shadow-sm ring-2 ring-purple-200"
                   : currentStep > 3
-                  ? "bg-slate-900/60 border-slate-800/80"
-                  : "bg-slate-900/30 border-slate-800/40 opacity-50"
+                  ? "border-slate-200 bg-slate-50/70"
+                  : "border-slate-200 bg-slate-50/40 opacity-70"
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-purple-300 flex items-center gap-1.5">
-                  <span className="h-5 w-5 rounded-full bg-purple-400/20 text-purple-300 flex items-center justify-center text-[10px] font-black border border-purple-400/40">
+                <span className="text-xs font-bold text-purple-900 flex items-center gap-1.5">
+                  <span className="h-5 w-5 rounded-full bg-purple-200 text-purple-900 flex items-center justify-center text-[10px] font-black border border-purple-300">
                     3
                   </span>
                   Step 3: Soundbox Proactively Alerts Lost Regular Customer
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-bold px-2.5 py-0.5 border border-amber-400/30">
+                  <span className="rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 border border-amber-300">
                     Slump Alert (Rajesh • Inactive 22d)
                   </span>
                   <button
+                    type="button"
                     onClick={() => handleStep3(false)}
                     disabled={isPlayingAudio}
-                    className="rounded-lg bg-purple-400/20 hover:bg-purple-400/30 text-purple-300 text-[11px] font-bold px-2.5 py-1 transition flex items-center gap-1 cursor-pointer border border-purple-400/30"
+                    className="rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-900 text-[11px] font-bold px-2.5 py-1 transition flex items-center gap-1 cursor-pointer border border-purple-300 active:scale-95"
                   >
-                    <Volume2 className="h-3 w-3" />
+                    <Volume2 className="h-3.5 w-3.5 text-purple-900" />
                     <span>Listen Step 3</span>
                   </button>
                 </div>
               </div>
 
               <div className="pl-6">
-                <p className="text-sm sm:text-base font-bold text-amber-100 leading-relaxed">
+                <p className="text-sm sm:text-base font-bold text-purple-950 leading-relaxed">
                   &ldquo;{data.prompt}&rdquo;
                 </p>
-                <p className="text-[11px] text-slate-400 mt-1">
+                <p className="text-[11px] text-slate-500 mt-1">
                   💡 Quiet afternoon hours (1:30 PM). Zero customer line disruption. Shopkeeper just needs to say 1 word.
                 </p>
               </div>
@@ -529,62 +548,62 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
               <div
                 className={`rounded-2xl border p-4 transition-all duration-300 animate-in fade-in zoom-in-95 ${
                   currentStep === 4
-                    ? "bg-gradient-to-r from-emerald-950/50 via-slate-900 to-slate-900 border-emerald-400 shadow-lg shadow-emerald-950/60 ring-1 ring-emerald-400/40"
-                    : "bg-slate-900/60 border-slate-800"
+                    ? "border-emerald-500 bg-emerald-50/90 shadow-sm ring-2 ring-emerald-200"
+                    : "border-slate-200 bg-slate-50/60"
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
-                    <span className="h-5 w-5 rounded-full bg-emerald-400/20 text-emerald-300 flex items-center justify-center text-[10px] font-black border border-emerald-400/40">
+                  <span className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                    <span className="h-5 w-5 rounded-full bg-emerald-200 text-emerald-900 flex items-center justify-center text-[10px] font-black border border-emerald-300">
                       4
                     </span>
                     Step 4: Venkat-ji Confirms by Pure Voice (1-Word Audio Action)
                   </span>
-                  <span className="text-[11px] font-extrabold text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                  <span className="text-[11px] font-extrabold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full">
                     ✓ 1-Word Voice Trigger
                   </span>
                 </div>
 
                 <div className="pl-6 space-y-3">
                   <div>
-                    <span className="text-xs text-slate-400 block font-medium">Merchant Spoke:</span>
-                    <p className="text-lg font-black text-white">
+                    <span className="text-xs text-slate-500 block font-medium">Merchant Spoke:</span>
+                    <p className="text-lg font-black text-slate-900">
                       &ldquo;{data.approval}&rdquo;{" "}
-                      <span className="text-xs font-normal text-slate-400 italic">
+                      <span className="text-xs font-normal text-slate-500 italic">
                         ({data.approvalPhonetic})
                       </span>
                     </p>
                   </div>
 
                   {isDispatched && (
-                    <div className="pt-3 border-t border-emerald-800/60 space-y-3 animate-in fade-in duration-300">
-                      <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                    <div className="pt-3 border-t border-emerald-200 space-y-3 animate-in fade-in duration-300">
+                      <div className="flex items-center gap-2 text-xs font-bold text-emerald-900">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                         <span>Soundbox Confirmation: &ldquo;{data.confirmed}&rdquo;</span>
                       </div>
 
                       {/* WhatsApp Dispatched Preview Card */}
-                      <div className="rounded-2xl bg-slate-950/90 border border-emerald-500/40 p-4 space-y-2">
+                      <div className="rounded-2xl bg-white border border-emerald-300 p-4 space-y-2.5 shadow-sm">
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="font-extrabold text-emerald-400 uppercase tracking-wider flex items-center gap-1">
-                            <Sparkles className="h-3 w-3" /> Real-Time Dispatched WhatsApp Offer
+                          <span className="font-extrabold text-emerald-800 uppercase tracking-wider flex items-center gap-1">
+                            <Sparkles className="h-3.5 w-3.5 text-emerald-600" /> Real-Time Dispatched WhatsApp Offer
                           </span>
-                          <span className="text-slate-400 font-mono">
+                          <span className="text-slate-500 font-mono text-[11px] font-medium">
                             To: Rajesh (+91 8374360774)
                           </span>
                         </div>
-                        <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans bg-slate-900 p-3 rounded-xl border border-slate-800">
+                        <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-sans bg-emerald-50/70 p-3 rounded-xl border border-emerald-200">
                           &ldquo;{data.waPreview}&rdquo;
                         </p>
                         <div className="flex items-center justify-between pt-1">
-                          <span className="text-[11px] text-slate-400">
+                          <span className="text-[11px] text-slate-500">
                             ⚡ 100% Free wa.me Link • Zero API fees
                           </span>
                           <a
                             href={`https://wa.me/918374360774?text=${encodeURIComponent(data.waPreview)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3.5 py-1.5 transition active:scale-95 shadow-sm"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-1.5 transition active:scale-95 shadow-sm"
                           >
                             <Share2 className="h-3.5 w-3.5" />
                             <span>Test wa.me Link 🚀</span>
@@ -596,18 +615,17 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
                 </div>
               </div>
             )}
-
           </div>
 
-          {/* Interactive Simulation Action Bar */}
-          <div className="pt-2 flex flex-col sm:flex-row gap-3">
+          {/* Interactive Simulation Action Bar & Bottom Close */}
+          <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2.5">
             {/* Primary Action Button */}
             {currentStep < 3 && (
               <button
                 type="button"
                 onClick={() => handleStep1(true)}
                 disabled={isPlayingAudio}
-                className="flex-1 rounded-2xl bg-gradient-to-r from-cyan-400 via-[#00BAF2] to-blue-500 py-3.5 px-4 text-xs sm:text-sm font-extrabold text-slate-950 hover:brightness-110 shadow-lg shadow-cyan-900/40 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                className="flex-1 rounded-xl bg-[#002E6E] hover:bg-[#001D4A] py-3 px-4 text-xs sm:text-sm font-extrabold text-white shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
               >
                 <Play className={`h-4 w-4 fill-current ${isPlayingAudio ? "animate-spin" : ""}`} />
                 <span>
@@ -623,9 +641,9 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
                 type="button"
                 onClick={handleApprove}
                 disabled={isPlayingAudio}
-                className="flex-1 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 py-3.5 px-4 text-xs sm:text-sm font-black text-slate-950 hover:brightness-110 shadow-xl shadow-emerald-950/50 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 py-3 px-4 text-xs sm:text-sm font-black text-white shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Mic className="h-4 w-4 text-slate-950" />
+                <Mic className="h-4 w-4 text-white" />
                 <span>
                   Speak Voice Approval: &ldquo;{data.approval}&rdquo; (Dispatch ₹30 Offer)
                 </span>
@@ -636,9 +654,9 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
               <button
                 type="button"
                 onClick={handleReset}
-                className="flex-1 rounded-2xl bg-slate-800 hover:bg-slate-700 py-3.5 px-4 text-xs sm:text-sm font-bold text-slate-200 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                className="flex-1 rounded-xl bg-slate-100 hover:bg-slate-200 py-3 px-4 text-xs sm:text-sm font-bold text-slate-800 border border-slate-300 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
               >
-                <RotateCcw className="h-4 w-4 text-cyan-400" />
+                <RotateCcw className="h-4 w-4 text-[#002E6E]" />
                 <span>↺ Replay Eyes-Free Voice Interaction</span>
               </button>
             )}
@@ -652,14 +670,23 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
                   setIsPlayingAudio(false);
                   setActiveSpeaker("idle");
                 }}
-                className="rounded-2xl border border-red-500/40 bg-red-950/30 hover:bg-red-900/50 text-red-300 font-bold text-xs py-3.5 px-4 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                className="rounded-xl border border-red-300 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs py-3 px-4 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <VolumeX className="h-4 w-4" />
                 <span>Stop Speech</span>
               </button>
             )}
-          </div>
 
+            {/* Explicit Close Button in Footer */}
+            <button
+              type="button"
+              onClick={handleClose}
+              className="rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm py-3 px-4 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <X className="h-4 w-4" />
+              <span>Close</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

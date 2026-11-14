@@ -23,7 +23,126 @@ def generate_multilingual_response(
     """
     lang = language.capitalize() if language else "Hinglish"
 
-    if intent == "sales_overview":
+    if intent == "sales_yesterday":
+        rev = data.get("total_revenue", 18450)
+        growth = data.get("revenue_growth_pct", 12.5)
+        txns = data.get("total_transactions", 64)
+        peak = data.get("peak_hour", "7:00 PM - 8:00 PM")
+        peak_cnt = data.get("peak_bills", 34)
+        aov = data.get("avg_order_value", 288.3)
+        sign = "+" if growth >= 0 else ""
+
+        if lang == "Telugu":
+            return (
+                f"📊 **{business_name} - నిన్నటి అమ్మకాల నివేదిక (Yesterday):**\n\n"
+                f"నిన్న మీ దుకాణంలో మొత్తం కలెక్షన్ **₹{int(rev):,}** (మొత్తం **{txns} UPI బిల్లులు**).\n\n"
+                f"• **గరిష్ట రద్దీ సమయం (Peak Rush):** సాయంత్రం {peak} మధ్య అత్యధికంగా {peak_cnt} బిల్లులు నమోదయ్యాయి.\n"
+                f"• **ఆదాయ వృద్ధి (Growth):** గత వారం ఇదే రోజుతో పోలిస్తే `{sign}{growth}%` పెరిగింది.\n"
+                f"• **సగటు బిల్లు విలువ (AOV):** ఒక్కో బిల్లుకు ₹{aov:.1f}.\n\n"
+                f"💡 **వ్యాపార సూచన:** నిన్నటి వ్యాపార వృద్ధి చాలా బాగుంది! ఈ రోజు సాయంత్రం 7:00 గంటల రద్దీ సమయానికి కూడా కౌంటర్‌లో సరుకును సిద్ధంగా ఉంచండి."
+            )
+        elif lang == "Hindi":
+            return (
+                f"📊 **{business_name} - कल की बिक्री रिपोर्ट (Yesterday):**\n\n"
+                f"कल आपकी दुकान का कुल नेट कलेक्शन **₹{int(rev):,}** रहा (कुल **{txns} UPI बिल**)।\n\n"
+                f"• **व्यस्ततम समय (Peak Rush):** शाम {peak} के बीच सर्वाधिक {peak_cnt} बिल बने।\n"
+                f"• **राजस्व वृद्धि (Growth):** पिछले हफ्ते के इसी दिन से `{sign}{growth}%` बेहतर रहा।\n"
+                f"• **औसत बिल मूल्य (AOV):** ₹{aov:.1f} प्रति ग्राहक।\n\n"
+                f"💡 **व्यापार सलाह:** कल की बिक्री काफी मजबूत रही! आज शाम की मुख्य भीड़ के लिए काउंटर पर तैयारी रखें।"
+            )
+        elif lang == "Tamil":
+            return (
+                f"📊 **{business_name} - நேற்றைய விற்பனை அறிக்கை (Yesterday):**\n\n"
+                f"நேற்று உங்கள் கடையின் மொத்த வசூல் **₹{int(rev):,}** (மொத்தம் **{txns} பில்கள்**).\n\n"
+                f"• **அதிக கூட்டம் நேரம் (Peak Rush):** மாலை {peak} இடையே {peak_cnt} பில்கள்.\n"
+                f"• **வருவாய் வளர்ச்சி:** கடந்த வாரத்தை விட `{sign}{growth}%`.\n"
+                f"• **சராசரி பில் மதிப்பு (AOV):** ஒரு பில்லுக்கு ₹{aov:.1f}.\n\n"
+                f"💡 **வணிக ஆலோசனை:** நேற்றைய விற்பனை வளர்ச்சி சிறப்பாக இருந்தது! இன்றைய மாலை நேர கூட்டத்திற்கு தயாராக இருங்கள்."
+            )
+        elif lang == "Kannada":
+            return (
+                f"📊 **{business_name} - ನಿನ್ನೆಯ ಮಾರಾಟ ವರದಿ (Yesterday):**\n\n"
+                f"ನಿನ್ನೆ ನಿಮ್ಮ ಅಂಗಡಿಯ ಒಟ್ಟು ಕಲೆಕ್ಷನ್ **₹{int(rev):,}** (ಒಟ್ಟು **{txns} ಬಿಲ್‌ಗಳು**).\n\n"
+                f"• **ಗರಿಷ್ಠ ವ್ಯಾಪಾರದ ಸಮಯ:** ಸಂಜೆ {peak} ಸಮಯದಲ್ಲಿ {peak_cnt} ಬಿಲ್‌ಗಳು.\n"
+                f"• **ಆದಾಯ ಬೆಳವಣಿಗೆ:** ಕಳೆದ ವಾರದ ಇದೇ ದಿನಕ್ಕೆ ಹೋಲಿಸಿದರೆ `{sign}{growth}%` ಹೆಚ್ಚಳ.\n"
+                f"• **ಸರಾಸರಿ ಬಿಲ್ ಮೌಲ್ಯ (AOV):** ಪ್ರತಿ ಬಿಲ್‌ಗೆ ₹{aov:.1f}.\n\n"
+                f"💡 **ವ್ಯವಹಾರ ಸಲಹೆ:** ನಿನ್ನೆಯ ವ್ಯಾಪಾರ ಬೆಳವಣಿಗೆ ಉತ್ತಮವಾಗಿದೆ! ಇಂದಿನ ಸಂಜೆಯ ರಶ್‌ಗೆ ಸಿದ್ಧವಾಗಿರಿ."
+            )
+        elif lang == "English":
+            return (
+                f"📊 **{business_name} - Yesterday's Sales Report:**\n\n"
+                f"Yesterday's total net collection was **₹{int(rev):,}** across **{txns} verified UPI bills**.\n\n"
+                f"• **Peak Rush Window:** {peak} with {peak_cnt} bills.\n"
+                f"• **Revenue Growth:** `{sign}{growth}%` compared to same day last week.\n"
+                f"• **Average Order Value (AOV):** ₹{aov:.1f} per customer.\n\n"
+                f"💡 **Actionable Tip:** Solid collection yesterday! Ensure counter helpers are ready for today's 7:00 PM rush."
+            )
+        else: # Hinglish
+            return (
+                f"📊 **{business_name} - Kal Ki Sales Report (Yesterday):**\n\n"
+                f"Kal aapki dukaan ka total collection **₹{int(rev):,}** raha across **{txns} UPI bills**.\n\n"
+                f"• **Peak Rush Window:** Shaam {peak} ke beech {peak_cnt} bills complete hue.\n"
+                f"• **Revenue Growth:** Pichle hafte ke mukable `{sign}{growth}%` behtar raha.\n"
+                f"• **Average Order Value (AOV):** ₹{aov:.1f} per customer.\n\n"
+                f"💡 **Dukaan Tip:** Kal ka dhandha badhiya raha! Aaj shaam ke rush window ke liye counter par fast-moving items ready rakhein."
+            )
+
+    elif intent == "sales_today":
+        rev = data.get("total_revenue", 5830)
+        txns = data.get("total_transactions", 42)
+        as_of = data.get("as_of_time", "5:00 PM")
+        aov = data.get("avg_order_value", 138.8)
+
+        if lang == "Telugu":
+            return (
+                f"📊 **{business_name} - నేటి అమ్మకాల నివేదిక (Today till {as_of}):**\n\n"
+                f"ఈ రోజు సాయంత్రం {as_of} వరకు మొత్తం **{txns} UPI బిల్లులు** పూర్తయ్యాయి, మొత్తం కలెక్షన్ **₹{int(rev):,}**.\n\n"
+                f"• **ప్రస్తుత స్థితి:** సాయంత్రం పీక్ రద్దీ సమయం (7:00 PM – 8:00 PM) ప్రారంభం కానుంది.\n"
+                f"• **సగటు బిల్లు విలువ (AOV):** ఒక్కో బిల్లుకు ₹{aov:.1f}.\n\n"
+                f"💡 **వ్యాపార సూచన:** సాయంత్రం రద్దీ ప్రారంభం కానుంది. ఫాస్ట్ మూవింగ్ సరుకులను కౌంటర్ వద్ద సిద్ధంగా ఉంచండి!"
+            )
+        elif lang == "Hindi":
+            return (
+                f"📊 **{business_name} - आज की बिक्री रिपोर्ट (Today till {as_of}):**\n\n"
+                f"आज शाम {as_of} तक दुकान पर कुल **{txns} बिल** पूरे हुए हैं और कुल कलेक्शन **₹{int(rev):,}** रहा है।\n\n"
+                f"• **स्थिति:** शाम की मुख्य भीड़ (7:00 PM - 8:00 PM) अब शुरू होने वाली है।\n"
+                f"• **औसत बिल मूल्य (AOV):** ₹{aov:.1f} प्रति ग्राहक।\n\n"
+                f"💡 **व्यापार सलाह:** शाम का पीक समय आ रहा है, तुरंत बिकने वाले सामान को आगे रखें!"
+            )
+        elif lang == "Tamil":
+            return (
+                f"📊 **{business_name} - இன்றைய விற்பனை அறிக்கை (Today till {as_of}):**\n\n"
+                f"இன்று மாலை {as_of} வரை **{txns} பில்கள்** முடிந்துள்ளன, மொத்த வசூல் **₹{int(rev):,}**.\n\n"
+                f"• **நிலை:** மாலை நேர பீக் ஹவர்ஸ் (7:00 PM - 8:00 PM) இப்போது தொடங்குகிறது.\n"
+                f"• **சராசரி பில் மதிப்பு (AOV):** ₹{aov:.1f}.\n\n"
+                f"💡 **வணிக ஆலோசனை:** மாலை நேர கூட்டத்திற்கு கவுண்டரை தயார் நிலையில் வைக்கவும்!"
+            )
+        elif lang == "Kannada":
+            return (
+                f"📊 **{business_name} - ಇಂದಿನ ಮಾರಾಟ ವರದಿ (Today till {as_of}):**\n\n"
+                f"ಇಂದು ಸಂಜೆ {as_of} ವರೆಗೆ **{txns} ಬಿಲ್‌ಗಳು** ಪೂರ್ಣಗೊಂಡಿವೆ, ಒಟ್ಟು ಸಂಗ್ರಹ **₹{int(rev):,}**.\n\n"
+                f"• **ಸ್ಥಿತಿ:** ಸಂಜೆಯ ಗರಿಷ್ಠ ವ್ಯಾಪಾರದ ಸಮಯ (7:00 PM - 8:00 PM) ಈಗ ಆರಂಭವಾಗುತ್ತಿದೆ.\n"
+                f"• **ಸರಾಸರಿ ಬಿಲ್ ಮೌಲ್ಯ (AOV):** ಪ್ರತಿ ಬಿಲ್‌ಗೆ ₹{aov:.1f}.\n\n"
+                f"💡 **ವ್ಯವಹಾರ ಸಲಹೆ:** ಸಂಜೆಯ ರಶ್ ಆರಂಭವಾಗುತ್ತಿದೆ. ಹೆಚ್ಚು ಮಾರಾಟವಾಗುವ ವಸ್ತುಗಳನ್ನು ಕೌಂಟರ್‌ನಲ್ಲಿ ಸಿದ್ಧವಾಗಿಡಿ!"
+            )
+        elif lang == "English":
+            return (
+                f"📊 **{business_name} - Today's Sales Status (as of {as_of}):**\n\n"
+                f"Till {as_of} today, **{txns} bills** have completed with total collection of **₹{int(rev):,}**.\n\n"
+                f"• **Rush Status:** Evening peak window (7:00 PM – 8:00 PM) is starting now.\n"
+                f"• **Average Order Value (AOV):** ₹{aov:.1f} per bill.\n\n"
+                f"💡 **Actionable Tip:** Evening rush incoming! Keep high-frequency convenience goods upfront."
+            )
+        else: # Hinglish
+            return (
+                f"📊 **{business_name} - Aaj Ki Sales Status (till {as_of}):**\n\n"
+                f"Aaj shaam {as_of} tak aapki dukaan par **{txns} bills** complete ho chuke hain, total collection **₹{int(rev):,}** raha.\n\n"
+                f"• **Rush Status:** Shaam ki bheed (7:00 PM - 8:00 PM) ab shuru hone wali hai.\n"
+                f"• **Average Order Value (AOV):** ₹{aov:.1f} per bill.\n\n"
+                f"💡 **Dukaan Tip:** Shaam ki bheed shuru ho rahi hai. Fast-moving items counter par aage rakhein!"
+            )
+
+    elif intent == "sales_overview":
         rev = data.get("total_revenue", 482500)
         growth = data.get("revenue_growth_pct", 18.0)
         txns = data.get("total_transactions", 1420)
@@ -411,15 +530,56 @@ def run_agentic_query(db: Session, merchant_id: str, query: str, language: str =
         "ನಮಸ್ಕಾರ", "ಹಲೋ", "ನೀವು ಯಾರು"
     ]
 
-    if any(k in query_lower for k in greeting_keywords) and len(query_lower.strip().split()) <= 4:
+    # Detect Timeframe Entities across English, Roman Transliterations & Native Scripts
+    is_yesterday = any(w in query_lower for w in [
+        "yesterday", "yday", "previous day", "last day",
+        "ninna", "ninnati", "ninnane", "ninnana", "నిన్న", "నిన్నటి", "నిన్ననే",
+        "kal", "kal ka", "bite kal", "pichle din", "कल", "कल का", "बीते कल",
+        "netru", "nethu", "netraya", "நேற்று", "நேற்றைய",
+        "ninne", "ninnedina", "ninneya", "ನಿನ್ನೆ", "ನಿನ್ನೆಯ",
+        "okka roju", "okke roju", "mathrame", "mathram", "sirf kal", "only yesterday", "just yesterday", "single day"
+    ])
+
+    is_today = any(w in query_lower for w in [
+        "today", "so far", "current day", "this day",
+        "ee roju", "eroju", "eeroju", "neti", "naati", "ఈ రోజు", "ఈరోజు", "నేటి",
+        "aaj", "aaj ka", "aajki", "aaj ka dhandha", "आज", "आज का", "आज की",
+        "indru", "iniki", "inniku", "இன்று", "இன்றைய",
+        "indu", "ivatthu", "ivattha", "ಇಂದು", "ಇವತ್ತು"
+    ])
+
+    is_week = any(w in query_lower for w in [
+        "7 days", "7d", "week", "this week", "last week", "weekly",
+        "vaaram", "varam", "ee vaaram", "gatha vaaram", "వారం", "ఈ వారం", "గత వారం",
+        "hafta", "hafte", "is hafte", "pichle hafte", "हफ्ता", "इस हफ्ते", "पिछले हफ्ते",
+        "வாரம்", "இந்த வாரம்", "ವಾರ", "ಈ ವಾರ"
+    ])
+
+    is_month = any(w in query_lower for w in [
+        "30 days", "30d", "month", "this month", "last month", "monthly",
+        "nela", "ee nela", "gatha nela", "నెల", "ఈ నెల", "గత నెల",
+        "mahina", "mahine", "is mahine", "महीना", "महीने", "इस महीने",
+        "மாதம்", "இந்த மாதம்", "ತಿಂಗಳು", "ಈ ತಿಂಗಳು"
+    ])
+
+    # Route by extracted intent & timeframe
+    query_words = set(query_lower.strip().split())
+    is_greeting = any(k in query_words or query_lower == k for k in greeting_keywords)
+
+    if is_greeting and len(query_words) <= 3 and not (is_yesterday or is_today or is_week or is_month):
         intent = "greeting"
         tool_executed = "merchant_assistant_greeting"
         tool_data = {}
 
-    elif any(k in query_lower for k in sales_keywords):
-        intent = "sales_overview"
-        tool_executed = "compare_sales_periods(timeframe='30d')"
-        tool_data = compute_overview(db, merchant_id, timeframe="30d")
+    elif is_yesterday:
+        intent = "sales_yesterday"
+        tool_executed = "calc_sales_metrics(timeframe='yesterday')"
+        tool_data = compute_overview(db, merchant_id, timeframe="yesterday")
+
+    elif is_today:
+        intent = "sales_today"
+        tool_executed = "calc_sales_metrics(timeframe='today')"
+        tool_data = compute_overview(db, merchant_id, timeframe="today")
 
     elif any(k in query_lower for k in rush_keywords):
         intent = "peak_hours"
@@ -437,8 +597,18 @@ def run_agentic_query(db: Session, merchant_id: str, query: str, language: str =
         tool_executed = "draft_whatsapp_campaign_recommendation()"
         tool_data = {"type": "slump_booster", "discount_pct": 10}
 
+    elif is_week:
+        intent = "sales_overview"
+        tool_executed = "compare_sales_periods(timeframe='7d')"
+        tool_data = compute_overview(db, merchant_id, timeframe="7d")
+
+    elif is_month or any(k in query_lower for k in sales_keywords):
+        intent = "sales_overview"
+        tool_executed = "compare_sales_periods(timeframe='30d')"
+        tool_data = compute_overview(db, merchant_id, timeframe="30d")
+
     else:
-        intent = "general"
+        intent = "sales_today"
         tool_executed = "calc_sales_metrics(timeframe='today')"
         tool_data = compute_overview(db, merchant_id, timeframe="today")
 
@@ -449,20 +619,27 @@ def run_agentic_query(db: Session, merchant_id: str, query: str, language: str =
     if settings.GEMINI_API_KEY and len(settings.GEMINI_API_KEY.strip()) > 10:
         try:
             import urllib.request
-            model_name = getattr(settings, "GEMINI_MODEL", "gemini-1.5-flash") or "gemini-1.5-flash"
+            model_name = getattr(settings, "GEMINI_MODEL", "gemini-flash-lite-latest") or "gemini-flash-lite-latest"
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={settings.GEMINI_API_KEY}"
+            prompt = (
+                f"You are Vyapaar AI Copilot, a trusted AI business advisor for {business_name}.\n"
+                f"Merchant Query: \"{query}\"\n"
+                f"Target Output Language: {language}\n"
+                f"Verified Deterministic Ledger Data:\n{response_text}\n\n"
+                f"Instructions:\n"
+                f"1. Answer strictly in the requested target language ({language}).\n"
+                f"2. Even if the merchant's query was typed in English, transliterated Roman script (e.g. Telugu/Hindi written in English alphabets), or mixed slang, your output MUST be 100% natural, correct and polished in {language}.\n"
+                f"3. Keep all numbers, rupee amounts (₹), bill counts, and percentages EXACTLY as in the verified data.\n"
+                f"4. Be direct, clear, motivating, and helpful."
+            )
             payload = json.dumps({
-                "contents": [{
-                    "parts": [{
-                        "text": f"You are Vyapaar AI, business partner for {business_name}.\nQuery: {query}\nTarget Language: {language}\nBase Verified Response:\n{response_text}\nRefine or polish this response strictly in {language}. Keep all rupee amounts, percentages and numbers exact."
-                    }]
-                }]
+                "contents": [{"parts": [{"text": prompt}]}]
             }).encode()
-            req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
-            with urllib.request.urlopen(req, timeout=3) as r:
+            req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")
+            with urllib.request.urlopen(req, timeout=6) as r:
                 res_data = json.loads(r.read().decode())
                 refined = res_data["candidates"][0]["content"]["parts"][0]["text"]
-                if refined and len(refined.strip()) > 20:
+                if refined and len(refined.strip()) > 25:
                     response_text = refined
         except Exception:
             pass

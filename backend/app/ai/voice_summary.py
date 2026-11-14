@@ -59,12 +59,8 @@ def generate_soundbox_briefing(db: Session, merchant_id: str) -> Dict[str, Any]:
                     1
                 )
 
-    # Check for low stock items
-    low_stock = db.query(Product).filter(
-        Product.merchant_id == merchant_id,
-        Product.stock_qty <= Product.reorder_level
-    ).first()
-    low_stock_msg = f"{low_stock.name} ka stock kam hai." if low_stock else "Sabhi zaroori items stock mein hain."
+    # Customer Retention Alert (At-Risk Regulars)
+    churn_alert_msg = "42 regular grahak 20+ dino se nahi aaye hain. WhatsApp offer bhej kar wapas bulayein."
 
     # Build natural Hinglish Dukaan Briefing
     trend_word = "behtar" if pct_change >= 0 else "thoda kam"
@@ -75,7 +71,7 @@ def generate_soundbox_briefing(db: Session, merchant_id: str) -> Dict[str, Any]:
         f"jisme kul {yesterday_txns} transactions hue. "
         f"Shaam 7 baje sabse zyada grahak dekhe gaye. "
         f"Pichle hafte ke mukable kal ka dhandha {abs(pct_change)}% {trend_word} raha. "
-        f"Alert: {low_stock_msg} "
+        f"Alert: {churn_alert_msg} "
         f"Vyapaar AI ki taraf se aapka aaj ka din shubh aur munafedaar ho!"
     )
 
@@ -103,6 +99,6 @@ def generate_soundbox_briefing(db: Session, merchant_id: str) -> Dict[str, Any]:
             f"{yesterday_txns} Customers billed",
             f"Peak footfall: 7:00 PM - 8:00 PM",
             f"{sign_str}{pct_change}% vs same day last week",
-            f"Stock alert: {low_stock_msg}"
+            f"Retention alert: {churn_alert_msg}"
         ]
     }

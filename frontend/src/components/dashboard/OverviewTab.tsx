@@ -13,6 +13,10 @@ import {
   Calendar,
   Sparkles,
   Clock,
+  EyeOff,
+  Mic,
+  Volume2,
+  Radio,
 } from "lucide-react";
 import {
   AreaChart,
@@ -25,7 +29,7 @@ import {
 } from "recharts";
 import { formatINR, formatCompactINR } from "@/lib/utils";
 import { OverviewSummary, RevenueTrendPoint } from "@/lib/types";
-import { LoanModal } from "./LoanModal";
+import { EyesFreeModal } from "./EyesFreeModal";
 
 interface OverviewTabProps {
   overview: OverviewSummary | null;
@@ -54,14 +58,14 @@ const OVERVIEW_CONTENT: Record<string, {
   kpiHighLoyalty: string;
   chartTitle: string;
   chartSub: string;
-  loanTitle: string;
-  loanTier: string;
-  loanConsistency: string;
-  loanPreApproved: string;
-  loanRepayment: string;
-  growthTip: React.ReactNode;
+  eyesFreeTitle: string;
+  eyesFreeBadge: string;
+  eyesFreePersona: string;
+  eyesFreeQuery: string;
+  eyesFreeResponse: string;
+  eyesFreeRetentionAlert: string;
   btnCampaign: string;
-  btnApplyLoan: string;
+  btnLaunchEyesFree: string;
 }> = {
   Hindi: {
     tag: "Paytm साउंडबॉक्स इंटेलिजेंस सक्रिय",
@@ -81,14 +85,14 @@ const OVERVIEW_CONTENT: Record<string, {
     kpiHighLoyalty: "मजबूत ग्राहक निष्ठा",
     chartTitle: "दैनिक बिक्री और वॉल्यूम ट्रेंड",
     chartSub: "180-दिनों का सत्यापित खाता लेजर",
-    loanTitle: "Paytm वर्किंग कैपिटल",
-    loanTier: "प्राइम टियर",
-    loanConsistency: "उत्कृष्ट कैश फ्लो निरंतरता (92%)",
-    loanPreApproved: "प्री-अप्रूव्ड लोन लिमिट",
-    loanRepayment: "साउंडबॉक्स UPI सेटलमेंट के माध्यम से दैनिक आसान किस्तों में भुगतान।",
-    growthTip: <><strong>💡 ग्रोथ टिप:</strong> अगले 12 दिनों तक ₹15,000+ की दैनिक बिक्री बनाए रखें और <strong>₹3,50,000</strong> की लोन लिमिट अनलॉक करें!</>,
+    eyesFreeTitle: "स्क्रीन-फ्री वॉयस कोपायलट",
+    eyesFreeBadge: "समावेशी भारत AI",
+    eyesFreePersona: "वेंकट जी (58 वर्ष • कम दृष्टि वाले दुकानदार, हैदराबाद)",
+    eyesFreeQuery: "आज कुल कितना कलेक्शन हुआ?",
+    eyesFreeResponse: "85 ट्रांजेक्शन • ₹9,420 कलेक्शन। शाम को भीड़ रही।",
+    eyesFreeRetentionAlert: "राजेश जी 22 दिनों से नहीं आए। क्या ₹30 का ऑफर भेजें?",
     btnCampaign: "व्हाट्सएप ऑफर से बिक्री बढ़ाएं",
-    btnApplyLoan: "प्री-अप्रूव्ड लोन आवेदन देखें (₹2.5L)",
+    btnLaunchEyesFree: "🎙️ वॉयस डेमो शुरू करें (Scenario 3)",
   },
   Telugu: {
     tag: "Paytm సౌండ్‌బాక్స్ ఇంటెలిజెన్స్ యాక్టివ్",
@@ -108,14 +112,14 @@ const OVERVIEW_CONTENT: Record<string, {
     kpiHighLoyalty: "అధిక కస్టమర్ లాయల్టీ",
     chartTitle: "రోజువారీ కలెక్షన్ వేగం & పరిమాణం",
     chartSub: "180 రోజుల నిరంతర లెడ్జర్ విశ్లేషణ",
-    loanTitle: "Paytm గ్రోత్ లోన్",
-    loanTier: "ప్రైమ్ టైర్",
-    loanConsistency: "అద్భుతమైన నగదు ప్రవాహ స్థిరత్వం (92%)",
-    loanPreApproved: "ప్రీ-అప్రూవ్డ్ లోన్ లిమిట్",
-    loanRepayment: "సౌండ్‌బాక్స్ UPI సెటిల్మెంట్ల ద్వారా రోజువారీ సులభ కిస్తీలు.",
-    growthTip: <><strong>💡 వృద్ధి చిట్కా:</strong> మరో 12 రోజులు ₹15,000+ రోజువారీ సేల్స్ కొనసాగించండి, <strong>₹3,50,000</strong> లోన్ లిమిట్ అన్‌లాక్ చేయండి!</>,
+    eyesFreeTitle: "స్క్రీన్-ఫ్రీ వాయిస్ కోపైలట్",
+    eyesFreeBadge: "సమ్మిళిత భారత్ AI",
+    eyesFreePersona: "వెంకట్ గారు (58 ఏళ్ళు • కంటి చూపు లోపం, హైదరాబాద్)",
+    eyesFreeQuery: "ఈ రోజు మొత్తం ఎంత కలెక్షన్ అయింది?",
+    eyesFreeResponse: "85 లావాదేవీలు • ₹9,420 కలెక్షన్. సాయంత్రం రద్దీ ఎక్కువ.",
+    eyesFreeRetentionAlert: "రాజేష్ గారు గత 22 రోజులుగా రాలేదు. ₹30 ఆఫర్ పంపమంటారా?",
     btnCampaign: "వాట్సాప్ ఆఫర్‌తో అమ్మకాలు పెంచండి",
-    btnApplyLoan: "ప్రీ-అప్రూవ్డ్ లోన్ దరఖాస్తు చేయండి (₹2.5L)",
+    btnLaunchEyesFree: "🎙️ వాయిస్ డెమో ప్రారంభించండి (Scenario 3)",
   },
   Tamil: {
     tag: "Paytm சவுண்ட்பாக்ஸ் நுண்ணறிவு செயலில் உள்ளது",
@@ -135,14 +139,14 @@ const OVERVIEW_CONTENT: Record<string, {
     kpiHighLoyalty: "வாடிக்கையாளர் விசுவாசம்",
     chartTitle: "தினசரி வசூல் வேகம் மற்றும் அளவு",
     chartSub: "180 நாள் தொடர்ச்சியான கணக்கு",
-    loanTitle: "Paytm வணிக கடன்",
-    loanTier: "முதன்மை நிலை",
-    loanConsistency: "சிறந்த பணப்புழக்க நிலைத்தன்மை (92%)",
-    loanPreApproved: "முன்-அங்கீகரிக்கப்பட்ட கடன் வரம்பு",
-    loanRepayment: "சவுண்ட்பாக்ஸ் UPI தீர்வுகள் மூலம் தினசரி எளிதான தவணைகள்.",
-    growthTip: <><strong>💡 வளர்ச்சி உதவிக்குறிப்பு:</strong> அடுத்த 12 நாட்களுக்கு ₹15,000+ தினசரி விற்பனையைத் தக்கவைத்து <strong>₹3,50,000</strong> கடன் வரம்பைப் பெறுங்கள்!</>,
+    eyesFreeTitle: "ஸ்கிரீன்-ஃப்ரீ வாய்ஸ் அசிஸ்டண்ட்",
+    eyesFreeBadge: "பாரத் அணுகல் AI",
+    eyesFreePersona: "வெங்கட் அவர்கள் (58 வயது • பார்வைக் குறைபாடுள்ள வணிகர்)",
+    eyesFreeQuery: "இன்று மொத்த வசூல் எவ்வளவு?",
+    eyesFreeResponse: "85 பரிவர்த்தனைகள் • ₹9,420 வசூல். மாலையில் கூட்டம் அதிகம்.",
+    eyesFreeRetentionAlert: "ராஜேஷ் அவர்கள் 22 நாட்களாக வரவில்லை. சலுகை அனுப்பவா?",
     btnCampaign: "வாட்ஸ்அப் சலுகை மூலம் விற்பனையை அதிகரிக்கவும்",
-    btnApplyLoan: "முன்-அங்கீகரிக்கப்பட்ட கடன் பெறுங்கள் (₹2.5L)",
+    btnLaunchEyesFree: "🎙️ வாய்ஸ் டெமோ தொடங்கவும் (Scenario 3)",
   },
   Kannada: {
     tag: "Paytm ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಇಂಟೆಲಿಜೆನ್ಸ್ ಸಕ್ರಿಯವಾಗಿದೆ",
@@ -162,14 +166,14 @@ const OVERVIEW_CONTENT: Record<string, {
     kpiHighLoyalty: "ಗ್ರಾಹಕರ ನಿಷ್ಠೆ",
     chartTitle: "ದೈನಂದಿನ ಸಂಗ್ರಹ ವೇಗ ಮತ್ತು ಪ್ರಮಾಣ",
     chartSub: "180 ದಿನಗಳ ನಿರಂತರ ಲೆಡ್ಜರ್",
-    loanTitle: "Paytm ಬಂಡವಾಳ ಸಾಲ",
-    loanTier: "ಪ್ರೈಮ್ ಶ್ರೇಣಿ",
-    loanConsistency: "ಅತ್ಯುತ್ತಮ ನಗದು ಹರಿವಿನ ಸ್ಥಿರತೆ (92%)",
-    loanPreApproved: "ಪೂರ್ವ-ಅನುಮೋದಿತ ಸಾಲದ ಮಿತಿ",
-    loanRepayment: "ಸೌಂಡ್‌ಬಾಕ್ಸ್ UPI ಮೂಲಕ ಸುಲಭ ದೈನಂದಿನ ಮರುಪಾವತಿ.",
-    growthTip: <><strong>💡 ಬೆಳವಣಿಗೆಯ ಸಲಹೆ:</strong> ಮುಂದಿನ 12 ದಿನಗಳಲ್ಲಿ ₹15,000+ ಸರಾಸರಿ ಕಾಯ್ದುಕೊಳ್ಳಿ, <strong>₹3,50,000</strong> ಸಾಲದ ಮಿತಿ ಪಡೆಯಿರಿ!</>,
+    eyesFreeTitle: "ಸ್ಕ್ರೀನ್-ಫ್ರೀ ವಾಯ್ಸ್ ಸಹಾಯಕ",
+    eyesFreeBadge: "ಭಾರತ ಪ್ರವೇಶಿಸುವಿಕೆ AI",
+    eyesFreePersona: "ವೆಂಕಟ್ ಅವರು (58 ವರ್ಷ • ದೃಷ್ಟಿ ದೋಷವಿರುವ ಅಂಗಡಿಯವರು)",
+    eyesFreeQuery: "ಇಂದು ಒಟ್ಟು ಎಷ್ಟು ಕಲೆಕ್ಷನ್ ಆಗಿದೆ?",
+    eyesFreeResponse: "85 ವಹಿವಾಟುಗಳು • ₹9,420 ಸಂಗ್ರಹ. ಸಂಜೆ ವ್ಯಾಪಾರ ಹೆಚ್ಚು.",
+    eyesFreeRetentionAlert: "ರಾಜೇಶ್ 22 ದಿನಗಳಿಂದ ಬಂದಿಲ್ಲ. ಆಫರ್ ಕಳುಹಿಸಬೇಕೆ?",
     btnCampaign: "ವಾಟ್ಸಾಪ್ ಆಫರ್‌ನೊಂದಿಗೆ ಮಾರಾಟ ಹೆಚ್ಚಿಸಿ",
-    btnApplyLoan: "ಪೂರ್ವ-ಅನುಮೋದಿತ ಸಾಲ ಪಡೆಯಿರಿ (₹2.5L)",
+    btnLaunchEyesFree: "🎙️ ಧ್ವನಿ ಡೆಮೊ ಪ್ರಾರಂಭಿಸಿ (Scenario 3)",
   },
   English: {
     tag: "Paytm Soundbox Intelligence Active",
@@ -189,14 +193,14 @@ const OVERVIEW_CONTENT: Record<string, {
     kpiHighLoyalty: "High Dukaan Loyalty",
     chartTitle: "Daily Collection Velocity & Volume",
     chartSub: "180-day continuous ledger calculated deterministically",
-    loanTitle: "Paytm Growth Capital",
-    loanTier: "Prime Tier",
-    loanConsistency: "Excellent Cash Flow Consistency (92%)",
-    loanPreApproved: "Pre-Approved Collateral-Free Limit",
-    loanRepayment: "Eligible for daily micro-repayment via Soundbox UPI settlements.",
-    growthTip: <><strong>💡 Growth Tip:</strong> Maintain ₹15,000+ daily average for 12 more days to unlock the <strong>₹3,50,000</strong> loan bracket!</>,
+    eyesFreeTitle: "Eyes-Free Voice Copilot",
+    eyesFreeBadge: "Inclusive Bharat AI",
+    eyesFreePersona: "Venkat ji (58 yrs • Low Vision Store Owner, Hyderabad)",
+    eyesFreeQuery: "How much was today's total collection?",
+    eyesFreeResponse: "85 Transactions • ₹9,420 Collection. Peak rush evening.",
+    eyesFreeRetentionAlert: "Rajesh hasn't visited in 22 days. Send ₹30 coupon?",
     btnCampaign: "Boost Sales with WhatsApp Offer",
-    btnApplyLoan: "Apply for ₹2,50,000 Loan (Instant)",
+    btnLaunchEyesFree: "🎙️ Launch Eyes-Free Voice Demo (Scenario 3)",
   },
   Hinglish: {
     tag: "Paytm Soundbox Intelligence Active",
@@ -216,14 +220,14 @@ const OVERVIEW_CONTENT: Record<string, {
     kpiHighLoyalty: "High Dukaan Loyalty",
     chartTitle: "Daily Collection Velocity & Volume",
     chartSub: "180-day continuous ledger calculated deterministically",
-    loanTitle: "Paytm Growth Capital",
-    loanTier: "Prime Tier",
-    loanConsistency: "Excellent Cash Flow Consistency (92%)",
-    loanPreApproved: "Pre-Approved Collateral-Free Limit",
-    loanRepayment: "Soundbox UPI settlements ke zariye rozana aasan micro-repayment.",
-    growthTip: <><strong>💡 Growth Tip:</strong> Agle 12 din ₹15,000+ daily average maintain karein aur <strong>₹3,50,000</strong> loan bracket unlock karein!</>,
+    eyesFreeTitle: "Eyes-Free Voice Copilot",
+    eyesFreeBadge: "Inclusive Bharat AI",
+    eyesFreePersona: "Venkat ji (58 yrs • Low Vision Store Owner, Hyderabad)",
+    eyesFreeQuery: "Aaj kul kitna collection hua?",
+    eyesFreeResponse: "85 Transactions • ₹9,420 Collection. Shaam ko rush tha.",
+    eyesFreeRetentionAlert: "Rajesh ji 22 din se nahi aaye. ₹30 ka offer bhejein?",
     btnCampaign: "WhatsApp Offer se Sales Badhayein",
-    btnApplyLoan: "Apply for ₹2.5L Pre-Approved Loan",
+    btnLaunchEyesFree: "🎙️ Launch Eyes-Free Voice Demo (Scenario 3)",
   },
 };
 
@@ -237,7 +241,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
 }) => {
   const content = OVERVIEW_CONTENT[language] || OVERVIEW_CONTENT.Hinglish;
   const [timeframe, setTimeframe] = useState<"7d" | "30d" | "90d">("30d");
-  const [isLoanModalOpen, setIsLoanModalOpen] = useState<boolean>(false);
+  const [isEyesFreeModalOpen, setIsEyesFreeModalOpen] = useState<boolean>(false);
 
   const totalRev = overview?.total_revenue ?? 482500;
   const revGrowth = overview?.revenue_growth_pct ?? 14.2;
@@ -451,72 +455,74 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           </div>
         </div>
 
-        {/* Right 1 Col: Paytm Merchant Loan Readiness Meter */}
-        <div className="rounded-2xl border border-blue-200/80 bg-gradient-to-b from-blue-50/50 via-white to-white p-6 shadow-sm flex flex-col justify-between">
+        {/* Right 1 Col: Scenario 3 - Eyes-Free Voice Operating Copilot */}
+        <div className="rounded-2xl border-2 border-cyan-500/50 bg-gradient-to-b from-slate-900 via-slate-900 to-[#002E6E] p-6 text-white shadow-xl flex flex-col justify-between relative overflow-hidden">
+          {/* Ambient Glow */}
+          <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-cyan-500/10 blur-2xl pointer-events-none" />
+
           <div>
             <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#002E6E]">
-                <ShieldCheck className="h-4 w-4 text-[#00BAF2]" />
-                {content.loanTitle}
+              <span className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-cyan-300">
+                <EyeOff className="h-4 w-4 text-cyan-400" />
+                {content.eyesFreeTitle}
               </span>
-              <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800">
-                {content.loanTier}
+              <span className="rounded-full bg-cyan-400/20 text-cyan-200 border border-cyan-400/30 px-2.5 py-0.5 text-[11px] font-bold">
+                {content.eyesFreeBadge}
               </span>
             </div>
 
-            {/* Score Ring / Bar */}
-            <div className="mt-5 text-center">
-              <span className="text-4xl font-extrabold tracking-tight text-[#002E6E]">
-                {loanScore}
+            {/* Persona Tag */}
+            <div className="mt-4 rounded-xl bg-slate-800/80 border border-slate-700/80 p-3">
+              <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400 block">
+                Scenario 3 Store Persona:
               </span>
-              <span className="text-sm font-semibold text-slate-400"> / 900</span>
-              <p className="mt-1 text-xs font-semibold text-emerald-600">
-                {content.loanConsistency}
+              <p className="mt-0.5 text-xs font-bold text-white">
+                {content.eyesFreePersona}
               </p>
+              <span className="text-[10px] text-cyan-300 font-semibold mt-1 block">
+                • 100% Screen-Free • Native Audio Only
+              </span>
             </div>
 
-            <div className="mt-4 h-2.5 w-full rounded-full bg-slate-100 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-[#002E6E] via-[#00BAF2] to-emerald-500"
-                style={{ width: `${(loanScore / 900) * 100}%` }}
-              />
-            </div>
+            {/* Audio Dialogue Snippet */}
+            <div className="mt-4 space-y-2.5 text-xs">
+              <div className="rounded-xl bg-slate-950/70 border border-slate-800 p-2.5">
+                <span className="text-[10px] text-slate-400 font-semibold flex items-center gap-1">
+                  <Mic className="h-3 w-3 text-cyan-400" /> Merchant Speaks Aloud:
+                </span>
+                <p className="mt-1 font-bold text-slate-100">&ldquo;{content.eyesFreeQuery}&rdquo;</p>
+              </div>
 
-            {/* Pre-approved offer */}
-            <div className="mt-6 rounded-xl border border-slate-200 bg-white p-4">
-              <p className="text-xs font-medium text-slate-500">
-                {content.loanPreApproved}:
-              </p>
-              <p className="mt-1 text-2xl font-black text-[#0A1120]">
-                {formatINR(loanLimit)}
-              </p>
-              <p className="mt-2 text-[11px] text-slate-500 leading-relaxed">
-                {content.loanRepayment}
-              </p>
-            </div>
+              <div className="rounded-xl bg-cyan-950/40 border border-cyan-500/30 p-2.5">
+                <span className="text-[10px] text-cyan-300 font-semibold flex items-center gap-1">
+                  <Radio className="h-3 w-3 text-[#00BAF2]" /> Soundbox Voice Answer:
+                </span>
+                <p className="mt-1 font-semibold text-slate-200">{content.eyesFreeResponse}</p>
+              </div>
 
-            {/* AI Recommendation tip */}
-            <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200/70 p-3 text-xs text-amber-900">
-              {content.growthTip}
+              <div className="rounded-xl bg-amber-950/40 border border-amber-500/30 p-2.5">
+                <span className="text-[10px] text-amber-300 font-bold flex items-center gap-1">
+                  <Sparkles className="h-3 w-3 text-amber-400" /> Retention Prompt:
+                </span>
+                <p className="mt-0.5 text-[11px] font-medium text-amber-100">&ldquo;{content.eyesFreeRetentionAlert}&rdquo;</p>
+              </div>
             </div>
           </div>
 
           <button
-            onClick={() => setIsLoanModalOpen(true)}
-            className="mt-6 w-full rounded-xl bg-gradient-to-r from-[#002E6E] via-[#004098] to-[#00BAF2] py-3 text-xs font-black text-white hover:brightness-110 transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
+            onClick={() => setIsEyesFreeModalOpen(true)}
+            className="mt-6 w-full rounded-xl bg-gradient-to-r from-cyan-400 via-[#00BAF2] to-blue-500 py-3 text-xs font-black text-slate-950 hover:brightness-110 transition shadow-lg shadow-cyan-950/50 active:scale-95 flex items-center justify-center gap-1.5"
           >
-            <ShieldCheck className="h-4 w-4" />
-            {content.btnApplyLoan}
+            <Volume2 className="h-4 w-4" />
+            {content.btnLaunchEyesFree}
           </button>
         </div>
       </div>
 
-      {/* Interactive Loan Disbursal & Daily Micro-Repayment Flow Modal */}
-      <LoanModal
-        isOpen={isLoanModalOpen}
-        onClose={() => setIsLoanModalOpen(false)}
-        loanScore={loanScore}
-        maxLimit={loanLimit}
+      {/* Interactive Scenario 3: Eyes-Free Voice Copilot Modal */}
+      <EyesFreeModal
+        isOpen={isEyesFreeModalOpen}
+        onClose={() => setIsEyesFreeModalOpen(false)}
         language={language}
       />
     </div>

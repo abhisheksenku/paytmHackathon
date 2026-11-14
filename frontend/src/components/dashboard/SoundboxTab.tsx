@@ -31,49 +31,49 @@ export const BRIEFING_SCRIPTS: Record<
     label: "हिंदी (Hindi)",
     langCode: "hi-IN",
     native:
-      "नमस्ते शर्मा जी! कल आपकी दुकान का कुल कलेक्शन ₹18,450 रहा, जिसमें कुल 34 ट्रांजेक्शन हुए। शाम 7 बजे सबसे ज्यादा भीड़ देखी गई। पिछले हफ्ते के मुकाबले कल का व्यापार 12.5% बेहतर रहा। अलर्ट: अमूल बटर का स्टॉक कम है। व्यापार AI की तरफ से आपका आज का दिन शुभ और मुनाफेदार हो!",
+      "नमस्ते शर्मा जी! कल आपकी दुकान का कुल कलेक्शन ₹18,450 रहा, जिसमें कुल 34 ट्रांजेक्शन हुए। शाम 7 बजे सबसे ज्यादा भीड़ देखी गई। पिछले हफ्ते के मुकाबले कल का व्यापार 12.5% बेहतर रहा। अलर्ट: 42 नियमित ग्राहक 20+ दिनों से नहीं आए हैं, उन्हें व्हाट्सएप डिस्काउंट भेजें। व्यापार AI की तरफ से आपका आज का दिन शुभ और मुनाफेदार हो!",
     phonetic:
-      "Namaste Sharma ji! Kal aapki dukaan ka kul collection atharah hazaar chaar sau pachaas rupaye raha, jisme kul chauthis transactions hue. Shaam saat baje sabse zyada bheed dekhi gayi. Pichle hafte ke mukable kal ka dhandha baarah point paanch percent behtar raha. Alert: Amul butter ka stock kam hai. Vyapaar AI ki taraf se aapka aaj ka din shubh aur munafedaar ho!",
+      "Namaste Sharma ji! Kal aapki dukaan ka kul collection atharah hazaar chaar sau pachaas rupaye raha, jisme kul chauthis transactions hue. Shaam saat baje sabse zyada bheed dekhi gayi. Pichle hafte ke mukable kal ka dhandha baarah point paanch percent behtar raha. Alert: Byalees regular grahak bees dino se nahi aaye hain, unhe WhatsApp discount bhejein. Vyapaar AI ki taraf se aapka aaj ka din shubh aur munafedaar ho!",
   },
   Telugu: {
     label: "తెలుగు (Telugu)",
     langCode: "te-IN",
     native:
-      "నమస్కారం శర్మ గారూ! నిన్న మీ దుకాణం మొత్తం కలెక్షన్ ₹18,450, ఇందులో మొత్తం 34 లావాదేవీలు జరిగాయి. సాయంత్రం 7 గంటలకు అత్యధిక రద్దీ కనిపించింది. గత వారంతో పోలిస్తే నిన్నటి వ్యాపారం 12.5% పెరిగింది. అలర్ట్: అమూల్ బటర్ స్టాక్ తక్కువగా ఉంది. వ్యాపార్ AI తరపున మీకు శుభదినం మరియు లాభదాయకమైన రోజు కావాలని కోరుకుంటున్నాము!",
+      "నమస్కారం శర్మ గారూ! నిన్న మీ దుకాణం మొత్తం కలెక్షన్ ₹18,450, ఇందులో మొత్తం 34 లావాదేవీలు జరిగాయి. సాయంత్రం 7 గంటలకు అత్యధిక రద్దీ కనిపించింది. గత వారంతో పోలిస్తే నిన్నటి వ్యాపారం 12.5% పెరిగింది. అలర్ట్: 42 మంది రెగ్యులర్ కస్టమర్లు 20 రోజులుగా రాలేదు, వారికి వాట్సాప్ ఆఫర్ పంపండి. వ్యాపార్ AI తరపున మీకు శుభదినం మరియు లాభదాయకమైన రోజు కావాలని కోరుకుంటున్నాము!",
     phonetic:
-      "Namaskaram Sharma gaaru! Ninna mee dukaanam motham collection padhenimidi vela naalugu vandhala yaabhai rupayalu, andulo motham mupphai naalugu transactions jarigaayi. Saayantram yedu gantlaku athyadhika raddi kanipinchindi. Gatha vaaram tho polisthe ninna vyaapaaram baarah point paanch percent perigindi. Alert: Amul butter stock thakkuvaga undi. Vyapaar AI tharapuna meeku shubhadhinam mariyu laabhadaayakamaina roju kaavaalani korukuntunnaamu!",
+      "Namaskaram Sharma gaaru! Ninna mee dukaanam motham collection padhenimidi vela naalugu vandhala yaabhai rupayalu, andulo motham mupphai naalugu transactions jarigaayi. Saayantram yedu gantlaku athyadhika raddi kanipinchindi. Gatha vaaram tho polisthe ninna vyaapaaram baarah point paanch percent perigindi. Alert: Nalabhai rendu mandi regular customers iravai rojuluga raaledhu, vaariki WhatsApp offer pampandi. Vyapaar AI tharapuna meeku shubhadhinam mariyu laabhadaayakamaina roju kaavaalani korukuntunnaamu!",
   },
   Tamil: {
     label: "தமிழ் (Tamil)",
     langCode: "ta-IN",
     native:
-      "வணக்கம் சர்மா அவர்களே! நேற்று உங்கள் கடையின் மொத்த வசூல் ₹18,450 (34 பரிவர்த்தனைகள்). மாலை 7 மணிக்கு அதிக கூட்டம் இருந்தது. கடந்த வாரத்தை விட நேற்று விற்பனை 12.5% அதிகரித்துள்ளது. வியாபார் AI சார்பாக இனிய நாளாக அமைய வாழ்த்துகள்!",
+      "வணக்கம் சர்மா அவர்களே! நேற்று உங்கள் கடையின் மொத்த வசூல் ₹18,450 (34 பரிவர்த்தனைகள்). மாலை 7 மணிக்கு அதிக கூட்டம் இருந்தது. கடந்த வாரத்தை விட நேற்று விற்பனை 12.5% அதிகரித்துள்ளது. எச்சரிக்கை: 42 வழக்கமான வாடிக்கையாளர்கள் 20 நாட்களாக வரவில்லை, வாட்ஸ்அப் சலுகை அனுப்பவும்! வியாபார் AI சார்பாக இனிய நாளாக அமைய வாழ்த்துகள்!",
     phonetic:
-      "Vanakkam Sharma avargale! Netru ungal kadayin motha vasool padhinettu aayirathu naanoothu aimbadhu roobai, idhil muppathi naangu parivarthanaigal nadanthana. Maalai yezhu manikku adhigam koottam irundhadhu. Kadandha vaarathai vida netru vilpanai baarah point paanch percent adhigarithulladhu. Vyapaar AI saarbaaga iniya naal aamaia vaazhthukkal!",
+      "Vanakkam Sharma avargale! Netru ungal kadayin motha vasool padhinettu aayirathu naanoothu aimbadhu roobai, idhil muppathi naangu parivarthanaigal nadanthana. Maalai yezhu manikku adhigam koottam irundhadhu. Kadandha vaarathai vida netru vilpanai baarah point paanch percent adhigarithulladhu. Echharikkai: Naarpadhu irandu regular customers irubadhu naatkalaga varavillai. Vyapaar AI saarbaaga iniya naal aamaia vaazhthukkal!",
   },
   Kannada: {
     label: "ಕನ್ನಡ (Kannada)",
     langCode: "kn-IN",
     native:
-      "ನಮಸ್ಕಾರ ಶರ್ಮಾ ಅವರೇ! ನಿನ್ನೆ ನಿಮ್ಮ ಅಂಗಡಿಯ ಒಟ್ಟು ಸಂಗ್ರಹ ₹18,450, ಇದರಲ್ಲಿ 34 ವಹಿವಾಟುಗಳು ನಡೆದಿವೆ. ಸಂಜೆ 7 ಗಂಟೆಗೆ ಗರಿಷ್ಠ ವ್ಯಾಪಾರ ದಾಖಲಾಗಿದೆ. ಕಳೆದ ವಾರಕ್ಕಿಂತ ವ್ಯಾಪಾರ 12.5% ಹೆಚ್ಚಾಗಿದೆ. ವ್ಯಾಪಾರ AI ವತಿಯಿಂದ ನಿಮಗೆ ಶುಭ ದಿನ!",
+      "ನಮಸ್ಕಾರ ಶರ್ಮಾ ಅವರೇ! ನಿನ್ನೆ ನಿಮ್ಮ ಅಂಗಡಿಯ ಒಟ್ಟು ಸಂಗ್ರಹ ₹18,450, ಇದರಲ್ಲಿ 34 ವಹಿವಾಟುಗಳು ನಡೆದಿವೆ. ಸಂಜೆ 7 ಗಂಟೆಗೆ ಗರಿಷ್ಠ ವ್ಯಾಪಾರ ದಾಖಲಾಗಿದೆ. ಕಳೆದ ವಾರಕ್ಕಿಂತ ವ್ಯಾಪಾರ 12.5% ಹೆಚ್ಚಾಗಿದೆ. ಎಚ್ಚರಿಕೆ: 42 ನಿಯಮಿತ ಗ್ರಾಹಕರು 20 ದಿನಗಳಿಂದ ಬಂದಿಲ್ಲ, ವಾಟ್ಸಾಪ್ ರಿಯಾಯಿತಿ ನೀಡಿ! ವ್ಯಾಪಾರ AI ವತಿಯಿಂದ ನಿಮಗೆ ಶುಭ ದಿನ!",
     phonetic:
-      "Namaskara Sharma avare! Ninne nimma angadiya sangraha hadinentu saavirada naanoora aivathu roopayi, idharalli moovathu naalku vahivaatugalu nadadhive. Sanje yelu gantege garishtha vyaapaara dhaakhalagidhe. Kaledha vaarakkintha vyaapaara baarah point paanch percent hechhaagidhe. Vyapaar AI vathiyinda nimge shubha dina!",
+      "Namaskara Sharma avare! Ninne nimma angadiya sangraha hadinentu saavirada naanoora aivathu roopayi, idharalli moovathu naalku vahivaatugalu nadadhive. Sanje yelu gantege garishtha vyaapaara dhaakhalagidhe. Kaledha vaarakkintha vyaapaara baarah point paanch percent hechhaagidhe. Eccharike: Nalavattheradu regular grahakaru ippatthu dinagalinda bandilla. Vyapaar AI vathiyinda nimge shubha dina!",
   },
   English: {
     label: "English",
     langCode: "en-IN",
     native:
-      "Good morning Sharma ji! Yesterday your store collection was ₹18,450 across 34 transactions. Peak footfall was observed at 7:00 PM. Sales grew by 12.5% compared to last week. Alert: Amul Butter stock is running low. Vyapaar AI wishes you a profitable business day ahead!",
+      "Good morning Sharma ji! Yesterday your store collection was ₹18,450 across 34 transactions. Peak footfall was observed at 7:00 PM. Sales grew by 12.5% compared to last week. Alert: 42 regular customers have not visited in 20+ days. Send them a WhatsApp re-engagement offer. Vyapaar AI wishes you a profitable business day ahead!",
     phonetic:
-      "Good morning Sharma ji! Yesterday your store collection was eighteen thousand four hundred fifty rupees across thirty-four transactions. Peak footfall was observed at 7:00 PM. Sales grew by 12.5% compared to last week. Alert: Amul Butter stock is running low. Vyapaar AI wishes you a profitable business day ahead!",
+      "Good morning Sharma ji! Yesterday your store collection was eighteen thousand four hundred fifty rupees across thirty-four transactions. Peak footfall was observed at 7:00 PM. Sales grew by 12.5% compared to last week. Alert: Forty-two regular customers have not visited in twenty days. Send them a WhatsApp offer. Vyapaar AI wishes you a profitable business day ahead!",
   },
   Hinglish: {
     label: "Hinglish",
     langCode: "hi-IN",
     native:
-      "Namaste Sharma ji! Kal aapki dukaan ka total collection ₹18,450 raha, jisme kul 34 transactions hue. Shaam 7 baje sabse zyada bheed dekhi gayi. Pichle hafte ke mukable kal ka dhandha 12.5% behtar raha. Alert: Amul Butter ka stock kam hai. Vyapaar AI ki taraf se aapka aaj ka din shubh aur munafedaar ho!",
+      "Namaste Sharma ji! Kal aapki dukaan ka total collection ₹18,450 raha, jisme kul 34 transactions hue. Shaam 7 baje sabse zyada bheed dekhi gayi. Pichle hafte ke mukable kal ka dhandha 12.5% behtar raha. Alert: 42 regular grahak 20+ dino se nahi aaye hain, unhe WhatsApp discount bhej kar wapas bulayein. Vyapaar AI ki taraf se aapka aaj ka din shubh aur munafedaar ho!",
     phonetic:
-      "Namaste Sharma ji! Kal aapki dukaan ka total collection atharah hazaar chaar sau pachaas rupaye raha, jisme kul chauthis transactions hue. Shaam saat baje sabse zyada bheed dekhi gayi. Pichle hafte ke mukable kal ka dhandha baarah point paanch percent behtar raha. Alert: Amul Butter ka stock kam hai. Vyapaar AI ki taraf se aapka aaj ka din shubh aur munafedaar ho!",
+      "Namaste Sharma ji! Kal aapki dukaan ka total collection atharah hazaar chaar sau pachaas rupaye raha, jisme kul chauthis transactions hue. Shaam saat baje sabse zyada bheed dekhi gayi. Pichle hafte ke mukable kal ka dhandha baarah point paanch percent behtar raha. Alert: Byalees regular grahak bees dino se nahi aaye hain, unhe WhatsApp discount bhejein. Vyapaar AI ki taraf se aapka aaj ka din shubh aur munafedaar ho!",
   },
 };
 

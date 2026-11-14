@@ -37,6 +37,7 @@ export interface CustomerProfile {
   name: string;
   masked_vpa: string;
   masked_phone: string;
+  phone?: string;
   segment: string;
   frequency_label: string;
   days_ago: number;

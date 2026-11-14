@@ -134,14 +134,41 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const copilotAudioRef = useRef<HTMLAudioElement | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isListeningRef = useRef<boolean>(false);
+  const recognitionRef = useRef<any>(null);
+  const transcriptRef = useRef<string>("");
 
-  // Stop speech synthesis/audio if user unmounts or leaves tab
+  const cleanupListening = () => {
+    isListeningRef.current = false;
+    setIsListening(false);
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+    if (mediaStreamRef.current) {
+      try {
+        mediaStreamRef.current.getTracks().forEach((t) => t.stop());
+      } catch (e) {}
+      mediaStreamRef.current = null;
+    }
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {}
+      recognitionRef.current = null;
+    }
+  };
+
+  // Stop speech synthesis/audio and mic if user unmounts or leaves tab
   useEffect(() => {
     return () => {
       if (copilotAudioRef.current) {
         copilotAudioRef.current.pause();
       }
       stopSpeech();
+      cleanupListening();
     };
   }, []);
 
@@ -212,42 +239,111 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
     }
   }, [initialPrompt]);
 
-  // Web Speech API Voice Recognition (100% Free, Browser Native)
-  const toggleVoiceInput = () => {
+  // Web Speech API Voice Recognition (Robust, Multi-accent, Continuous)
+  const toggleVoiceInput = async () => {
     if (typeof window === "undefined") return;
+
+    if (isListeningRef.current) {
+      const captured = transcriptRef.current.trim();
+      cleanupListening();
+      if (captured.length > 1) {
+        setInput("");
+        handleSendQuery(captured);
+      }
+      return;
+    }
+
+    // Warm up microphone hardware via getUserMedia
+    let stream: MediaStream | null = null;
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaStreamRef.current = stream;
+      } catch (e: any) {
+        console.warn("getUserMedia error:", e);
+      }
+    }
 
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      alert("Voice speech recognition is not supported in this browser. Please use Google Chrome or Microsoft Edge.");
-      return;
-    }
-
-    if (isListening) {
-      setIsListening(false);
+      alert("Voice speech recognition is supported in Google Chrome, Microsoft Edge, and Safari.");
       return;
     }
 
     try {
       const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition;
       recognition.lang = SPEECH_LANG_CODE[language] || "hi-IN";
-      recognition.continuous = false;
-      recognition.interimResults = false;
+      recognition.continuous = true; // Keep listening across breath pauses
+      recognition.interimResults = true; // Stream words live
+      recognition.maxAlternatives = 1;
 
-      recognition.onstart = () => setIsListening(true);
-      recognition.onend = () => setIsListening(false);
-      recognition.onerror = () => setIsListening(false);
+      isListeningRef.current = true;
+      setIsListening(true);
+      transcriptRef.current = "";
+
+      recognition.onstart = () => {
+        isListeningRef.current = true;
+        setIsListening(true);
+      };
 
       recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setInput(transcript);
-        handleSendQuery(transcript);
+        let interim = "";
+        let final = "";
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const text = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            final += text;
+          } else {
+            interim += text;
+          }
+        }
+
+        const words = (final || interim || "").trim();
+        if (words) {
+          transcriptRef.current = words;
+          setInput(words);
+
+          if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+
+          // Auto-submit after 1.8 seconds of natural silence once words are spoken
+          silenceTimerRef.current = setTimeout(() => {
+            if (isListeningRef.current && transcriptRef.current.trim().length > 1) {
+              const toSubmit = transcriptRef.current.trim();
+              cleanupListening();
+              setInput("");
+              handleSendQuery(toSubmit);
+            }
+          }, 1800);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        if (event?.error === "no-speech") return; // Ignore harmless silence pauses
+        if (event?.error === "not-allowed") {
+          cleanupListening();
+        }
+      };
+
+      recognition.onend = () => {
+        if (isListeningRef.current) {
+          const captured = transcriptRef.current.trim();
+          if (captured.length > 1) {
+            cleanupListening();
+            setInput("");
+            handleSendQuery(captured);
+          } else {
+            cleanupListening();
+          }
+        }
       };
 
       recognition.start();
     } catch (e) {
-      setIsListening(false);
+      cleanupListening();
       console.error("Speech recognition error:", e);
     }
   };

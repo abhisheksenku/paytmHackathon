@@ -26,9 +26,10 @@ class CampaignResponse(BaseModel):
     whatsapp_share_url: str
     created_at: str
 
-def format_whatsapp_url(message: str) -> str:
+def format_whatsapp_url(message: str, phone: str = "8374360774") -> str:
     encoded_text = urllib.parse.quote(message)
-    return f"https://wa.me/?text={encoded_text}"
+    clean = "".join(filter(str.isdigit, phone)) if phone else "8374360774"
+    return f"https://wa.me/91{clean}?text={encoded_text}"
 
 @router.get("")
 def list_campaigns(db: Session = Depends(get_db)):
@@ -68,15 +69,18 @@ def generate_campaign(req: CampaignCreate, db: Session = Depends(get_db)):
 
     code = f"SAVE{req.discount_pct}"
     
+    signoff = f"\n\n— {merchant.owner_name or 'Abhishek'}, {merchant.business_name} (📞 {merchant.phone or '8919581022'})"
+
     # Build localized WhatsApp copy with high conversion hooks
     if "Risk" in req.target_segment:
         name = "Special Reconnect Offer"
         message = (
             f"Namaste! 🙏\n"
             f"We noticed it's been a while since your last visit to *{merchant.business_name}*.\n\n"
-            f"As a valued customer, here is an exclusive *Flat {req.discount_pct}% OFF* on your next purchase!\n"
+            f"As a valued regular customer, here is an exclusive *Flat {req.discount_pct}% OFF* on your next purchase!\n"
             f"🎟️ Use Code: *{code}* at the billing counter.\n\n"
-            f"📍 Visit us today in {merchant.city} or pay via Paytm UPI to claim your discount. Valid till this Sunday!"
+            f"📍 Visit us today in {merchant.city} or pay via Paytm Soundbox / UPI to claim your discount. Valid till this Sunday!"
+            f"{signoff}"
         )
     elif "Weekend" in req.objective or "Spurt" in req.objective:
         name = "Weekend Evening Flash Sale"
@@ -86,6 +90,7 @@ def generate_campaign(req: CampaignCreate, db: Session = Depends(get_db)):
             f"⚡ Show this WhatsApp message at our counter to avail discount.\n"
             f"⏰ Offer valid Saturday & Sunday 5 PM - 9 PM only!\n\n"
             f"Pay easily with Paytm QR Soundbox. See you soon! 😊"
+            f"{signoff}"
         )
     else:
         name = f"{req.target_segment} Delight Offer"
@@ -94,6 +99,7 @@ def generate_campaign(req: CampaignCreate, db: Session = Depends(get_db)):
             f"Enjoy *Flat {req.discount_pct}% OFF* on your favorite grocery & household items this week.\n"
             f"🎟️ Promo Code: *{code}*\n\n"
             f"Thank you for being our loyal customer! Pay seamlessly via Paytm QR."
+            f"{signoff}"
         )
 
     camp = Campaign(

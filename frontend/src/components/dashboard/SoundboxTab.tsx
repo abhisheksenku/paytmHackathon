@@ -22,6 +22,13 @@ import {
   Users,
   User,
   Bot,
+  Sun,
+  Wifi,
+  Battery,
+  QrCode,
+  Activity,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { SoundboxBriefing } from "@/lib/types";
 import { speakText, stopSpeech } from "@/lib/speech";
@@ -622,9 +629,43 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // References to guarantee Web Speech API never loses words due to stale React closures
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isListeningRef = useRef<boolean>(false);
   const recognitionRef = useRef<any>(null);
   const transcriptRef = useRef<string>("");
   const hasProcessedQueryRef = useRef<boolean>(false);
+
+  const cleanupListening = () => {
+    isListeningRef.current = false;
+    setIsListening(false);
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+    if (mediaStreamRef.current) {
+      try {
+        mediaStreamRef.current.getTracks().forEach((t) => t.stop());
+      } catch (e) {}
+      mediaStreamRef.current = null;
+    }
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {}
+      recognitionRef.current = null;
+    }
+  };
+
+  const stopListeningAndSubmit = (text: string) => {
+    if (hasProcessedQueryRef.current) return;
+    hasProcessedQueryRef.current = true;
+    cleanupListening();
+    setInterimSpokenText("");
+    if (text.trim().length > 1) {
+      handleExecuteQuery(text.trim());
+    }
+  };
 
   const langKey = TIMELINE_CONTENT[language] ? language : "Hinglish";
   const currentContent = TIMELINE_CONTENT[langKey][activeMode];
@@ -644,16 +685,12 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
     phonetic: presetQueries[0].phonetic || presetQueries[0].ans,
   });
 
-  // Stop playback when unmounting
+  // Stop playback and mic when unmounting
   useEffect(() => {
     return () => {
       if (audioRef.current) audioRef.current.pause();
       stopSpeech();
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.abort();
-        } catch (e) {}
-      }
+      cleanupListening();
     };
   }, []);
 
@@ -661,13 +698,8 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
   useEffect(() => {
     if (audioRef.current) audioRef.current.pause();
     stopSpeech();
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.abort();
-      } catch (e) {}
-    }
+    cleanupListening();
     setIsPlaying(false);
-    setIsListening(false);
     setInterimSpokenText("");
     setMicStatusMsg(null);
     setHasDispatchedRetention(false);
@@ -792,33 +824,22 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
     handleExecuteQuery(item.q);
   };
 
-  // Web Speech API: Bulletproof Microphone Speech Recognition from the merchant!
-  const handleToggleMic = () => {
+  // Web Speech API: Bulletproof Continuous Microphone Speech Recognition (like ChatGPT)
+  const handleToggleMic = async () => {
     if (typeof window === "undefined") return;
 
-    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRec) {
-      alert("Microphone recognition is supported in Google Chrome & Microsoft Edge. You can also tap any sample query below!");
-      return;
-    }
-
-    if (isListening) {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop();
-        } catch (e) {}
-      }
-      setIsListening(false);
+    // If currently listening, clicking mic triggers immediate submission
+    if (isListeningRef.current) {
       const captured = transcriptRef.current.trim();
-      if (!hasProcessedQueryRef.current && captured.length > 1) {
-        hasProcessedQueryRef.current = true;
-        setInterimSpokenText("");
-        handleExecuteQuery(captured);
+      if (captured.length > 1) {
+        stopListeningAndSubmit(captured);
+      } else {
+        cleanupListening();
+        setMicStatusMsg("Microphone paused. Tap mic to speak or select a query below.");
       }
       return;
     }
 
-    // Reset refs and start listening
     stopSpeech();
     setIsPlaying(false);
     setInterimSpokenText("");
@@ -826,15 +847,41 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
     transcriptRef.current = "";
     hasProcessedQueryRef.current = false;
 
+    // 1. Warm up audio hardware via getUserMedia (ensures active microphone stream)
+    let stream: MediaStream | null = null;
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaStreamRef.current = stream;
+      } catch (err: any) {
+        console.warn("getUserMedia failed or denied:", err);
+        if (err?.name === "NotAllowedError" || err?.name === "PermissionDeniedError") {
+          setMicStatusMsg("Microphone permission denied. Please allow microphone access in your browser address bar.");
+          return;
+        }
+      }
+    }
+
+    // 2. Initialize Speech Recognition
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRec) {
+      setMicStatusMsg("Speech recognition is supported in Google Chrome, Microsoft Edge, and Safari.");
+      return;
+    }
+
     try {
       const recognition = new SpeechRec();
       recognitionRef.current = recognition;
       recognition.lang = micLang || "en-IN";
-      recognition.continuous = false;
-      recognition.interimResults = true;
+      recognition.continuous = true; // Crucial: prevents early termination on 500ms silence!
+      recognition.interimResults = true; // Stream words in real-time
       recognition.maxAlternatives = 1;
 
+      isListeningRef.current = true;
+      setIsListening(true);
+
       recognition.onstart = () => {
+        isListeningRef.current = true;
         setIsListening(true);
         setMicStatusMsg(null);
       };
@@ -856,71 +903,87 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
         if (currentWords) {
           transcriptRef.current = currentWords;
           setInterimSpokenText(currentWords);
-        }
 
-        if (final && final.trim().length > 1) {
-          hasProcessedQueryRef.current = true;
-          setIsListening(false);
-          setInterimSpokenText("");
-          try {
-            recognition.stop();
-          } catch (e) {}
-          handleExecuteQuery(final.trim());
+          // Reset silence timer on every new word
+          if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+
+          // Auto-submit after 1.8 seconds of silence once words are spoken
+          silenceTimerRef.current = setTimeout(() => {
+            if (isListeningRef.current && transcriptRef.current.trim().length > 1 && !hasProcessedQueryRef.current) {
+              stopListeningAndSubmit(transcriptRef.current.trim());
+            }
+          }, 1800);
         }
       };
 
       recognition.onerror = (event: any) => {
         console.warn("Speech recognition event:", event?.error);
-        const captured = transcriptRef.current.trim();
-        if (!hasProcessedQueryRef.current && captured.length > 1) {
-          hasProcessedQueryRef.current = true;
-          setIsListening(false);
-          setInterimSpokenText("");
-          handleExecuteQuery(captured);
+        if (event?.error === "no-speech") {
+          // In continuous mode, harmless pause event - keep listening!
           return;
         }
-
-        setIsListening(false);
         if (event?.error === "not-allowed") {
-          setMicStatusMsg("Microphone permission denied. Please allow microphone access in your browser settings.");
+          setMicStatusMsg("Microphone permission denied. Please click the lock/settings icon in your browser to allow microphone.");
+          cleanupListening();
         }
-        // Do NOT set error messages on 'no-speech' or 'aborted' - silent graceful pause
       };
 
       recognition.onend = () => {
-        setIsListening(false);
-        const captured = transcriptRef.current.trim();
-        if (!hasProcessedQueryRef.current && captured.length > 1) {
-          hasProcessedQueryRef.current = true;
-          setInterimSpokenText("");
-          handleExecuteQuery(captured);
+        // If recognition closed but user spoke words and hasn't submitted yet:
+        if (isListeningRef.current) {
+          const captured = transcriptRef.current.trim();
+          if (captured.length > 1 && !hasProcessedQueryRef.current) {
+            stopListeningAndSubmit(captured);
+          } else {
+            cleanupListening();
+          }
         }
       };
 
       recognition.start();
-    } catch (e) {
-      setIsListening(false);
+    } catch (e: any) {
+      console.error("Speech recognition startup error:", e);
       setMicStatusMsg("Could not start microphone. You can type your question or tap any sample query below.");
-      console.error("Speech recognition start error:", e);
+      cleanupListening();
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div>
-        <div className="flex items-center space-x-2">
-          <span className="rounded-full bg-cyan-100 px-3 py-1 text-xs font-bold text-[#002E6E] border border-cyan-200">
-            {t.soundbox.headerBadge}
-          </span>
-          <span className="text-xs text-slate-500">• {t.soundbox.headerSub}</span>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center space-x-2">
+            <span className="rounded-full bg-cyan-100 px-3 py-1 text-xs font-bold text-[#002E6E] border border-cyan-200">
+              {t.soundbox.headerBadge}
+            </span>
+            <span className="text-xs text-slate-500">• {t.soundbox.headerSub}</span>
+          </div>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-[#0A1120]">
+            {t.soundbox.headerTitle}
+          </h2>
+          <p className="text-xs text-slate-500 max-w-2xl">
+            {t.soundbox.headerDesc}
+          </p>
         </div>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#0A1120]">
-          {t.soundbox.headerTitle}
-        </h2>
-        <p className="text-xs text-slate-500">
-          {t.soundbox.headerDesc}
-        </p>
+
+        {/* Hardware Status Pill */}
+        <div className="flex items-center gap-2 bg-slate-900 text-white px-3.5 py-1.5 rounded-2xl border border-slate-700/80 shadow-xs self-start md:self-auto">
+          <div className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[11px] font-bold text-slate-200">Soundbox 4G Pro</span>
+          </div>
+          <span className="text-slate-600">|</span>
+          <div className="flex items-center gap-1 text-[11px] text-slate-300 font-mono">
+            <Wifi className="h-3 w-3 text-emerald-400" />
+            <span>VoLTE</span>
+          </div>
+          <span className="text-slate-600">|</span>
+          <div className="flex items-center gap-1 text-[11px] text-emerald-400 font-bold">
+            <Battery className="h-3.5 w-3.5" />
+            <span>94%</span>
+          </div>
+        </div>
       </div>
 
       {/* 3 Real-Life Timeline Mode Switcher */}
@@ -928,22 +991,28 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
         {/* Mode 1: Morning Briefing */}
         <button
           onClick={() => setActiveMode("morning")}
-          className={`flex flex-col text-left p-4 rounded-2xl border-2 transition-all active:scale-98 cursor-pointer ${
+          className={`group flex flex-col text-left p-4 rounded-2xl border-2 transition-all active:scale-98 cursor-pointer relative overflow-hidden ${
             activeMode === "morning"
-              ? "border-[#002E6E] bg-gradient-to-br from-blue-50/80 to-cyan-50/60 shadow-md ring-2 ring-[#00BAF2]/30"
-              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80"
+              ? "border-[#002E6E] bg-gradient-to-br from-blue-50/90 via-sky-50/50 to-white shadow-md ring-2 ring-[#00BAF2]/30"
+              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70"
           }`}
         >
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1.5 text-xs font-bold text-[#002E6E]">
-              <Clock className="h-4 w-4 text-[#00BAF2]" />
-              8:00 AM • Morning
+              <Sun className="h-4 w-4 text-amber-500" />
+              8:00 AM • Morning Opening
             </span>
-            {activeMode === "morning" && (
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            )}
+            <span
+              className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+                activeMode === "morning"
+                  ? "bg-[#002E6E] text-white"
+                  : "bg-slate-100 text-slate-600"
+              }`}
+            >
+              STAGE 1
+            </span>
           </div>
-          <p className="mt-2 text-sm font-extrabold text-slate-900">
+          <p className="mt-2 text-sm font-black text-slate-900 group-hover:text-[#002E6E] transition-colors">
             {t.soundbox.stage1Tab}
           </p>
           <p className="mt-1 text-[11px] text-slate-500 leading-tight">
@@ -954,22 +1023,28 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
         {/* Mode 2: Afternoon Slump */}
         <button
           onClick={() => setActiveMode("afternoon")}
-          className={`flex flex-col text-left p-4 rounded-2xl border-2 transition-all active:scale-98 cursor-pointer ${
+          className={`group flex flex-col text-left p-4 rounded-2xl border-2 transition-all active:scale-98 cursor-pointer relative overflow-hidden ${
             activeMode === "afternoon"
-              ? "border-amber-600 bg-gradient-to-br from-amber-50/90 to-orange-50/60 shadow-md ring-2 ring-amber-400/40"
-              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80"
+              ? "border-amber-600 bg-gradient-to-br from-amber-50/90 via-orange-50/50 to-white shadow-md ring-2 ring-amber-400/40"
+              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70"
           }`}
         >
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1.5 text-xs font-bold text-amber-800">
               <Coffee className="h-4 w-4 text-amber-600" />
-              1:30 PM • Slump Hours
+              1:30 PM • Afternoon Slump
             </span>
-            {activeMode === "afternoon" && (
-              <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-            )}
+            <span
+              className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+                activeMode === "afternoon"
+                  ? "bg-amber-700 text-white"
+                  : "bg-slate-100 text-slate-600"
+              }`}
+            >
+              STAGE 2
+            </span>
           </div>
-          <p className="mt-2 text-sm font-extrabold text-slate-900">
+          <p className="mt-2 text-sm font-black text-slate-900 group-hover:text-amber-800 transition-colors">
             {t.soundbox.stage2Tab}
           </p>
           <p className="mt-1 text-[11px] text-slate-500 leading-tight">
@@ -980,22 +1055,28 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
         {/* Mode 3: Anytime On-Demand */}
         <button
           onClick={() => setActiveMode("ondemand")}
-          className={`flex flex-col text-left p-4 rounded-2xl border-2 transition-all active:scale-98 cursor-pointer ${
+          className={`group flex flex-col text-left p-4 rounded-2xl border-2 transition-all active:scale-98 cursor-pointer relative overflow-hidden ${
             activeMode === "ondemand"
-              ? "border-cyan-600 bg-gradient-to-br from-cyan-50/90 to-blue-50/60 shadow-md ring-2 ring-cyan-400/40"
-              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80"
+              ? "border-cyan-600 bg-gradient-to-br from-cyan-50/90 via-blue-50/50 to-white shadow-md ring-2 ring-cyan-400/40"
+              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-xs font-bold text-cyan-900">
+            <span className="flex items-center gap-1.5 text-xs font-bold text-cyan-950">
               <Mic className="h-4 w-4 text-[#00BAF2]" />
-              Live • Anytime
+              Live • Anytime Voice
             </span>
-            {activeMode === "ondemand" && (
-              <span className="h-2 w-2 rounded-full bg-cyan-500 animate-pulse" />
-            )}
+            <span
+              className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+                activeMode === "ondemand"
+                  ? "bg-[#002E6E] text-white"
+                  : "bg-slate-100 text-slate-600"
+              }`}
+            >
+              STAGE 3
+            </span>
           </div>
-          <p className="mt-2 text-sm font-extrabold text-slate-900">
+          <p className="mt-2 text-sm font-black text-slate-900 group-hover:text-cyan-900 transition-colors">
             {t.soundbox.stage3Tab}
           </p>
           <p className="mt-1 text-[11px] text-slate-500 leading-tight">
@@ -1005,9 +1086,9 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
       </div>
 
       {/* The Digital Soundbox Device Simulator Card */}
-      <div className="rounded-3xl border-2 border-slate-200 bg-gradient-to-b from-slate-900 via-[#002E6E] to-slate-950 p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
+      <div className="rounded-3xl border-2 border-slate-700/60 bg-gradient-to-b from-slate-900 via-[#001D47] to-[#0A1120] p-6 md:p-8 text-white shadow-2xl relative overflow-hidden">
         {/* Top Mode Header Banner */}
-        <div className="flex items-center justify-between pb-5 border-b border-slate-800/80 mb-6 relative z-10">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-5 border-b border-slate-700/70 mb-6 relative z-10">
           <div className="flex items-center gap-2">
             <span className="rounded-full bg-[#00BAF2]/20 text-[#00BAF2] border border-[#00BAF2]/40 px-3 py-1 text-xs font-bold">
               {currentContent.badge}
@@ -1017,52 +1098,137 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-[11px] text-slate-300 font-semibold bg-white/10 px-3 py-1 rounded-full border border-white/10">
-            <Languages className="h-3.5 w-3.5 text-[#00BAF2]" />
-            <span>Voice: {language}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-medium text-slate-400">Audio Synthesis:</span>
+            <div className="flex items-center gap-1.5 text-xs text-white font-bold bg-white/10 px-3 py-1 rounded-full border border-white/10">
+              <Languages className="h-3.5 w-3.5 text-[#00BAF2]" />
+              <span>{language} Voice Engine</span>
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 relative z-10">
-          {/* Left: Device Speaker Visual */}
-          <div className="flex flex-col items-center shrink-0">
-            <div className="relative flex h-36 w-36 items-center justify-center rounded-3xl bg-slate-800/90 border-2 border-[#00BAF2]/40 shadow-inner">
-              {/* Speaker Grille Circle */}
-              <div className="h-24 w-24 rounded-full border border-slate-700 bg-slate-950/80 flex items-center justify-center">
-                <Radio className={`h-10 w-10 text-[#00BAF2] ${isPlaying ? "animate-pulse" : ""}`} />
+        <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8 relative z-10">
+          {/* Left: Authentic 3D Paytm Soundbox Hardware Chassis */}
+          <div className="flex flex-col items-center shrink-0 w-full max-w-[280px]">
+            {/* The Soundbox Physical Hardware Body */}
+            <div className="w-full rounded-3xl bg-gradient-to-b from-slate-800 via-[#002E6E] to-[#0A1120] border-2 border-slate-600/70 shadow-[0_20px_50px_rgba(0,46,110,0.6)] p-5 flex flex-col items-center relative overflow-hidden">
+              {/* Subtle Gloss Highlight at Top */}
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
+
+              {/* Hardware Top Header Row */}
+              <div className="w-full flex items-center justify-between pb-3 border-b border-white/10 text-[10px] text-slate-300 font-mono">
+                <span className="font-extrabold tracking-wider text-cyan-300">PAYTM SOUNDBOX 4G</span>
+                <div className="flex items-center gap-1 text-emerald-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>ONLINE</span>
+                </div>
               </div>
 
-              {/* Paytm Logo Badge */}
-              <div className="absolute -top-3 bg-[#00BAF2] text-[#0A1120] text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-widest shadow">
-                PAYTM SOUNDBOX 4G
+              {/* Top Tactile Hardware Control Buttons on Chassis */}
+              <div className="w-full flex items-center justify-center gap-3 my-3">
+                <button
+                  type="button"
+                  className="h-7 w-7 rounded-full bg-slate-900 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs shadow-inner cursor-default"
+                  title="Hardware Volume Down"
+                >
+                  <Minus className="h-3 w-3" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    stopSpeech();
+                    setIsPlaying(false);
+                    setTimeout(() => handleTogglePlay(), 100);
+                  }}
+                  className="h-7 w-7 rounded-full bg-slate-900 border border-cyan-500/40 text-[#00BAF2] hover:text-white flex items-center justify-center text-xs shadow-inner cursor-pointer hover:bg-slate-800 transition"
+                  title="Replay Audio"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                </button>
+                <button
+                  type="button"
+                  className="h-7 w-7 rounded-full bg-slate-900 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs shadow-inner cursor-default"
+                  title="Hardware Volume Up"
+                >
+                  <Plus className="h-3 w-3" />
+                </button>
               </div>
 
-              {/* Status LED */}
-              <div className="absolute bottom-2 flex items-center space-x-1.5">
-                <div
-                  className={`h-2 w-2 rounded-full ${
+              {/* Speaker Grille with Perforated Texture and Active Sound Equalizer */}
+              <div className="relative my-2 flex h-32 w-32 items-center justify-center rounded-full bg-slate-950 border-4 border-slate-800 shadow-[inset_0_4px_12px_rgba(0,0,0,0.8)] ring-2 ring-[#00BAF2]/40">
+                {/* Acoustic Perforated Mesh Pattern */}
+                <div className="absolute inset-2 rounded-full opacity-35 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:5px_5px]" />
+
+                {/* Dynamic Audio Visualizer / Dancing Equalizer Bars */}
+                <div className="relative z-10 flex items-center justify-center gap-1.5 h-12">
+                  {[
+                    { delay: "0ms", height: isPlaying ? "h-8" : isListening ? "h-6" : "h-3" },
+                    { delay: "150ms", height: isPlaying ? "h-11" : isListening ? "h-9" : "h-4" },
+                    { delay: "75ms", height: isPlaying ? "h-6" : isListening ? "h-11" : "h-2" },
+                    { delay: "220ms", height: isPlaying ? "h-10" : isListening ? "h-8" : "h-4" },
+                    { delay: "120ms", height: isPlaying ? "h-7" : isListening ? "h-5" : "h-3" },
+                  ].map((bar, i) => (
+                    <span
+                      key={i}
+                      className={`w-1.5 rounded-full transition-all duration-200 ${bar.height} ${
+                        isPlaying
+                          ? "bg-emerald-400 animate-pulse"
+                          : isListening
+                          ? "bg-red-400 animate-pulse"
+                          : "bg-cyan-500/60"
+                      }`}
+                      style={{ animationDelay: bar.delay }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Paytm Soundbox Official Raised Logo Emblem */}
+              <div className="mt-3 flex items-center gap-1.5 bg-white text-[#002E6E] px-3 py-1 rounded-lg shadow-md border border-slate-200">
+                <span className="text-xs font-black tracking-tighter">Paytm</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Soundbox</span>
+              </div>
+
+              {/* Simulated NPCI UPI QR Sticker on Base */}
+              <div className="mt-3 w-full bg-white text-slate-900 rounded-xl p-2 flex items-center justify-between border border-slate-300 shadow-2xs">
+                <div className="flex items-center gap-1.5">
+                  <QrCode className="h-5 w-5 text-[#002E6E]" />
+                  <div className="text-[9px] font-black leading-tight text-[#002E6E]">
+                    <p>Paytm UPI</p>
+                    <p className="text-[8px] text-slate-500 font-medium">All Banks Accepted</p>
+                  </div>
+                </div>
+                <span className="text-[8px] bg-emerald-100 text-emerald-800 font-extrabold px-1.5 py-0.5 rounded">
+                  NPCI OK
+                </span>
+              </div>
+
+              {/* Dynamic LED Light Bar */}
+              <div className="mt-4 w-full pt-2 border-t border-slate-700/80 flex items-center justify-center gap-2">
+                <span
+                  className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
                     isListening
-                      ? "bg-red-500 animate-ping"
+                      ? "bg-red-500 shadow-[0_0_12px_#ef4444] animate-ping"
                       : isPlaying
-                      ? "bg-emerald-400 animate-ping"
-                      : "bg-cyan-400"
+                      ? "bg-emerald-400 shadow-[0_0_12px_#34d399] animate-pulse"
+                      : "bg-[#00BAF2] shadow-[0_0_8px_#00BAF2]"
                   }`}
                 />
-                <span className="text-[10px] text-slate-400 font-mono">
-                  {isListening ? "LISTENING MIC" : isPlaying ? "SPEAKING ALOUD" : "STANDBY READY"}
+                <span className="text-[10px] font-mono font-bold tracking-wider text-slate-300">
+                  {isListening ? "LISTENING TO MERCHANT" : isPlaying ? "SPEAKING ALOUD" : "4G STANDBY READY"}
                 </span>
               </div>
             </div>
 
-            {/* Playback Controls */}
-            <div className="mt-4 flex items-center space-x-3">
+            {/* Playback Audio Controls under device */}
+            <div className="mt-4 flex items-center space-x-3 w-full">
               <button
                 onClick={() => {
                   stopSpeech();
                   setIsPlaying(false);
                   setTimeout(() => handleTogglePlay(), 100);
                 }}
-                className="rounded-full bg-slate-800 p-2.5 text-slate-300 hover:bg-slate-700 hover:text-white transition shadow-sm active:scale-95 cursor-pointer"
+                className="rounded-2xl bg-slate-800/90 border border-slate-700 p-3 text-slate-300 hover:bg-slate-700 hover:text-white transition shadow-sm active:scale-95 cursor-pointer"
                 title="Replay Audio"
               >
                 <RotateCcw className="h-4 w-4" />
@@ -1070,7 +1236,7 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
 
               <button
                 onClick={() => handleTogglePlay()}
-                className={`flex items-center space-x-2 rounded-full px-6 py-2.5 text-xs font-bold transition shadow-lg active:scale-95 cursor-pointer ${
+                className={`flex-1 flex items-center justify-center space-x-2 rounded-2xl py-3 px-4 text-xs font-black transition shadow-lg active:scale-95 cursor-pointer ${
                   isPlaying
                     ? "bg-amber-400 text-slate-950 hover:bg-amber-300 ring-2 ring-amber-400/50"
                     : "bg-gradient-to-r from-cyan-400 via-[#00BAF2] to-blue-500 text-slate-950 hover:brightness-110 ring-2 ring-[#00BAF2]/50 font-black"
@@ -1096,29 +1262,94 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
           </div>
 
           {/* Right: Spoken Transcript & Interactive Dialogue Container */}
-          <div className="flex-1 w-full rounded-2xl bg-slate-950/70 border border-slate-700/60 p-5 md:p-6 backdrop-blur-md flex flex-col justify-between">
+          <div className="flex-1 w-full rounded-3xl bg-slate-950/80 border border-slate-700/80 p-5 md:p-6 backdrop-blur-md flex flex-col justify-between shadow-inner">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <div className="flex items-center space-x-2">
                   <Volume2 className="h-4 w-4 text-[#00BAF2]" />
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                    Soundbox Spoken Audio Dialogue
+                    Paytm Soundbox Spoken Dialogue
                   </span>
                 </div>
-                <span className="text-[11px] font-mono text-cyan-300 font-semibold">
-                  Zero Hallucination
+                <span className="text-[11px] font-mono text-cyan-300 font-semibold bg-cyan-950/60 border border-cyan-800/60 px-2 py-0.5 rounded-full">
+                  100% Screen-Free
                 </span>
               </div>
 
               {/* Mode 1 & Mode 2 Display */}
               {activeMode !== "ondemand" && (
-                <div className="mt-4 rounded-xl bg-slate-900/80 border border-slate-800 p-4">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">
-                    Soundbox Speaks Aloud:
-                  </span>
-                  <p className="text-sm leading-relaxed text-slate-100 font-semibold whitespace-pre-line">
+                <div className="mt-4 rounded-2xl bg-slate-900/90 border border-slate-800 p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-black tracking-wider text-[#00BAF2] flex items-center gap-1.5">
+                      <Radio className="h-3.5 w-3.5" />
+                      Soundbox Speaks Aloud:
+                    </span>
+                    {isPlaying && (
+                      <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/40 animate-pulse">
+                        ● Playing Voice
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm md:text-base leading-relaxed text-slate-100 font-semibold whitespace-pre-line">
                     &ldquo;{currentContent.native}&rdquo;
                   </p>
+
+                  <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                    <span className="flex items-center gap-1 text-cyan-300">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-cyan-400" />
+                      Deterministic Ledger Numbers
+                    </span>
+                    <button
+                      onClick={() => handleTogglePlay()}
+                      className="text-cyan-400 hover:text-white font-bold cursor-pointer transition flex items-center gap-1"
+                    >
+                      <RotateCcw className="h-3 w-3" /> Replay
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Mode 2: Afternoon Slump Retention Action Callout */}
+              {activeMode === "afternoon" && (
+                <div className="mt-4 rounded-2xl bg-gradient-to-r from-amber-950/80 via-slate-900 to-amber-950/60 border-2 border-amber-500/50 p-5 space-y-3">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="space-y-1">
+                      <span className="text-[11px] font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Users className="h-4 w-4 text-amber-400" />
+                        1-Click Real-time Retention Action
+                      </span>
+                      <p className="text-xs text-slate-200 leading-relaxed max-w-xl">
+                        Rajesh-ji and 41 regular customers haven&apos;t visited in 22 days. Recover them with a ₹30 WhatsApp coupon.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleApproveRetention}
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black bg-emerald-600 hover:bg-emerald-500 text-white transition active:scale-95 shadow-md cursor-pointer whitespace-nowrap"
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                        <span>Yes, Send It (Voice Action)</span>
+                      </button>
+
+                      <button
+                        onClick={() => onOpenCustomers && onOpenCustomers()}
+                        className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-black bg-amber-500 hover:bg-amber-400 text-slate-950 transition active:scale-95 shadow-md cursor-pointer whitespace-nowrap"
+                      >
+                        <Users className="h-4 w-4" />
+                        <span>Open WhatsApp Dispatcher</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {hasDispatchedRetention && (
+                    <div className="rounded-xl bg-emerald-950/90 border border-emerald-500/40 p-3 text-xs text-emerald-200 flex items-center gap-2 animate-in fade-in">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                      <span>
+                        Verified: WhatsApp coupon code <strong>SAVE30</strong> successfully dispatched to 42 customers!
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1133,10 +1364,10 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
                         Step 1: Merchant Spoke (Voice Input)
                       </span>
                       {isListening && (
-                        <span className="flex items-center gap-1 text-[10px] font-bold text-red-400 bg-red-950/80 px-2 py-0.5 rounded-full border border-red-500/30 animate-pulse">
-                          <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-ping" />
-                          Live Mic Active
-                        </span>
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-red-300 bg-red-950/90 px-2.5 py-0.5 rounded-full border border-red-500/50 animate-pulse">
+                          <span className="h-2 w-2 rounded-full bg-red-400 animate-ping" />
+                          <span>Live Mic Recording...</span>
+                        </div>
                       )}
                     </div>
                     <p className="text-sm md:text-base font-bold text-white leading-snug">
@@ -1211,37 +1442,12 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
                 </div>
               )}
 
-              {/* Customer Retention Management Redirection for Mode 2: Afternoon Slump */}
-              {activeMode === "afternoon" && (
-                <div className="mt-4 rounded-xl bg-gradient-to-r from-amber-950/70 via-slate-900 to-amber-950/50 border border-amber-500/40 p-4">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div>
-                      <span className="text-[11px] font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <Users className="h-3.5 w-3.5 text-amber-400" />
-                        {t.soundbox.retentionRedirectTitle}
-                      </span>
-                      <p className="text-xs text-slate-200 mt-1 max-w-xl leading-relaxed">
-                        {t.soundbox.retentionRedirectDesc}
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => onOpenCustomers && onOpenCustomers()}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 transition active:scale-95 shadow-md cursor-pointer shrink-0"
-                    >
-                      <Users className="h-4 w-4" />
-                      <span>{t.soundbox.retentionRedirectBtn}</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-
               {/* Interactive Controls for Mode 3: Live Microphone + Manual Ask Bar + Preset Taps */}
               {activeMode === "ondemand" && (
-                <div className="mt-4 space-y-3 pt-3 border-t border-slate-800">
+                <div className="mt-5 space-y-3 pt-3 border-t border-slate-800">
                   {/* Mic status or error banner */}
                   {micStatusMsg && (
-                    <div className="text-xs rounded-xl bg-amber-950/80 border border-amber-500/40 p-2.5 text-amber-200 flex items-center justify-between">
+                    <div className="text-xs rounded-xl bg-amber-950/80 border border-amber-500/40 p-2.5 text-amber-200 flex items-center justify-between animate-in fade-in">
                       <span>{micStatusMsg}</span>
                       <button
                         onClick={() => setMicStatusMsg(null)}
@@ -1285,25 +1491,33 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
                     </div>
                   </div>
 
-                  {/* Live Microphone Button for the Merchant */}
+                  {/* Large Prominent Live Microphone Button */}
                   <div className="flex items-center gap-3">
                     <button
                       onClick={handleToggleMic}
-                      className={`flex-1 flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-2xl text-xs font-black transition-all shadow-lg active:scale-95 cursor-pointer ${
+                      className={`flex-1 flex items-center justify-center gap-3 py-4 px-6 rounded-2xl text-sm font-black transition-all shadow-xl active:scale-95 cursor-pointer relative overflow-hidden ${
                         isListening
-                          ? "bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white ring-4 ring-red-400/50 animate-pulse"
-                          : "bg-gradient-to-r from-blue-600 via-[#002E6E] to-blue-700 hover:brightness-110 text-white border border-[#00BAF2]/40"
+                          ? "bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white ring-4 ring-red-400/60 shadow-[0_0_30px_rgba(239,68,68,0.6)] animate-pulse"
+                          : "bg-gradient-to-r from-blue-600 via-[#002E6E] to-blue-700 hover:brightness-110 text-white border-2 border-[#00BAF2]/60 shadow-[0_10px_25px_rgba(0,186,242,0.3)]"
                       }`}
                     >
                       {isListening ? (
                         <>
-                          <MicOff className="h-4 w-4" />
-                          <span>Listening... Click to Stop &amp; Get Answer</span>
+                          <div className="flex items-center gap-1">
+                            <span className="w-1.5 h-4 bg-white rounded-full animate-bounce [animation-delay:0ms]" />
+                            <span className="w-1.5 h-6 bg-white rounded-full animate-bounce [animation-delay:150ms]" />
+                            <span className="w-1.5 h-4 bg-white rounded-full animate-bounce [animation-delay:300ms]" />
+                          </div>
+                          <span className="tracking-wide">
+                            🔴 Listening... (Speak now or tap to finish)
+                          </span>
                         </>
                       ) : (
                         <>
-                          <Mic className="h-4 w-4 text-[#00BAF2]" />
-                          <span>🎙️ Tap to Speak Question Aloud with Your Mic</span>
+                          <Mic className="h-5 w-5 text-[#00BAF2]" />
+                          <span className="tracking-wide">
+                            🎙️ Tap to Speak Question Aloud with Your Mic
+                          </span>
                         </>
                       )}
                     </button>
@@ -1337,7 +1551,7 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
                           setManualQueryText("");
                         }
                       }}
-                      className="rounded-xl bg-[#00BAF2] px-4 py-2.5 text-xs font-black text-slate-950 hover:bg-[#3ecbf7] active:scale-95 cursor-pointer shrink-0"
+                      className="rounded-xl bg-[#00BAF2] px-4 py-2.5 text-xs font-black text-slate-950 hover:bg-[#3ecbf7] active:scale-95 cursor-pointer shrink-0 shadow-md"
                     >
                       Ask Soundbox
                     </button>

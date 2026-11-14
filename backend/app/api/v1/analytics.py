@@ -107,6 +107,7 @@ def get_customers_endpoint(
             "name": c.name or "Shopper",
             "masked_vpa": masked_vpa,
             "masked_phone": masked_phone,
+            "phone": phone,
             "segment": seg,
             "frequency_label": freq_label,
             "days_ago": days_ago,
@@ -115,6 +116,8 @@ def get_customers_endpoint(
             "last_seen": c.last_seen.strftime("%d %b %Y") if c.last_seen else "N/A"
         })
         
+    # Prioritize Rajeshwari at top for live real-time WhatsApp retention demo
+    results.sort(key=lambda x: (0 if "rajeshwari" in x["name"].lower() else 1, -x["total_spent"]))
     total_count = len(results)
     paged = results[offset : offset + limit]
     

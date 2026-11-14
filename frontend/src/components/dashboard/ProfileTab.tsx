@@ -64,7 +64,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ language, onLanguageChan
             {[
               { icon: Store,      label: t.profile.bizType,  value: t.profile.bizTypeValue },
               { icon: MapPin,     label: t.profile.city,     value: t.profile.cityValue },
-              { icon: Phone,      label: t.profile.contact,  value: "+91 98765-43210" },
+              { icon: Phone,      label: t.profile.contact,  value: "+91 89195-81022 (Abhishek)" },
               { icon: CreditCard, label: t.profile.upiVpa,   value: "sharmakirana@paytm" },
               { icon: Globe,      label: t.profile.regOn,    value: "Paytm for Business v2.0" },
             ].map(({ icon: Icon, label, value }) => (

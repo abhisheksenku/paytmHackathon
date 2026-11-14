@@ -29,6 +29,8 @@ export const CampaignsTab: React.FC<CampaignsTabProps> = ({ language = "Hinglish
   const [discountPct, setDiscountPct] = useState(15);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activePreviewCampaign, setActivePreviewCampaign] = useState<Campaign | null>(null);
+  const [recipientPhone, setRecipientPhone] = useState<string>("8374360774");
+  const [recipientName, setRecipientName] = useState<string>("Rajeshwari");
 
   // Load campaigns from backend
   const loadCampaigns = async () => {
@@ -181,39 +183,69 @@ export const CampaignsTab: React.FC<CampaignsTabProps> = ({ language = "Hinglish
             </button>
           </div>
 
-          {/* Campaign Approval Callout */}
+          {/* Campaign Approval & WhatsApp Dispatch Callout */}
           {activePreviewCampaign && (
-            <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-4 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold text-[#002E6E]">
-                  Status: {activePreviewCampaign.status}
-                </p>
-                <p className="text-[13px] text-slate-500">
-                  {activePreviewCampaign.status === "APPROVED"
-                    ? "Campaign verified & ready for WhatsApp Broadcast."
-                    : "Review the simulated smartphone preview before approving."}
-                </p>
+            <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-bold text-[#002E6E]">
+                    Status: {activePreviewCampaign.status}
+                  </p>
+                  <p className="text-[12px] text-slate-500">
+                    {activePreviewCampaign.status === "APPROVED"
+                      ? "Campaign verified & ready for instant 1-click WhatsApp dispatch."
+                      : "Review the simulated smartphone preview before approving."}
+                  </p>
+                </div>
+
+                {activePreviewCampaign.status !== "APPROVED" && (
+                  <button
+                    onClick={() => handleApproveCampaign(activePreviewCampaign.id)}
+                    className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-sm active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Check className="h-3.5 w-3.5" />
+                    <span>{t.campaigns.approveBtn}</span>
+                  </button>
+                )}
               </div>
 
-              {activePreviewCampaign.status !== "APPROVED" ? (
-                <button
-                  onClick={() => handleApproveCampaign(activePreviewCampaign.id)}
-                  className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-sm active:scale-95 flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Check className="h-3.5 w-3.5" />
-                  <span>{t.campaigns.approveBtn}</span>
-                </button>
-              ) : (
+              {/* Real-time Recipient Selector & wa.me Dispatch */}
+              <div className="pt-2 border-t border-blue-100/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold text-slate-600">Send To:</span>
+                  <div className="flex items-center rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs shadow-2xs">
+                    <span className="text-slate-400 font-mono mr-1">+91</span>
+                    <input
+                      type="text"
+                      value={recipientPhone}
+                      onChange={(e) => setRecipientPhone(e.target.value)}
+                      placeholder="8374360774"
+                      className="w-24 font-mono font-bold text-slate-800 bg-transparent outline-none"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRecipientPhone("8374360774");
+                      setRecipientName("Rajeshwari");
+                    }}
+                    className="text-[11px] text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-2 py-0.5 rounded font-bold cursor-pointer transition"
+                    title="Pre-fill with Rajeshwari (Demo At-Risk Customer)"
+                  >
+                    ⭐ Rajeshwari
+                  </button>
+                </div>
+
                 <a
-                  href={`https://wa.me/?text=${encodeURIComponent(activePreviewCampaign.message_text)}`}
+                  href={`https://wa.me/91${recipientPhone.replace(/\D/g, "") || "8374360774"}?text=${encodeURIComponent(activePreviewCampaign.message_text)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-sm active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                  className="rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] px-4 py-2 text-xs font-bold text-white transition shadow-sm active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Share2 className="h-3.5 w-3.5" />
-                  <span>Send via WhatsApp</span>
+                  <span>Send via WhatsApp (wa.me) 🚀</span>
                 </a>
-              )}
+              </div>
             </div>
           )}
         </div>
@@ -236,23 +268,28 @@ export const CampaignsTab: React.FC<CampaignsTabProps> = ({ language = "Hinglish
                   SG
                 </div>
                 <div>
-                  <p className="text-xs font-bold leading-tight">{t.navbar.storeName}</p>
-                  <p className="text-[12px] text-emerald-200">Official Paytm Verified Merchant</p>
+                  <p className="text-xs font-bold leading-tight">{t.navbar.storeName} (Abhishek)</p>
+                  <p className="text-[11px] text-emerald-200">📞 8919581022 • Paytm Verified</p>
                 </div>
               </div>
 
               {/* Chat Message Bubble Body */}
-              <div className="flex-1 p-3 overflow-y-auto space-y-3">
+              <div className="flex-1 p-3 overflow-y-auto space-y-2.5">
                 <div className="text-center">
-                  <span className="bg-white/80 text-[12px] text-slate-600 px-2 py-0.5 rounded shadow-sm">
+                  <span className="bg-white/80 text-[11px] text-slate-600 px-2 py-0.5 rounded shadow-sm">
                     TODAY
                   </span>
                 </div>
 
+                <div className="rounded-lg bg-amber-50 border border-amber-200 p-2 text-[10px] text-amber-900 flex items-center justify-between">
+                  <span>Target: <strong>{recipientName} (+91 {recipientPhone})</strong></span>
+                  <span className="bg-amber-200 text-amber-950 font-bold px-1.5 py-0.5 rounded text-[9px]">LIVE</span>
+                </div>
+
                 {activePreviewCampaign ? (
-                  <div className="max-w-[92%] rounded-2xl rounded-tl-none bg-white p-3 text-[13px] text-slate-800 shadow-sm leading-relaxed whitespace-pre-line border border-slate-200">
+                  <div className="max-w-[95%] rounded-2xl rounded-tl-none bg-white p-3 text-[12px] text-slate-800 shadow-sm leading-relaxed whitespace-pre-line border border-slate-200">
                     {activePreviewCampaign.message_text}
-                    <div className="mt-1.5 text-right text-[11px] text-slate-400">
+                    <div className="mt-1.5 text-right text-[10px] text-slate-400">
                       {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} ✓✓
                     </div>
                   </div>

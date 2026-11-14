@@ -269,19 +269,19 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
   return (
     <div
       onClick={handleClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 animate-in fade-in duration-200"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-3xl rounded-3xl bg-white border border-slate-200 text-slate-900 shadow-2xl overflow-hidden my-4 sm:my-6 animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-3xl max-h-[88vh] flex flex-col min-h-0 rounded-3xl bg-white border border-slate-200 text-slate-900 shadow-2xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200"
       >
-        {/* Top Header */}
-        <div className="relative bg-[#002E6E] p-5 sm:p-6 text-white border-b border-[#001D4A]">
+        {/* Top Header - Fixed & Pinned */}
+        <div className="shrink-0 relative bg-[#002E6E] p-4 sm:p-5 text-white border-b border-[#001D4A]">
           {/* Prominent High-Contrast Close Button */}
           <button
             type="button"
             onClick={handleClose}
-            className="absolute top-4 right-4 sm:top-5 sm:right-5 h-10 w-10 rounded-full bg-white/15 hover:bg-white text-white hover:text-[#002E6E] flex items-center justify-center transition-all shadow-md cursor-pointer border border-white/30 active:scale-95 z-20 group"
+            className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-white/20 hover:bg-white text-white hover:text-[#002E6E] flex items-center justify-center transition-all shadow-md cursor-pointer border border-white/30 active:scale-95 z-20 group"
             title="Close Accessibility Demo"
             aria-label="Close"
           >
@@ -289,7 +289,7 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
           </button>
 
           <div className="flex flex-wrap items-center gap-2 pr-12">
-            <span className="rounded-full bg-amber-400 text-slate-950 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-xs">
+            <span className="rounded-full bg-amber-400 text-slate-950 px-2.5 py-0.5 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-xs">
               <EyeOff className="h-3.5 w-3.5" />
               Bharat Accessibility • 100% Screen-Free Voice Copilot
             </span>
@@ -298,34 +298,34 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
             </span>
           </div>
 
-          <h2 className="mt-2.5 text-xl sm:text-2xl font-black text-white tracking-tight">
+          <h2 className="mt-2 text-lg sm:text-xl font-black text-white tracking-tight">
             Paytm Soundbox 4G: Spoken Operating Copilot
           </h2>
-          <p className="mt-1 text-xs text-sky-100/90 max-w-xl leading-relaxed">
+          <p className="mt-0.5 text-xs text-sky-100/90 max-w-xl leading-relaxed">
             Designed for elderly, cataract-affected, and visually impaired shopkeepers who cannot read mobile screens during busy store hours. Run accounts & customer retention through pure voice!
           </p>
 
           {/* Store Persona & Language Pill Bar */}
-          <div className="mt-4 rounded-2xl bg-white/10 border border-white/15 p-3 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div className="flex items-center space-x-3">
-              <div className="h-10 w-10 rounded-2xl bg-amber-400 text-[#002E6E] flex items-center justify-center font-extrabold text-sm shadow-md">
+          <div className="mt-3 rounded-2xl bg-white/10 border border-white/15 p-2.5 sm:p-3 flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+            <div className="flex items-center space-x-3 min-w-0">
+              <div className="h-9 w-9 rounded-xl bg-amber-400 text-[#002E6E] flex items-center justify-center font-extrabold text-sm shadow-md shrink-0">
                 VJ
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-bold text-white">{data.merchantName}</span>
-                  <span className="text-[10px] bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 px-1.5 py-0.5 rounded font-semibold">
+                  <span className="text-sm font-bold text-white truncate">{data.merchantName}</span>
+                  <span className="text-[10px] bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 px-1.5 py-0.5 rounded font-semibold shrink-0">
                     Verified Merchant
                   </span>
                 </div>
-                <p className="text-[11px] text-sky-200 font-medium">
+                <p className="text-[11px] text-sky-200 font-medium truncate">
                   {data.storeName} • 100% Voice Operated
                 </p>
               </div>
             </div>
 
             {/* Language Selector Pills */}
-            <div className="flex flex-wrap items-center gap-1">
+            <div className="flex flex-wrap items-center gap-1 shrink-0">
               {LANGUAGE_OPTIONS.map((lang) => (
                 <button
                   key={lang.id}
@@ -335,7 +335,7 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
                     setActiveSpeaker("idle");
                     setActiveLang(lang.id);
                   }}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                  className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-[11px] font-bold transition cursor-pointer ${
                     activeLang === lang.id
                       ? "bg-white text-[#002E6E] shadow-sm"
                       : "bg-white/10 text-white/80 hover:bg-white/20 hover:text-white"
@@ -348,8 +348,8 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
           </div>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-5 sm:p-6 space-y-5 bg-white">
+        {/* Modal Scrollable Body */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-4 bg-white overscroll-contain">
           {/* Soundbox 4G Hardware Live Simulator Bar */}
           <div className="rounded-2xl border border-slate-200 bg-slate-900 text-white p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center space-x-3">
@@ -616,77 +616,77 @@ export const EyesFreeModal: React.FC<EyesFreeModalProps> = ({
               </div>
             )}
           </div>
+        </div>
 
-          {/* Interactive Simulation Action Bar & Bottom Close */}
-          <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2.5">
-            {/* Primary Action Button */}
-            {currentStep < 3 && (
-              <button
-                type="button"
-                onClick={() => handleStep1(true)}
-                disabled={isPlayingAudio}
-                className="flex-1 rounded-xl bg-[#002E6E] hover:bg-[#001D4A] py-3 px-4 text-xs sm:text-sm font-extrabold text-white shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
-              >
-                <Play className={`h-4 w-4 fill-current ${isPlayingAudio ? "animate-spin" : ""}`} />
-                <span>
-                  {isPlayingAudio
-                    ? "Speaking in Natural Audio..."
-                    : `▶ Play Complete Voice Walkthrough (${activeLang})`}
-                </span>
-              </button>
-            )}
-
-            {currentStep === 3 && (
-              <button
-                type="button"
-                onClick={handleApprove}
-                disabled={isPlayingAudio}
-                className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 py-3 px-4 text-xs sm:text-sm font-black text-white shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Mic className="h-4 w-4 text-white" />
-                <span>
-                  Speak Voice Approval: &ldquo;{data.approval}&rdquo; (Dispatch ₹30 Offer)
-                </span>
-              </button>
-            )}
-
-            {currentStep === 4 && (
-              <button
-                type="button"
-                onClick={handleReset}
-                className="flex-1 rounded-xl bg-slate-100 hover:bg-slate-200 py-3 px-4 text-xs sm:text-sm font-bold text-slate-800 border border-slate-300 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <RotateCcw className="h-4 w-4 text-[#002E6E]" />
-                <span>↺ Replay Eyes-Free Voice Interaction</span>
-              </button>
-            )}
-
-            {/* Reset / Stop Button */}
-            {isPlayingAudio && (
-              <button
-                type="button"
-                onClick={() => {
-                  stopSpeech();
-                  setIsPlayingAudio(false);
-                  setActiveSpeaker("idle");
-                }}
-                className="rounded-xl border border-red-300 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs py-3 px-4 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <VolumeX className="h-4 w-4" />
-                <span>Stop Speech</span>
-              </button>
-            )}
-
-            {/* Explicit Close Button in Footer */}
+        {/* Sticky Action Footer - Fixed & Pinned at bottom */}
+        <div className="shrink-0 bg-slate-50 border-t border-slate-200 p-3 sm:p-4 flex flex-col sm:flex-row gap-2.5">
+          {/* Primary Action Button */}
+          {currentStep < 3 && (
             <button
               type="button"
-              onClick={handleClose}
-              className="rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm py-3 px-4 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+              onClick={() => handleStep1(true)}
+              disabled={isPlayingAudio}
+              className="flex-1 rounded-xl bg-[#002E6E] hover:bg-[#001D4A] py-3 px-4 text-xs sm:text-sm font-extrabold text-white shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
             >
-              <X className="h-4 w-4" />
-              <span>Close</span>
+              <Play className={`h-4 w-4 fill-current ${isPlayingAudio ? "animate-spin" : ""}`} />
+              <span>
+                {isPlayingAudio
+                  ? "Speaking in Natural Audio..."
+                  : `▶ Play Complete Voice Walkthrough (${activeLang})`}
+              </span>
             </button>
-          </div>
+          )}
+
+          {currentStep === 3 && (
+            <button
+              type="button"
+              onClick={handleApprove}
+              disabled={isPlayingAudio}
+              className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 py-3 px-4 text-xs sm:text-sm font-black text-white shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Mic className="h-4 w-4 text-white" />
+              <span>
+                Speak Voice Approval: &ldquo;{data.approval}&rdquo; (Dispatch ₹30 Offer)
+              </span>
+            </button>
+          )}
+
+          {currentStep === 4 && (
+            <button
+              type="button"
+              onClick={handleReset}
+              className="flex-1 rounded-xl bg-white hover:bg-slate-100 py-3 px-4 text-xs sm:text-sm font-bold text-slate-800 border border-slate-300 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+            >
+              <RotateCcw className="h-4 w-4 text-[#002E6E]" />
+              <span>↺ Replay Eyes-Free Voice Interaction</span>
+            </button>
+          )}
+
+          {/* Reset / Stop Button */}
+          {isPlayingAudio && (
+            <button
+              type="button"
+              onClick={() => {
+                stopSpeech();
+                setIsPlayingAudio(false);
+                setActiveSpeaker("idle");
+              }}
+              className="rounded-xl border border-red-300 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs py-3 px-4 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <VolumeX className="h-4 w-4" />
+              <span>Stop Speech</span>
+            </button>
+          )}
+
+          {/* Explicit Close Button in Footer */}
+          <button
+            type="button"
+            onClick={handleClose}
+            className="rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm py-3 px-4 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+          >
+            <X className="h-4 w-4" />
+            <span>Close</span>
+          </button>
         </div>
       </div>
     </div>

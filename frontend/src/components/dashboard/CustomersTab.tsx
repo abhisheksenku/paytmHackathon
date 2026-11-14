@@ -31,41 +31,330 @@ interface CustomersTabProps {
   language?: string;
 }
 
-const COHORT_CRITERIA: Record<string, { frequency: string; recency: string; spend: string }> = {
-  Champions: {
-    frequency: "3–4 visits / week",
-    recency: "Active in last 7 days",
-    spend: "18+ orders • Spend > ₹5,000",
+interface CohortDetailI18n {
+  title: string;
+  frequency: string;
+  recency: string;
+  spend: string;
+  action: string;
+}
+
+interface LoyaltyCardsI18n {
+  customersUnit: string;
+  avgSpendLabel: string;
+  frequencyLabel: string;
+  recencyLabel: string;
+  criteriaLabel: string;
+  viewBtn: string;
+  recoverBtn: string;
+  promoBtn: string;
+  viewAllBtn: string;
+  backToCardsBtn: string;
+  ledgerTitle: string;
+  shoppersUnit: string;
+  bannerTitle: string;
+  bannerSubtitle: string;
+  bannerBtn: string;
+  cohorts: Record<string, CohortDetailI18n>;
+}
+
+const LOYALTY_I18N: Record<string, LoyaltyCardsI18n> = {
+  English: {
+    customersUnit: "customers",
+    avgSpendLabel: "Average spend:",
+    frequencyLabel: "Visit Frequency:",
+    recencyLabel: "Recency Status:",
+    criteriaLabel: "Criteria:",
+    viewBtn: "View",
+    recoverBtn: "Recover 42",
+    promoBtn: "Promo",
+    viewAllBtn: "View All 600 Customers →",
+    backToCardsBtn: "← Back to Cohort Cards",
+    ledgerTitle: "Merchant Customer Directory",
+    shoppersUnit: "Profiled Shoppers",
+    bannerTitle: "Looking for individual customer records or transaction history?",
+    bannerSubtitle: "Search across all 600 profiled shoppers, filter by segment, or dispatch 1-click WhatsApp retention offers.",
+    bannerBtn: "Open Customer Directory (600) →",
+    cohorts: {
+      Champions: {
+        title: "Champions",
+        frequency: "3–4 visits / week",
+        recency: "Active in last 7 days",
+        spend: "18+ orders • Spend > ₹5,000",
+        action: "VIP loyalty rewards & early festive discounts to retain highest-value patrons",
+      },
+      Regulars: {
+        title: "Regulars",
+        frequency: "1–2 visits / week",
+        recency: "Active in last 21 days",
+        spend: "8 to 17 orders • Spend ₹1.5k–₹5k",
+        action: "Keep basket steady with weekend grocery combos & essential bundle offers",
+      },
+      "At Risk": {
+        title: "At Risk",
+        frequency: "Used to visit 1-2x/week",
+        recency: "⚠️ Not seen in >21 days (Churn Alert)",
+        spend: "5+ past orders • At risk of churning",
+        action: "Dispatch instant ₹30 WhatsApp coupon before they switch to Quick Commerce apps",
+      },
+      "Occasional Walk-ins": {
+        title: "Occasional Walk-ins",
+        frequency: "Passing / 1st visit",
+        recency: "Recent or one-time footfall",
+        spend: "1 to 4 orders • Low basket size",
+        action: "Welcome message with ₹15 off on next grocery bill of ₹200+ to encourage repeat footfall",
+      },
+    },
   },
-  Champion: {
-    frequency: "3–4 visits / week",
-    recency: "Active in last 7 days",
-    spend: "18+ orders • Spend > ₹5,000",
+  Hinglish: {
+    customersUnit: "grahak",
+    avgSpendLabel: "Ausat kharcha:",
+    frequencyLabel: "Aane ki frequency:",
+    recencyLabel: "Pichli visit status:",
+    criteriaLabel: "Maapdand:",
+    viewBtn: "Dekhein",
+    recoverBtn: "Wapas Layein (42)",
+    promoBtn: "Promo Bhejein",
+    viewAllBtn: "Sabhi 600 Grahak Dekhein →",
+    backToCardsBtn: "← Wapas Cohort Cards Par Jayein",
+    ledgerTitle: "Dukandar Grahak Directory",
+    shoppersUnit: "Profiled Grahak",
+    bannerTitle: "Kisi grahak ka record ya pichli khareedari dekhna chahte hain?",
+    bannerSubtitle: "Sabhi 600 grahakon ko khojein, segment filter karein aur 1-click me WhatsApp offer bhejein.",
+    bannerBtn: "Grahak Directory Kholein (600) →",
+    cohorts: {
+      Champions: {
+        title: "Champions (Sabse Khaas)",
+        frequency: "Hafte me 3–4 baar aana",
+        recency: "Pichle 7 dino me active",
+        spend: "18+ orders • Kharcha > ₹5,000",
+        action: "VIP reward aur tyohar par khaas discount dekar loyalty banaye rakhein",
+      },
+      Regulars: {
+        title: "Regulars (Pakke Grahak)",
+        frequency: "Hafte me 1–2 baar aana",
+        recency: "Pichle 21 dino me active",
+        spend: "8 se 17 orders • Kharcha ₹1.5k–₹5k",
+        action: "Weekend grocery combo offer bhejkar basket size steady rakhein",
+      },
+      "At Risk": {
+        title: "At Risk (Chhootne Wale)",
+        frequency: "Pehle hafte me 1-2 baar aate the",
+        recency: "⚠️ 21+ dino se nahi aaye (Alert)",
+        spend: "5+ purane orders • Chhootne ka jokhim",
+        action: "Turant ₹30 WhatsApp coupon bhejein isse pehle ki wo Blinkit/Zepto chale jayein",
+      },
+      "Occasional Walk-ins": {
+        title: "Occasional (Walk-in Grahak)",
+        frequency: "Raste ke / 1st visit",
+        recency: "Haal me 1 baar aana",
+        spend: "1 se 4 orders • Chhota basket",
+        action: "Agli ₹200+ khareedari par ₹15 discount ka welcome WhatsApp sandesh bhejein",
+      },
+    },
   },
-  Regulars: {
-    frequency: "1–2 visits / week",
-    recency: "Active in last 21 days",
-    spend: "8 to 17 orders • Spend ₹1.5k–₹5k",
+  Hindi: {
+    customersUnit: "ग्राहक",
+    avgSpendLabel: "औसत खर्च:",
+    frequencyLabel: "दुकान आने की आवृत्ति:",
+    recencyLabel: "अंतिम बार आने की स्थिति:",
+    criteriaLabel: "मापदंड:",
+    viewBtn: "देखें",
+    recoverBtn: "वापस लाएं (42)",
+    promoBtn: "ऑफर भेजें",
+    viewAllBtn: "सभी 600 ग्राहक देखें →",
+    backToCardsBtn: "← वापस कोहॉर्ट कार्ड पर जाएं",
+    ledgerTitle: "दुकानदार ग्राहक डायरेक्टरी",
+    shoppersUnit: "सत्यापित ग्राहक",
+    bannerTitle: "क्या आप किसी ग्राहक का रिकॉर्ड या लेनदेन देखना चाहते हैं?",
+    bannerSubtitle: "सभी 600 ग्राहकों को खोजें, सेगमेंट अनुसार छांटें और 1-क्लिक में व्हाट्सएप ऑफर भेजें।",
+    bannerBtn: "ग्राहक डायरेक्टरी खोलें (600) →",
+    cohorts: {
+      Champions: {
+        title: "चैंपियंस (सर्वश्रेष्ठ ग्राहक)",
+        frequency: "हफ्ते में 3–4 बार आना",
+        recency: "पिछले 7 दिनों में सक्रिय",
+        spend: "18+ ऑर्डर • कुल खर्च > ₹5,000",
+        action: "वीआईपी लॉयल्टी रिवार्ड और त्योहारी छूट देकर रिश्ता मजबूत रखें",
+      },
+      Regulars: {
+        title: "नियमित ग्राहक (रेगुलर)",
+        frequency: "हफ्ते में 1–2 बार आना",
+        recency: "पिछले 21 दिनों में सक्रिय",
+        spend: "8 से 17 ऑर्डर • खर्च ₹1,500-₹5,000",
+        action: "वीकेंड राशन कॉम्बो ऑफर भेजकर नियमित खरीदारी बनाए रखें",
+      },
+      "At Risk": {
+        title: "खतरे में (छूटने वाले ग्राहक)",
+        frequency: "पहले हफ्ते में 1-2 बार आते थे",
+        recency: "⚠️ 21+ दिनों से नहीं आए (खतरा)",
+        spend: "5+ पुराने ऑर्डर • ग्राहक खोने का जोखिम",
+        action: "तुरंत ₹30 का व्हाट्सएप विन-बैक कूपन भेजें, ताकि वे ब्लिंकिट/ज़ेप्टो न जाएं",
+      },
+      "Occasional Walk-ins": {
+        title: "कदाचित आने वाले (वॉक-इन)",
+        frequency: "रास्ते के ग्राहक / पहली बार आए",
+        recency: "हाल ही में या एक बार आए",
+        spend: "1 से 4 ऑर्डर • छोटा बिल",
+        action: "अगले ₹200+ के बिल पर ₹15 छूट का स्वागत व्हाट्सएप संदेश भेजें",
+      },
+    },
   },
-  Regular: {
-    frequency: "1–2 visits / week",
-    recency: "Active in last 21 days",
-    spend: "8 to 17 orders • Spend ₹1.5k–₹5k",
+  Telugu: {
+    customersUnit: "వినియోగదారులు",
+    avgSpendLabel: "సగటు ఖర్చు:",
+    frequencyLabel: "రాక ఫ్రీక్వెన్సీ:",
+    recencyLabel: "చివరి రాక స్థితి:",
+    criteriaLabel: "నిబంధన:",
+    viewBtn: "చూడండి",
+    recoverBtn: "మళ్లీ రప్పించండి (42)",
+    promoBtn: "ఆఫర్ పంపండి",
+    viewAllBtn: "మొత్తం 600 మంది కస్టమర్లను చూడండి →",
+    backToCardsBtn: "← తిరిగి కార్డ్‌లకి వెళ్లండి",
+    ledgerTitle: "మర్చంట్ కస్టమర్ డైరెక్టరీ",
+    shoppersUnit: "ప్రొఫైల్డ్ కస్టమర్లు",
+    bannerTitle: "వ్యక్తిగత కస్టమర్ రికార్డులు లేదా లావాదేవీల వివరాలు చూడాలనుకుంటున్నారా?",
+    bannerSubtitle: "మొత్తం 600 మంది దుకాణదారులను శోధించండి మరియు 1-క్లిక్ వాట్సాప్ ఆఫర్‌లను పంపండి.",
+    bannerBtn: "కస్టమర్ డైరెక్టరీ తెరవండి (600) →",
+    cohorts: {
+      Champions: {
+        title: "ఛాంపియన్స్ (ముఖ్య వినియోగదారులు)",
+        frequency: "వారానికి 3-4 సార్లు రాక",
+        recency: "గత 7 రోజుల్లో యాక్టివ్",
+        spend: "18+ ఆర్డర్లు • ఖర్చు > ₹5,000",
+        action: "వీఐపీ రివార్డులు మరియు ప్రత్యేక పండుగ డిస్కౌంట్‌లతో నమ్మకాన్ని పెంచండి",
+      },
+      Regulars: {
+        title: "రెగ్యులర్ కస్టమర్లు",
+        frequency: "వారానికి 1-2 సార్లు రాక",
+        recency: "గత 21 రోజుల్లో యాక్టివ్",
+        spend: "8 నుండి 17 ఆర్డర్లు • ఖర్చు ₹1,500-₹5,000",
+        action: "వీకెండ్ కిరాణా కాంబో ఆఫర్లతో ప్రతివారం క్రమం తప్పకుండా వచ్చేలా చేయండి",
+      },
+      "At Risk": {
+        title: "రిస్క్‌లో ఉన్నవారు (దూరమైనవారు)",
+        frequency: "గతంలో వారానికి 1-2 సార్లు వచ్చేవారు",
+        recency: "⚠️ 21 రోజులుగా రాలేదు (అలర్ట్)",
+        spend: "5+ మునుపటి ఆర్డర్లు • కోల్పోయే ప్రమాదం",
+        action: "బ్లింకిట్/జెప్టోకి వెళ్లకుండా వెంటనే ₹30 వాట్సాప్ విన్-బ్యాక్ కూపన్ పంపండి",
+      },
+      "Occasional Walk-ins": {
+        title: "అప్పుడప్పుడు వచ్చేవారు",
+        frequency: "మొదటిసారి / అప్పుడప్పుడు",
+        recency: "ఇటీవల ఒకసారి రాక",
+        spend: "1 నుండి 4 ఆర్డర్లు • చిన్న బిల్లు",
+        action: "తదుపరి ₹200+ కొనుగోలుపై ₹15 తగ్గింపుతో వెల్కమ్ మెసేజ్ పంపండి",
+      },
+    },
   },
-  "At Risk": {
-    frequency: "Used to visit 1-2x/week",
-    recency: "⚠️ Not seen in >21 days (Churn Alert)",
-    spend: "5+ past orders • At risk of churning",
+  Tamil: {
+    customersUnit: "வாடிக்கையாளர்கள்",
+    avgSpendLabel: "சராசரி செலவு:",
+    frequencyLabel: "வருகை இடைவெளி:",
+    recencyLabel: "கடைசி வருகை நிலை:",
+    criteriaLabel: "அளவுகோல்:",
+    viewBtn: "பார்",
+    recoverBtn: "மீட்டெடுங்கள் (42)",
+    promoBtn: "சலுகை அனுப்பு",
+    viewAllBtn: "அனைத்து 600 வாடிக்கையாளர்களையும் பார்க்கவும் →",
+    backToCardsBtn: "← மீண்டும் கார்டுகளுக்குச் செல்லவும்",
+    ledgerTitle: "வணிகர் வாடிக்கையாளர் டைரக்டரி",
+    shoppersUnit: "பதிவுசெய்த வாடிக்கையாளர்கள்",
+    bannerTitle: "தனிப்பட்ட வாடிக்கையாளர் விவரங்கள் அல்லது பரிவர்த்தனை வரலாறு வேண்டுமா?",
+    bannerSubtitle: "அனைத்து 600 வாடிக்கையாளர்களையும் தேடுங்கள், 1-கிளிக் வாட்ஸ்அப் சலுகைகளை அனுப்புங்கள்.",
+    bannerBtn: "வாடிக்கையாளர் டைரக்டரி திறக்கவும் (600) →",
+    cohorts: {
+      Champions: {
+        title: "சாம்பியன்ஸ் (முக்கிய வாடிக்கையாளர்கள்)",
+        frequency: "வாரத்திற்கு 3-4 முறை வருகை",
+        recency: "கடந்த 7 நாட்களில் செயலில்",
+        spend: "18+ ஆர்டர்கள் • செலவு > ₹5,000",
+        action: "விஐபி சலுகைகள் மற்றும் சிறப்பு தள்ளுபடிகளை வழங்கி தக்கவையுங்கள்",
+      },
+      Regulars: {
+        title: "வழக்கமான வாடிக்கையாளர்கள்",
+        frequency: "வாரத்திற்கு 1-2 முறை வருகை",
+        recency: "கடந்த 21 நாட்களில் செயலில்",
+        spend: "8 முதல் 17 ஆர்டர்கள் • செலவு ₹1,500-₹5,000",
+        action: "வார இறுதி மளிகை காம்போ சலுகைகள் மூலம் தொடர்ந்து வரவழையுங்கள்",
+      },
+      "At Risk": {
+        title: "ஆபத்தில் உள்ளவர்கள் (வரத்து குறைந்தவர்கள்)",
+        frequency: "முன்பு வாரத்திற்கு 1-2 முறை வந்தனர்",
+        recency: "⚠️ 21+ நாட்களாக வரவில்லை (எச்சரிக்கை)",
+        spend: "5+ பழைய ஆர்டர்கள் • இழக்கும் அபாயம்",
+        action: "உடனடியாக ₹30 வாட்ஸ்அப் சலுகை அனுப்பி மீண்டும் கடைக்கு வரவழையுங்கள்",
+      },
+      "Occasional Walk-ins": {
+        title: "அவ்வப்போது வருபவர்கள்",
+        frequency: "முதல் முறை / எப்போதாவது",
+        recency: "சமீபத்தில் ஒரு முறை வருகை",
+        spend: "1 முதல் 4 ஆர்டர்கள் • குறைந்த தொகை",
+        action: "அடுத்த ₹200+ வாங்குதலுக்கு ₹15 தள்ளுபடியுடன் வரவேற்பு செய்தி அனுப்புங்கள்",
+      },
+    },
   },
-  "Occasional Walk-ins": {
-    frequency: "Passing / 1st visit",
-    recency: "Recent or one-time footfall",
-    spend: "1 to 4 orders • Low basket size",
+  Kannada: {
+    customersUnit: "ಗ್ರಾಹಕರು",
+    avgSpendLabel: "ಸರಾಸರಿ ವೆಚ್ಚ:",
+    frequencyLabel: "ಭೇಟಿ ಆವರ್ತನ:",
+    recencyLabel: "ಕೊನೆಯ ಭೇಟಿ ಸ್ಥಿತಿ:",
+    criteriaLabel: "ಮಾನದಂಡ:",
+    viewBtn: "ನೋಡಿ",
+    recoverBtn: "ಮರಳಿ ತನ್ನಿ (42)",
+    promoBtn: "ಆಫರ್ ಕಳುಹಿಸಿ",
+    viewAllBtn: "ಎಲ್ಲಾ 600 ಗ್ರಾಹಕರನ್ನು ನೋಡಿ →",
+    backToCardsBtn: "← ಕಾರ್ಡ್‌ಗಳಿಗೆ ಹಿಂತಿರುಗಿ",
+    ledgerTitle: "ವರ್ತಕರ ಗ್ರಾಹಕ ಡೈರೆಕ್ಟರಿ",
+    shoppersUnit: "ದಾಖಲಿತ ಗ್ರಾಹಕರು",
+    bannerTitle: "ನಿರ್ದಿಷ್ಟ ಗ್ರಾಹಕರ ವಿವರಗಳು ಅಥವಾ ವಹಿವಾಟಿನ ಇತಿಹಾಸ ನೋಡಬೇಕೆ?",
+    bannerSubtitle: "ಎಲ್ಲಾ 600 ಗ್ರಾಹಕರನ್ನು ಹುಡುಕಿ ಮತ್ತು 1-ಕ್ಲಿಕ್ ವಾಟ್ಸಾಪ್ ಆಫರ್‌ಗಳನ್ನು ಕಳುಹಿಸಿ.",
+    bannerBtn: "ಗ್ರಾಹಕರ ಡೈರೆಕ್ಟರಿ ತೆರೆಯಿರಿ (600) →",
+    cohorts: {
+      Champions: {
+        title: "ಚಾಂಪಿಯನ್ಸ್ (ಪ್ರಮುಖ ಗ್ರಾಹಕರು)",
+        frequency: "ವಾರಕ್ಕೆ 3-4 ಬಾರಿ ಭೇಟಿ",
+        recency: "ಕಳೆದ 7 ದಿನಗಳಲ್ಲಿ ಸಕ್ರಿಯ",
+        spend: "18+ ಆರ್ಡರ್‌ಗಳು • ವೆಚ್ಚ > ₹5,000",
+        action: "ವಿಐಪಿ ರಿವಾರ್ಡ್‌ಗಳು ಮತ್ತು ವಿಶೇಷ ಹಬ್ಬದ ರಿಯಾಯಿತಿ ನೀಡಿ ವಿಶ್ವಾಸ ಉಳಿಸಿಕೊಳ್ಳಿ",
+      },
+      Regulars: {
+        title: "ನಿಯಮಿತ ಗ್ರಾಹಕರು (ರೆಗ್ಯುಲರ್)",
+        frequency: "ವಾರಕ್ಕೆ 1-2 ಬಾರಿ ಭೇಟಿ",
+        recency: "ಕಳೆದ 21 ದಿನಗಳಲ್ಲಿ ಸಕ್ರಿಯ",
+        spend: "8 ರಿಂದ 17 ಆರ್ಡರ್‌ಗಳು • ವೆಚ್ಚ ₹1,500-₹5,000",
+        action: "ವಾರಾಂತ್ಯದ ದಿನಸಿ ಕಾಂಬೊ ಆಫರ್‌ಗಳೊಂದಿಗೆ ನಿರಂತರ ಖರೀದಿಗೆ ಪ್ರೇರೇಪಿಸಿ",
+      },
+      "At Risk": {
+        title: "ಅಪಾಯದಲ್ಲಿರುವವರು (ದೂರವಾದವರು)",
+        frequency: "ಹಿಂದೆ ವಾರಕ್ಕೆ 1-2 ಬಾರಿ ಬರುತ್ತಿದ್ದರು",
+        recency: "⚠️ 21+ ದಿನಗಳಿಂದ ಬಂದಿಲ್ಲ (ಎಚ್ಚರಿಕೆ)",
+        spend: "5+ ಹಿಂದಿನ ಆರ್ಡರ್‌ಗಳು • ದೂರವಾಗುವ ಅಪಾಯ",
+        action: "ಬ್ಲಿಂಕಿಟ್/ಜೆಪ್ಟೊ ಕಡೆ ಹೋಗುವ ಮುನ್ನ ತಕ್ಷಣ ₹30 ವಾಟ್ಸಾಪ್ ಕೂಪನ್ ಕಳುಹಿಸಿ",
+      },
+      "Occasional Walk-ins": {
+        title: "ಅಪರೂಪದ ಗ್ರಾಹಕರು",
+        frequency: "ಮೊದಲ ಬಾರಿ / ಅಪರೂಪಕ್ಕೆ",
+        recency: "ಇತ್ತೀಚೆಗೆ ಒಮ್ಮೆ ಭೇಟಿ",
+        spend: "1 ರಿಂದ 4 ಆರ್ಡರ್‌ಗಳು • ಸಣ್ಣ ಮೊತ್ತ",
+        action: "ಮುಂದಿನ ₹200+ ಖರೀದಿಗೆ ₹15 ರಿಯಾಯಿತಿಯೊಂದಿಗೆ ಸ್ವಾಗತ ಸಂದೇಶ ಕಳುಹಿಸಿ",
+      },
+    },
   },
+};
+
+const getCohortI18n = (lang: string, segment: string): CohortDetailI18n => {
+  const dict = LOYALTY_I18N[lang] || LOYALTY_I18N.English;
+  const s = segment.toLowerCase();
+  if (s.includes("champion")) return dict.cohorts["Champions"];
+  if (s.includes("risk")) return dict.cohorts["At Risk"];
+  if (s.includes("regular")) return dict.cohorts["Regulars"];
+  return dict.cohorts["Occasional Walk-ins"];
 };
 
 export const CustomersTab: React.FC<CustomersTabProps> = ({ onTargetSegment, language = "Hinglish" }) => {
   const t = getTranslation(language);
+  const cardI18n = LOYALTY_I18N[language] || LOYALTY_I18N.English;
   const [cohorts, setCohorts] = useState<CustomerCohort[]>([]);
   const [customers, setCustomers] = useState<CustomerProfile[]>([]);
   const [totalFiltered, setTotalFiltered] = useState<number>(0);
@@ -254,30 +543,31 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
 
   const getSegmentBadge = (segment: string) => {
     const s = segment.toLowerCase();
+    const info = getCohortI18n(language, segment);
     if (s.includes("champion")) {
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5">
-          <Crown className="h-3 w-3 text-amber-500" /> Champion
+          <Crown className="h-3 w-3 text-amber-500" /> {info.title}
         </span>
       );
     }
     if (s.includes("risk")) {
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-red-100 text-red-800 text-[11px] font-bold px-2.5 py-0.5">
-          <AlertTriangle className="h-3 w-3 text-red-600" /> At Risk
+          <AlertTriangle className="h-3 w-3 text-red-600" /> {info.title}
         </span>
       );
     }
     if (s.includes("regular")) {
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 text-[#002E6E] text-[11px] font-bold px-2.5 py-0.5">
-          <UserCheck className="h-3 w-3 text-[#00BAF2]" /> Regular
+          <UserCheck className="h-3 w-3 text-[#00BAF2]" /> {info.title}
         </span>
       );
     }
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-700 text-[11px] font-medium px-2.5 py-0.5">
-        Walk-in
+        {info.title}
       </span>
     );
   };
@@ -295,12 +585,12 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
             <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-bold text-purple-900 border border-purple-200">
               {viewMode === "cards" ? t.customers.badge : "Customer Ledger"}
             </span>
-            <span className="text-xs text-slate-500 font-medium">• 600 Total Profiled Shoppers</span>
+            <span className="text-xs text-slate-500 font-medium">• 600 {cardI18n.shoppersUnit}</span>
           </div>
           <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#0A1120]">
             {viewMode === "cards"
               ? t.customers.title
-              : `Merchant Customer Directory (${selectedSegment === "All" ? "600 Shoppers" : selectedSegment + " Cohort"})`}
+              : `${cardI18n.ledgerTitle} (${selectedSegment === "All" ? `600 ${cardI18n.shoppersUnit}` : getCohortI18n(language, selectedSegment).title})`}
           </h2>
           <p className="text-xs text-slate-500 max-w-2xl">
             {viewMode === "cards"
@@ -314,7 +604,7 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
             className="inline-flex items-center gap-2 rounded-xl bg-[#002E6E] px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-[#002456] active:scale-95 transition cursor-pointer self-start sm:self-center whitespace-nowrap"
           >
             <Users className="h-4 w-4 text-[#00BAF2]" />
-            <span>View All 600 Customers →</span>
+            <span>{cardI18n.viewAllBtn}</span>
           </button>
         ) : (
           <button
@@ -322,7 +612,7 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
             className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2.5 text-xs font-bold shadow-sm active:scale-95 transition cursor-pointer self-start sm:self-center whitespace-nowrap"
           >
             <ArrowLeft className="h-4 w-4 text-[#002E6E]" />
-            <span>← Back to Cohort Cards</span>
+            <span>{cardI18n.backToCardsBtn}</span>
           </button>
         )}
       </div>
@@ -335,11 +625,7 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
               const isAtRisk = c.segment === "At Risk";
               const isChampion = c.segment === "Champions" || c.segment === "Champion";
               const isRegular = c.segment === "Regulars" || c.segment === "Regular";
-              const criteria = COHORT_CRITERIA[c.segment] || {
-                frequency: "1–2 visits/wk",
-                recency: "Active",
-                spend: "Regular spend",
-              };
+              const cohortInfo = getCohortI18n(language, c.segment);
 
               return (
                 <div
@@ -362,7 +648,7 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
                         {isAtRisk && <AlertTriangle className="h-4 w-4 text-red-600 animate-pulse" />}
                         {isRegular && <UserCheck className="h-4 w-4 text-[#002E6E]" />}
                         {!isChampion && !isAtRisk && !isRegular && <Users className="h-4 w-4 text-slate-500" />}
-                        {c.segment}
+                        {cohortInfo.title}
                       </span>
                       <span
                         className={`rounded-full px-2 py-0.5 text-[12px] font-extrabold ${
@@ -384,32 +670,32 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
                       <span className="text-3xl font-extrabold text-[#0A1120]">
                         {c.count}
                       </span>
-                      <span className="text-xs text-slate-500 font-semibold">customers</span>
+                      <span className="text-xs text-slate-500 font-semibold">{cardI18n.customersUnit}</span>
                     </div>
 
                     <p className="mt-1 text-xs text-slate-600 font-medium">
-                      Average spend: <strong className="text-slate-900">{formatINR(c.avg_spend)}</strong>
+                      {cardI18n.avgSpendLabel} <strong className="text-slate-900">{formatINR(c.avg_spend)}</strong>
                     </p>
 
                     {/* Explicit Frequency & Recency Criteria Box */}
                     <div className="mt-3 rounded-lg bg-slate-50 p-2.5 border border-slate-200/80 space-y-1 text-[11px]">
                       <div className="flex items-center justify-between text-slate-700">
-                        <span className="font-semibold text-slate-500">Visit Frequency:</span>
-                        <strong className="text-slate-900">{criteria.frequency}</strong>
+                        <span className="font-semibold text-slate-500">{cardI18n.frequencyLabel}</span>
+                        <strong className="text-slate-900">{cohortInfo.frequency}</strong>
                       </div>
                       <div className="flex items-center justify-between text-slate-700">
-                        <span className="font-semibold text-slate-500">Recency Status:</span>
+                        <span className="font-semibold text-slate-500">{cardI18n.recencyLabel}</span>
                         <span className={`font-semibold ${isAtRisk ? "text-red-700 font-bold" : "text-emerald-700"}`}>
-                          {criteria.recency}
+                          {cohortInfo.recency}
                         </span>
                       </div>
                       <div className="pt-1 text-[10px] text-slate-500 border-t border-slate-200/60 font-mono">
-                        Criteria: {criteria.spend}
+                        {cardI18n.criteriaLabel} {cohortInfo.spend}
                       </div>
                     </div>
 
                     <p className="mt-3 text-[12px] text-slate-600 leading-snug">
-                      {c.recommended_action}
+                      {cohortInfo.action}
                     </p>
                   </div>
 
@@ -418,10 +704,10 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
                     <button
                       onClick={() => openDirectoryView(c.segment)}
                       className="flex-1 flex items-center justify-center space-x-1 rounded-xl py-2 px-2 text-[11px] font-bold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition active:scale-95 cursor-pointer shadow-2xs"
-                      title={`View ${c.count} ${c.segment} customers in directory`}
+                      title={`View ${c.count} in directory`}
                     >
                       <Users className="h-3.5 w-3.5 text-[#002E6E]" />
-                      <span>View ({c.count})</span>
+                      <span>{cardI18n.viewBtn} ({c.count})</span>
                     </button>
                     <button
                       onClick={() => onTargetSegment(c.segment)}
@@ -431,7 +717,7 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
                           : "bg-[#002E6E] text-white hover:bg-[#002456]"
                       }`}
                     >
-                      <span>{isAtRisk ? "Recover 42" : "Promo"}</span>
+                      <span>{isAtRisk ? cardI18n.recoverBtn : cardI18n.promoBtn}</span>
                       <ArrowRight className="h-3 w-3 text-current" />
                     </button>
                   </div>
@@ -448,10 +734,10 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
               </div>
               <div>
                 <h4 className="font-extrabold text-sm text-[#0A1120]">
-                  Looking for individual customer records or transaction history?
+                  {cardI18n.bannerTitle}
                 </h4>
                 <p className="text-xs text-slate-500">
-                  Search across all 600 profiled shoppers, filter by segment, or dispatch 1-click WhatsApp retention offers.
+                  {cardI18n.bannerSubtitle}
                 </p>
               </div>
             </div>
@@ -460,7 +746,7 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
               className="inline-flex items-center gap-2 rounded-xl bg-[#002E6E] hover:bg-[#002456] text-white text-xs font-bold px-4 py-2.5 shadow-sm transition active:scale-95 cursor-pointer whitespace-nowrap self-start sm:self-auto"
             >
               <Users className="h-4 w-4 text-[#00BAF2]" />
-              <span>Open Customer Directory (600) →</span>
+              <span>{cardI18n.bannerBtn}</span>
             </button>
           </div>
         </div>
@@ -474,10 +760,10 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
               className="inline-flex items-center gap-1.5 text-xs font-bold text-[#002E6E] hover:underline cursor-pointer"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>← Back to Cohort Cards Overview</span>
+              <span>{cardI18n.backToCardsBtn}</span>
             </button>
             <span className="text-xs text-slate-500 font-medium">
-              Filtered Cohort: <strong className="text-slate-900">{selectedSegment}</strong> ({totalFiltered} shoppers)
+              Filtered Cohort: <strong className="text-slate-900">{selectedSegment === "All" ? t.customers.filterAll : getCohortI18n(language, selectedSegment).title}</strong> ({totalFiltered} {cardI18n.customersUnit})
             </span>
           </div>
 
@@ -486,10 +772,10 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
           <div>
             <h3 className="text-base font-bold text-[#0A1120] flex items-center gap-2">
               <Users className="h-4 w-4 text-[#002E6E]" />
-              Merchant Customer Directory (600 Shoppers)
+              {cardI18n.ledgerTitle} (600 {cardI18n.shoppersUnit})
             </h3>
             <p className="text-xs text-slate-500">
-              Showing {customers.length} of {totalFiltered} shoppers matching criteria • Compliant with DPDP Act 2023.
+              Showing {customers.length} of {totalFiltered} {cardI18n.customersUnit} matching criteria • Compliant with DPDP Act 2023.
             </p>
           </div>
           <span className="text-[12px] font-semibold text-slate-500 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 flex items-center gap-1 self-start sm:self-auto">
@@ -504,10 +790,10 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
           <div className="flex flex-wrap items-center gap-1.5 text-xs font-semibold">
             {[
               { id: "All", label: `${t.customers.filterAll} (600)` },
-              { id: "Champions", label: `👑 ${t.customers.champions} (54)` },
-              { id: "Regulars", label: `🤝 ${t.customers.regulars} (102)` },
-              { id: "At Risk", label: `⚠️ ${t.customers.atRisk} (42)` },
-              { id: "Occasional Walk-in", label: `🚶 ${t.customers.occasional} (402)` },
+              { id: "Champions", label: `👑 ${cardI18n.cohorts["Champions"].title} (54)` },
+              { id: "Regulars", label: `🤝 ${cardI18n.cohorts["Regulars"].title} (102)` },
+              { id: "At Risk", label: `⚠️ ${cardI18n.cohorts["At Risk"].title} (42)` },
+              { id: "Occasional Walk-in", label: `🚶 ${cardI18n.cohorts["Occasional Walk-ins"].title} (402)` },
             ].map((tab) => (
               <button
                 key={tab.id}

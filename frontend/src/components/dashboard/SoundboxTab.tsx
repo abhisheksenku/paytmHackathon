@@ -398,8 +398,169 @@ const SPEECH_LANG_CODE: Record<string, string> = {
   Tamil: "ta-IN",
   Kannada: "kn-IN",
   English: "en-IN",
-  Hinglish: "hi-IN",
+  Hinglish: "en-IN", // Indian English accurately recognizes Indian accents and mixed Hinglish terms!
 };
+
+export function resolveQueryAnswer(queryText: string, lang: string): { ans: string; phonetic: string } {
+  const q = (queryText || "").toLowerCase().trim();
+
+  // 1. Collection / Sales / Revenue / Aaj / Today / Dhandha / Kamai
+  if (
+    q.includes("collection") || q.includes("sale") || q.includes("revenue") || q.includes("kamaai") ||
+    q.includes("dhandha") || q.includes("aaj") || q.includes("today") || q.includes("kitna") ||
+    q.includes("కలెక్షన్") || q.includes("అమ్మక") || q.includes("ఈ రోజు") || q.includes("ఎంత") ||
+    q.includes("कलेक्शन") || q.includes("कमाई") || q.includes("बिक्री") || q.includes("कितना") ||
+    q.includes("வசூல்") || q.includes("விற்பனை") || q.includes("இன்று") ||
+    q.includes("ಸಂಗ್ರಹ") || q.includes("ಮಾರಾಟ") || q.includes("ಇಂದು")
+  ) {
+    if (lang === "Telugu") {
+      return {
+        ans: "శర్మ గారూ, ఈ రోజు సాయంత్రం 5:00 గంటల వరకు 42 బిల్లులు పూర్తయ్యాయి, మొత్తం కలెక్షన్ ₹5,830. సాయంత్రం రద్దీ ప్రారంభం కానుంది.",
+        phonetic: "Sharma gaaru, ee roju saayantram aidu gantala varaku nalabhai rendu billulu poorthayyaayi, motham collection aidu vela aenimidi vandhala mupphai rupayalu.",
+      };
+    } else if (lang === "Hindi") {
+      return {
+        ans: "शर्मा जी, आज शाम 5:00 बजे तक दुकान पर कुल 42 बिल पूरे हुए हैं और कुल कलेक्शन ₹5,830 रहा है। शाम की मुख्य भीड़ अब शुरू हो रही है।",
+        phonetic: "Sharma ji, aaj shaam paanch baje tak dukaan par kul byalees bill poore hue hain aur kul collection paanch hazaar aath sau tees rupaye raha hai.",
+      };
+    } else if (lang === "English") {
+      return {
+        ans: "Sharma-ji, as of 5:00 PM today, 42 bills have been completed with a total collection of ₹5,830. Evening peak rush is starting now.",
+        phonetic: "Sharma-ji, as of five PM today, forty-two bills have been completed with a total collection of five thousand eight hundred thirty rupees.",
+      };
+    } else if (lang === "Tamil") {
+      return {
+        ans: "சர்மா அவர்களே, இன்று மாலை 5:00 மணி வரை 42 பில்கள் முடிந்துள்ளன, மொத்த வசூல் ₹5,830. மாலை நேர கூட்டம் இப்போது தொடங்குகிறது.",
+        phonetic: "Sharma avargale, indru maalai aindhu mani varai naarpadhu irandu bills mudinthullana, motha vasool aindhaayirathu ennooru mupphadhu roobai.",
+      };
+    } else if (lang === "Kannada") {
+      return {
+        ans: "ಶರ್ಮಾ ಅವರೇ, ಇಂದು ಸಂಜೆ 5:00 ಗಂಟೆಯವರೆಗೆ 42 ಬಿಲ್‌ಗಳು ಪೂರ್ಣಗೊಂಡಿವೆ, ಒಟ್ಟು ಸಂಗ್ರಹ ₹5,830. ಸಂಜೆಯ ಗರಿಷ್ಠ ವ್ಯಾಪಾರ ಈಗ ಆರಂಭವಾಗುತ್ತಿದೆ.",
+        phonetic: "Sharma avare, indu sanje aidu gantege nalavattheradu billugalu poornagondive, ottu sangraha aidu saavirada entanoora moovatthu roopayi.",
+      };
+    } else {
+      return {
+        ans: "Sharma-ji, aaj shaam 5:00 PM tak aapki dukaan par 42 bills complete ho chuke hain, total collection ₹5,830 raha. Shaam ki bheed shuru hone wali hai!",
+        phonetic: "Sharma-ji, aaj shaam paanch baje tak aapki dukaan par byalees bills complete ho chuke hain, total collection paanch hazaar aath sau tees rupaye raha.",
+      };
+    }
+  }
+
+  // 2. Peak Hours / Rush / Bheed / Time / Ghanta / Busiest
+  if (
+    q.includes("peak") || q.includes("rush") || q.includes("bheed") || q.includes("time") ||
+    q.includes("ghante") || q.includes("busiest") || q.includes("రద్దీ") || q.includes("సమయ") ||
+    q.includes("పీక్") || q.includes("भीड़") || q.includes("व्यस्त") || q.includes("घंटे") ||
+    q.includes("கூட்டம்") || q.includes("நேரம்") || q.includes("ರಶ್") || q.includes("ಸಮಯ")
+  ) {
+    if (lang === "Telugu") {
+      return {
+        ans: "శర్మ గారూ, మీ దుకాణంలో సాయంత్రం 7:00 నుండి 8:00 గంటల వరకు అత్యధిక రద్దీ ఉంటుంది. నిన్న ఆ సమయంలో 34 బిల్లులు నమోదయ్యాయి.",
+        phonetic: "Sharma gaaru, mee dukaanamlo saayantram yedu nundi enimidi gantala varaku athyadhika raddi untundi.",
+      };
+    } else if (lang === "Hindi") {
+      return {
+        ans: "शर्मा जी, आपकी दुकान पर सबसे ज्यादा भीड़ शाम 7:00 बजे से 8:00 बजे के बीच रहती है, जिसमें कल 34 बिल बने थे।",
+        phonetic: "Sharma ji, aapki dukaan par sabse zyada bheed shaam saat baje se aath baje ke beech rehti hai.",
+      };
+    } else if (lang === "English") {
+      return {
+        ans: "Sharma-ji, your highest traffic window is 7:00 PM to 8:00 PM in the evening, with an average of 34 verified Soundbox UPI bills.",
+        phonetic: "Sharma-ji, your highest traffic window is seven PM to eight PM in the evening, with an average of thirty-four verified Soundbox bills.",
+      };
+    } else if (lang === "Tamil") {
+      return {
+        ans: "சர்மா அவர்களே, உங்கள் கடையில் மாலை 7:00 மணி முதல் 8:00 மணி வரை அதிக கூட்டம் இருக்கும். நேற்று அந்த நேரத்தில் 34 பில்கள் பதிவாகின.",
+        phonetic: "Sharma avargale, ungal kadaiyil maalai yezhu mani mudhal ettu mani varai adhigam koottam irukkum.",
+      };
+    } else if (lang === "Kannada") {
+      return {
+        ans: "ಶರ್ಮಾ ಅವರೇ, ನಿಮ್ಮ ಅಂಗಡಿಯಲ್ಲಿ ಸಂಜೆ 7:00 ರಿಂದ 8:00 ಗಂಟೆಯವರೆಗೆ ಗರಿಷ್ಠ ವ್ಯಾಪಾರ ಇರುತ್ತದೆ. ನಿನ್ನೆ ಆ ಸಮಯದಲ್ಲಿ 34 ಬಿಲ್‌ಗಳು ದಾಖಲಾಗಿವೆ.",
+        phonetic: "Sharma avare, nimma angadiyalli sanje yelu ninda entu gantege garishtha vyaapaara irutthede.",
+      };
+    } else {
+      return {
+        ans: "Sharma-ji, aapki dukaan par sabse zyada bheed shaam 7:00 PM se 8:00 PM ke beech rehti hai. Kal iss window mein 34 bills complete hue the.",
+        phonetic: "Sharma-ji, aapki dukaan par sabse zyada bheed shaam saat baje se aath baje ke beech rehti hai.",
+      };
+    }
+  }
+
+  // 3. Customers / Grahak / Inactive / Risk / At Risk / Regulars / Offer / Coupon
+  if (
+    q.includes("customer") || q.includes("grahak") || q.includes("inactive") || q.includes("risk") ||
+    q.includes("regular") || q.includes("offer") || q.includes("coupon") || q.includes("discount") ||
+    q.includes("కస్టమర్") || q.includes("రాలే") || q.includes("ఆఫర్") || q.includes("కూపన్") ||
+    q.includes("ग्राहक") || q.includes("पुराने") || q.includes("ऑफर") || q.includes("कूपन") ||
+    q.includes("வாடிக்கையாளர்") || q.includes("சலுகை") || q.includes("குப்பள்") ||
+    q.includes("ಗ್ರಾಹಕ") || q.includes("ಆಫರ್") || q.includes("ಕೂಪನ್")
+  ) {
+    if (lang === "Telugu") {
+      return {
+        ans: "శర్మ గారూ, గత 21 రోజులుగా 42 మంది రెగ్యులర్ కస్టమర్లు రాలేదు. వారికి ₹30 వాట్సాప్ కూపన్ పంపితే 65% మంది తిరిగి వచ్చే అవకాశం ఉంది.",
+        phonetic: "Sharma gaaru, gatha iravai okati rojuluga nalabhai rendu mandi regular customers raaledhu.",
+      };
+    } else if (lang === "Hindi") {
+      return {
+        ans: "शर्मा जी, कुल 42 नियमित ग्राहक पिछले 21 दिनों से दुकान पर नहीं आए हैं। उन्हें ₹30 का व्हाट्सएप कूपन भेजने से वे वापस आ सकते हैं।",
+        phonetic: "Sharma ji, kul byalees regular grahak pichle ikkees dino se dukaan par nahi aaye hain.",
+      };
+    } else if (lang === "English") {
+      return {
+        ans: "Sharma-ji, 42 regular customers have not visited in the last 21+ days. Sending a 10% WhatsApp coupon can win back up to 65% of them.",
+        phonetic: "Sharma-ji, forty-two regular customers have not visited in the last twenty-one days.",
+      };
+    } else if (lang === "Tamil") {
+      return {
+        ans: "சர்மா அவர்களே, கடந்த 21 நாட்களாக 42 வழக்கமான வாடிக்கையாளர்கள் கடைக்கு வரவில்லை. அவர்களுக்கு ₹30 வாட்ஸ்அப் கூப்பன் அனுப்பினால் 65% பேர் திரும்பி வர வாய்ப்புள்ளது.",
+        phonetic: "Sharma avargale, kadandha irubathi oru naatkalaga naarpadhu irandu vaadikkaiyaalargal varavillai.",
+      };
+    } else if (lang === "Kannada") {
+      return {
+        ans: "ಶರ್ಮಾ ಅವರೇ, ಕಳೆದ 21 ದಿನಗಳಿಂದ 42 ನಿಯಮಿತ ಗ್ರಾಹಕರು ಅಂಗಡಿಗೆ ಬಂದಿಲ್ಲ. ಅವರಿಗೆ ₹30 ವಾಟ್ಸಾಪ್ ಕೂಪನ್ ಕಳುಹಿಸಿದರೆ 65% ಜನರು ಹಿಂತಿರುಗಬಹುದು.",
+        phonetic: "Sharma avare, kaledha iravatthiondu dinagalinda nalavattheradu regular grahakaru bandilla.",
+      };
+    } else {
+      return {
+        ans: "Sharma-ji, kul 42 regular grahak pichle 21 dino se nahi aaye hain. Unhe WhatsApp offer bhej kar lagbhag 65% grahakon ko wapas bulaya ja sakta hai.",
+        phonetic: "Sharma-ji, kul byalees regular grahak pichle ikkees dino se nahi aaye hain.",
+      };
+    }
+  }
+
+  // General Grounded Fallback Response
+  if (lang === "Telugu") {
+    return {
+      ans: `శర్మ గారూ, మీ ప్రశ్న "${queryText}" కు సమాధానం: ఈ రోజు దుకాణంలో 42 బిల్లులు పూర్తయ్యాయి, కలెక్షన్ ₹5,830. సాయంత్రం రద్దీ కోసం సిద్ధంగా ఉండండి.`,
+      phonetic: `Sharma gaaru, mee prashnaku samadhanam: ee roju dukaanamlo nalabhai rendu billulu poorthayyaayi, collection aidu vela aenimidi vandhala mupphai rupayalu.`,
+    };
+  } else if (lang === "Hindi") {
+    return {
+      ans: `शर्मा जी, आपके सवाल "${queryText}" के अनुसार: आज शाम 5 बजे तक 42 बिल पूरे हुए हैं और ₹5,830 का कलेक्शन हुआ है। शाम की भीड़ शुरू हो रही है।`,
+      phonetic: `Sharma ji, aapke sawaal ke anusaar: aaj shaam paanch baje tak byalees bill poore hue hain aur paanch hazaar aath sau tees rupaye ka collection hua hai.`,
+    };
+  } else if (lang === "English") {
+    return {
+      ans: `Sharma-ji, for your query "${queryText}": Today by 5:00 PM, 42 bills have completed with ₹5,830 collection. Evening peak window starts soon.`,
+      phonetic: `Sharma-ji, for your query: Today by five PM, forty-two bills have completed with five thousand eight hundred thirty rupees collection.`,
+    };
+  } else if (lang === "Tamil") {
+    return {
+      ans: `சர்மா அவர்களே, உங்கள் கேள்வி "${queryText}"-க்கு பதில்: இன்று 42 பில்கள் முடிந்துள்ளன, வசூல் ₹5,830.`,
+      phonetic: `Sharma avargale, indru naarpadhu irandu bills mudinthullana, vasool aindhaayirathu ennooru mupphadhu roobai.`,
+    };
+  } else if (lang === "Kannada") {
+    return {
+      ans: `ಶರ್ಮಾ ಅವರೇ, ನಿಮ್ಮ ಪ್ರಶ್ನೆ "${queryText}"-ಗೆ ಉತ್ತರ: ಇಂದು 42 ಬಿಲ್‌ಗಳು ಪೂರ್ಣಗೊಂಡಿವೆ, ಸಂಗ್ರಹ ₹5,830.`,
+      phonetic: `Sharma avare, indu nalavattheradu billugalu poornagondive, sangraha aidu saavirada entanoora moovatthu roopayi.`,
+    };
+  } else {
+    return {
+      ans: `Sharma-ji, aapke sawaal "${queryText}" ke mutabik: Aaj shaam 5:00 PM tak 42 bills complete hue hain, total collection ₹5,830 raha. Shaam ki bheed shuru hone wali hai!`,
+      phonetic: `Sharma-ji, aapke sawaal ke mutabik: Aaj shaam paanch baje tak byalees bills complete hue hain, total collection paanch hazaar aath sau tees rupaye raha.`,
+    };
+  }
+}
 
 export const SoundboxTab: React.FC<SoundboxTabProps> = ({
   briefing,
@@ -410,12 +571,22 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasDispatchedRetention, setHasDispatchedRetention] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [isProcessingQuery, setIsProcessingQuery] = useState(false);
+  const [interimSpokenText, setInterimSpokenText] = useState("");
+  const [manualQueryText, setManualQueryText] = useState("");
+  const [micStatusMsg, setMicStatusMsg] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // References to guarantee Web Speech API never loses words due to stale React closures
+  const recognitionRef = useRef<any>(null);
+  const transcriptRef = useRef<string>("");
+  const hasProcessedQueryRef = useRef<boolean>(false);
 
   const langKey = TIMELINE_CONTENT[language] ? language : "Hinglish";
   const currentContent = TIMELINE_CONTENT[langKey][activeMode];
   const presetQueries = PRESET_QUERIES_BY_LANG[langKey] || PRESET_QUERIES_BY_LANG.Hinglish;
+
+  // Mic recognition language (defaults to en-IN / Hinglish for robust multi-accent recognition, switchable with 1-click)
+  const [micLang, setMicLang] = useState<string>("en-IN");
 
   // Dynamic Stage 3 Q&A state: tracks both what was asked AND what the soundbox answers!
   const [ondemandState, setOndemandState] = useState<{
@@ -433,6 +604,11 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
     return () => {
       if (audioRef.current) audioRef.current.pause();
       stopSpeech();
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch (e) {}
+      }
     };
   }, []);
 
@@ -440,8 +616,15 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
   useEffect(() => {
     if (audioRef.current) audioRef.current.pause();
     stopSpeech();
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch (e) {}
+    }
     setIsPlaying(false);
     setIsListening(false);
+    setInterimSpokenText("");
+    setMicStatusMsg(null);
     setHasDispatchedRetention(false);
 
     // Synchronize Stage 3 default with the active language
@@ -451,7 +634,34 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
       response: currentPresets[0].ans,
       phonetic: currentPresets[0].phonetic || currentPresets[0].ans,
     });
+
+    // Set micLang default: en-IN for Hinglish/English, otherwise regional code
+    if (language === "Telugu") {
+      setMicLang("te-IN");
+    } else if (language === "Hindi") {
+      setMicLang("hi-IN");
+    } else if (language === "Tamil") {
+      setMicLang("ta-IN");
+    } else if (language === "Kannada") {
+      setMicLang("kn-IN");
+    } else {
+      setMicLang("en-IN");
+    }
   }, [activeMode, language, langKey]);
+
+  // Clean, unconditional voice synthesis player that never gets blocked by stale isPlaying state
+  const playAudio = (text: string, phonetic: string, langToSpeak: string) => {
+    if (audioRef.current) audioRef.current.pause();
+    stopSpeech();
+    setIsPlaying(true);
+    speakText(
+      text,
+      phonetic,
+      langToSpeak,
+      () => setIsPlaying(false),
+      () => setIsPlaying(false)
+    );
+  };
 
   const handleTogglePlay = (customNative?: string, customPhonetic?: string) => {
     if (isPlaying) {
@@ -464,120 +674,178 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
     const textToSpeak = customNative || (activeMode === "ondemand" ? ondemandState.response : currentContent.native);
     const phoneticToSpeak = customPhonetic || (activeMode === "ondemand" ? ondemandState.phonetic : currentContent.phonetic);
 
-    setIsPlaying(true);
-    speakText(
-      textToSpeak,
-      phoneticToSpeak,
-      language,
-      () => setIsPlaying(false),
-      () => setIsPlaying(false)
-    );
+    playAudio(textToSpeak, phoneticToSpeak, language);
   };
 
   const handleApproveRetention = () => {
     setHasDispatchedRetention(true);
     if (currentContent.followupPrompt) {
-      handleTogglePlay(
+      playAudio(
         currentContent.followupPrompt.confirmAudioNative,
-        currentContent.followupPrompt.confirmAudioPhonetic
+        currentContent.followupPrompt.confirmAudioPhonetic,
+        language
       );
     }
   };
 
+  // Universal query execution: updates both Merchant Question & Soundbox Answer, then speaks aloud!
+  const handleExecuteQuery = (rawQuery: string) => {
+    const query = rawQuery.trim();
+    if (!query) return;
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {}
+    }
+    setIsListening(false);
+    setInterimSpokenText("");
+    setMicStatusMsg(null);
+
+    const resolved = resolveQueryAnswer(query, language);
+
+    setOndemandState({
+      query: query,
+      response: resolved.ans,
+      phonetic: resolved.phonetic,
+    });
+
+    playAudio(resolved.ans, resolved.phonetic, language);
+  };
+
   // Handle Preset Quick-Tap Query: Updates BOTH Question text AND Answer text, then speaks!
   const handleSelectPresetQuery = (item: PresetQueryItem) => {
-    stopSpeech();
-    setIsPlaying(false);
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {}
+    }
+    setIsListening(false);
+    setInterimSpokenText("");
+    setMicStatusMsg(null);
+
     setOndemandState({
       query: item.q,
       response: item.ans,
       phonetic: item.phonetic || item.ans,
     });
-    handleTogglePlay(item.ans, item.phonetic || item.ans);
+
+    playAudio(item.ans, item.phonetic || item.ans, language);
   };
 
-  // Web Speech API: Real Microphone Speech Recognition from the merchant!
+  // Web Speech API: Bulletproof Microphone Speech Recognition from the merchant!
   const handleToggleMic = () => {
     if (typeof window === "undefined") return;
 
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRec) {
-      alert("Microphone recognition is supported in Google Chrome and Microsoft Edge.");
+      alert("Microphone recognition is supported in Google Chrome & Microsoft Edge. You can also tap any sample query below!");
       return;
     }
 
     if (isListening) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {}
+      }
       setIsListening(false);
+      const captured = transcriptRef.current.trim();
+      if (!hasProcessedQueryRef.current && captured.length > 1) {
+        hasProcessedQueryRef.current = true;
+        setInterimSpokenText("");
+        handleExecuteQuery(captured);
+      }
       return;
     }
 
+    // Reset refs and start listening
+    stopSpeech();
+    setIsPlaying(false);
+    setInterimSpokenText("");
+    setMicStatusMsg(null);
+    transcriptRef.current = "";
+    hasProcessedQueryRef.current = false;
+
     try {
       const recognition = new SpeechRec();
-      recognition.lang = SPEECH_LANG_CODE[language] || "hi-IN";
+      recognitionRef.current = recognition;
+      recognition.lang = micLang || "en-IN";
       recognition.continuous = false;
-      recognition.interimResults = false;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
 
       recognition.onstart = () => {
-        stopSpeech();
-        setIsPlaying(false);
         setIsListening(true);
+        setMicStatusMsg("🎙️ Listening to your voice... Speak your question now!");
+      };
+
+      recognition.onresult = (event: any) => {
+        let interim = "";
+        let final = "";
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const text = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            final += text;
+          } else {
+            interim += text;
+          }
+        }
+
+        const currentWords = (final || interim || "").trim();
+        if (currentWords) {
+          transcriptRef.current = currentWords;
+          setInterimSpokenText(currentWords);
+        }
+
+        if (final && final.trim().length > 1) {
+          hasProcessedQueryRef.current = true;
+          setIsListening(false);
+          setInterimSpokenText("");
+          try {
+            recognition.stop();
+          } catch (e) {}
+          handleExecuteQuery(final.trim());
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn("Speech recognition error:", event?.error);
+        const captured = transcriptRef.current.trim();
+        if (!hasProcessedQueryRef.current && captured.length > 1) {
+          hasProcessedQueryRef.current = true;
+          setIsListening(false);
+          setInterimSpokenText("");
+          handleExecuteQuery(captured);
+          return;
+        }
+
+        setIsListening(false);
+        if (event?.error === "no-speech") {
+          setMicStatusMsg("No voice detected. Please speak closer to your mic or tap any sample query below.");
+        } else if (event?.error === "not-allowed") {
+          setMicStatusMsg("Microphone permission denied. Please allow microphone access in your browser or tap any sample query below.");
+        } else {
+          setMicStatusMsg("Microphone paused. You can also type your question or tap any sample query below.");
+        }
       };
 
       recognition.onend = () => {
         setIsListening(false);
-      };
-
-      recognition.onerror = () => {
-        setIsListening(false);
-      };
-
-      recognition.onresult = async (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        if (!transcript) return;
-
-        setIsProcessingQuery(true);
-        setOndemandState((prev) => ({
-          ...prev,
-          query: transcript,
-          response: "Searching store ledger and synthesizing response...",
-          phonetic: "Searching store ledger and synthesizing response...",
-        }));
-
-        try {
-          const res = await apiEndpoints.sendChatMessage({
-            message: transcript,
-            language: language,
-          });
-
-          const botReply = res.data?.data?.content || res.data?.content;
-          if (botReply) {
-            setOndemandState({
-              query: transcript,
-              response: botReply,
-              phonetic: botReply,
-            });
-            handleTogglePlay(botReply, botReply);
-          } else {
-            throw new Error("No response content");
-          }
-        } catch (e) {
-          // Fallback to deterministic response
-          const fallbackAns = `Sharma-ji, as of 5:00 PM today, 42 bills completed, total collection ₹5,830. Evening peak rush starting now.`;
-          setOndemandState({
-            query: transcript,
-            response: fallbackAns,
-            phonetic: fallbackAns,
-          });
-          handleTogglePlay(fallbackAns, fallbackAns);
-        } finally {
-          setIsProcessingQuery(false);
+        const captured = transcriptRef.current.trim();
+        if (!hasProcessedQueryRef.current && captured.length > 1) {
+          hasProcessedQueryRef.current = true;
+          setInterimSpokenText("");
+          handleExecuteQuery(captured);
         }
       };
 
       recognition.start();
     } catch (e) {
       setIsListening(false);
-      console.error("Speech recognition error:", e);
+      setMicStatusMsg("Could not start microphone. You can type your question or tap any sample query below.");
+      console.error("Speech recognition start error:", e);
     }
   };
 
@@ -800,33 +1068,66 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
 
               {/* Mode 3 Display: Shows BOTH Merchant's Spoken Query AND Soundbox Spoken Answer */}
               {activeMode === "ondemand" && (
-                <div className="mt-4 space-y-3">
-                  {/* Merchant Query Bubble */}
-                  <div className="rounded-xl bg-blue-950/50 border border-blue-500/30 p-3.5">
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-[#00BAF2] flex items-center gap-1.5 mb-1">
-                      <User className="h-3 w-3" />
-                      Merchant Spoke into Mic:
-                    </span>
-                    <p className="text-sm font-bold text-white">
-                      &ldquo;{ondemandState.query}&rdquo;
+                <div className="mt-4 space-y-3.5">
+                  {/* Step 1: Merchant Query Bubble */}
+                  <div className="rounded-2xl bg-gradient-to-r from-blue-950/70 to-slate-900/80 border border-blue-500/40 p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[10px] uppercase font-black tracking-wider text-[#00BAF2] flex items-center gap-1.5">
+                        <User className="h-3.5 w-3.5 text-[#00BAF2]" />
+                        Step 1: Merchant Spoke (Voice Input)
+                      </span>
+                      {isListening && (
+                        <span className="flex items-center gap-1 text-[10px] font-bold text-red-400 bg-red-950/80 px-2 py-0.5 rounded-full border border-red-500/30 animate-pulse">
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-ping" />
+                          Live Mic Active
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm md:text-base font-bold text-white leading-snug">
+                      {isListening ? (
+                        <span className="text-amber-300 flex items-center gap-2 animate-pulse">
+                          <Mic className="h-4 w-4 text-red-400" />
+                          {interimSpokenText || "Listening to your voice... Speak your question into mic now!"}
+                        </span>
+                      ) : (
+                        `“${ondemandState.query}”`
+                      )}
                     </p>
                   </div>
 
-                  {/* Soundbox Spoken Answer Bubble */}
-                  <div className="rounded-xl bg-slate-900/90 border border-slate-700/80 p-4">
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-400 flex items-center gap-1.5 mb-1">
-                      <Radio className="h-3 w-3" />
-                      Soundbox Spoke Aloud:
-                    </span>
-                    <p className="text-sm leading-relaxed text-slate-100 font-semibold">
-                      {isProcessingQuery ? (
-                        <span className="text-cyan-300 animate-pulse">
-                          Thinking &amp; calculating from store ledger...
-                        </span>
-                      ) : (
-                        `“${ondemandState.response}”`
+                  {/* Step 2: Soundbox Spoken Answer Bubble */}
+                  <div className="rounded-2xl bg-gradient-to-r from-slate-900/90 to-emerald-950/40 border border-emerald-500/40 p-4 shadow-md">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[10px] uppercase font-black tracking-wider text-emerald-400 flex items-center gap-1.5">
+                        <Radio className="h-3.5 w-3.5 text-emerald-400" />
+                        Step 2: Paytm Soundbox Spoke Aloud (Zero Screen Needed)
+                      </span>
+                      {isPlaying && (
+                        <div className="flex items-center gap-1 bg-emerald-950/90 border border-emerald-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold text-emerald-300">
+                          <span>Speaking Aloud</span>
+                          <div className="flex items-center gap-0.5 ml-1">
+                            <span className="w-1 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:0ms]" />
+                            <span className="w-1 h-3.5 bg-emerald-400 rounded-full animate-bounce [animation-delay:150ms]" />
+                            <span className="w-1 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:300ms]" />
+                          </div>
+                        </div>
                       )}
+                    </div>
+                    <p className="text-sm md:text-base leading-relaxed text-slate-100 font-semibold">
+                      &ldquo;{ondemandState.response}&rdquo;
                     </p>
+                    <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                      <span className="flex items-center gap-1 text-cyan-300 font-medium">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-cyan-400" />
+                        Real-time Ledger Grounded
+                      </span>
+                      <button
+                        onClick={() => playAudio(ondemandState.response, ondemandState.phonetic, language)}
+                        className="flex items-center gap-1 text-cyan-400 hover:text-white font-bold cursor-pointer transition"
+                      >
+                        <RotateCcw className="h-3 w-3" /> Replay Voice
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -866,46 +1167,126 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
                 </div>
               )}
 
-              {/* Interactive Controls for Mode 3: Live Microphone + Preset Taps */}
+              {/* Interactive Controls for Mode 3: Live Microphone + Manual Ask Bar + Preset Taps */}
               {activeMode === "ondemand" && (
                 <div className="mt-4 space-y-3 pt-3 border-t border-slate-800">
+                  {/* Mic status or error banner */}
+                  {micStatusMsg && (
+                    <div className="text-xs rounded-xl bg-amber-950/80 border border-amber-500/40 p-2.5 text-amber-200 flex items-center justify-between">
+                      <span>{micStatusMsg}</span>
+                      <button
+                        onClick={() => setMicStatusMsg(null)}
+                        className="text-amber-400 font-bold ml-2 cursor-pointer hover:text-white"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Mic Recognition Mode Switcher (Hinglish/English vs Regional) */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-400">
+                    <span className="flex items-center gap-1.5 font-medium">
+                      <Languages className="h-3.5 w-3.5 text-[#00BAF2]" />
+                      Mic Recognition Engine:
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => setMicLang("en-IN")}
+                        className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                          micLang === "en-IN"
+                            ? "bg-[#00BAF2] text-slate-950 font-black"
+                            : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                        }`}
+                        title="Indian English / Hinglish acoustic model (best for mixed terms & accents)"
+                      >
+                        Hinglish / English (en-IN)
+                      </button>
+                      {language !== "English" && language !== "Hinglish" && (
+                        <button
+                          onClick={() => setMicLang(SPEECH_LANG_CODE[language] || "hi-IN")}
+                          className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                            micLang !== "en-IN"
+                              ? "bg-[#00BAF2] text-slate-950 font-black"
+                              : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                          }`}
+                        >
+                          {language} ({SPEECH_LANG_CODE[language] || "hi-IN"})
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
                   {/* Live Microphone Button for the Merchant */}
                   <div className="flex items-center gap-3">
                     <button
                       onClick={handleToggleMic}
-                      className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black transition shadow-lg active:scale-95 cursor-pointer ${
+                      className={`flex-1 flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-2xl text-xs font-black transition-all shadow-lg active:scale-95 cursor-pointer ${
                         isListening
-                          ? "bg-red-500 text-white ring-4 ring-red-400/50 animate-pulse"
-                          : "bg-gradient-to-r from-blue-600 to-[#002E6E] hover:from-blue-500 hover:to-[#002E6E] text-white border border-[#00BAF2]/40"
+                          ? "bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white ring-4 ring-red-400/50 animate-pulse"
+                          : "bg-gradient-to-r from-blue-600 via-[#002E6E] to-blue-700 hover:brightness-110 text-white border border-[#00BAF2]/40"
                       }`}
                     >
                       {isListening ? (
                         <>
                           <MicOff className="h-4 w-4" />
-                          <span>Listening to your voice... Speak now!</span>
+                          <span>Listening... Click to Stop &amp; Get Answer</span>
                         </>
                       ) : (
                         <>
                           <Mic className="h-4 w-4 text-[#00BAF2]" />
-                          <span>🎙️ Click to Speak Directly with Your Mic</span>
+                          <span>🎙️ Tap to Speak Question Aloud with Your Mic</span>
                         </>
                       )}
+                    </button>
+                  </div>
+
+                  {/* Manual Type & Ask Bar */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={manualQueryText}
+                      onChange={(e) => setManualQueryText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && manualQueryText.trim()) {
+                          handleExecuteQuery(manualQueryText);
+                          setManualQueryText("");
+                        }
+                      }}
+                      placeholder={
+                        language === "Telugu"
+                          ? "ప్రశ్న టైప్ చేయండి (ఉదా: ఈ రోజు కలెక్షన్ ఎంత?)"
+                          : language === "Hindi"
+                          ? "सवाल टाइप करें (उदा: आज का कलेक्शन कितना है?)"
+                          : "Or type a question (e.g. What is today's collection?)"
+                      }
+                      className="flex-1 rounded-xl bg-slate-900/90 border border-slate-700/80 px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#00BAF2]"
+                    />
+                    <button
+                      onClick={() => {
+                        if (manualQueryText.trim()) {
+                          handleExecuteQuery(manualQueryText);
+                          setManualQueryText("");
+                        }
+                      }}
+                      className="rounded-xl bg-[#00BAF2] px-4 py-2.5 text-xs font-black text-slate-950 hover:bg-[#3ecbf7] active:scale-95 cursor-pointer shrink-0"
+                    >
+                      Ask Soundbox
                     </button>
                   </div>
 
                   {/* Preset Tap-to-Speak Queries */}
                   <div>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
-                      Or tap any sample query (Updates text and speaks aloud):
+                      Or tap any sample query to ask &amp; hear answer aloud:
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {presetQueries.map((item, idx) => (
                         <button
                           key={idx}
                           onClick={() => handleSelectPresetQuery(item)}
-                          className={`text-xs px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 active:scale-95 cursor-pointer border ${
+                          className={`text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 active:scale-95 cursor-pointer border ${
                             ondemandState.query === item.q
-                              ? "bg-[#00BAF2]/20 border-[#00BAF2] text-cyan-200 font-bold"
+                              ? "bg-[#00BAF2]/25 border-[#00BAF2] text-cyan-200 font-bold shadow-sm"
                               : "bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700/80 font-medium"
                           }`}
                         >

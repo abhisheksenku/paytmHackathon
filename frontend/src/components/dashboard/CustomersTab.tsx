@@ -7,6 +7,7 @@ import {
   AlertTriangle,
   ShieldCheck,
   ArrowRight,
+  ArrowLeft,
   UserCheck,
   Search,
   Filter,
@@ -72,6 +73,9 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ onTargetSegment, lan
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [loadingCohorts, setLoadingCohorts] = useState(true);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
+
+  // View Mode: "cards" (Cohort Cards Overview) vs "directory" (Customer Directory Ledger)
+  const [viewMode, setViewMode] = useState<"cards" | "directory">("cards");
 
   // Pagination State for All 600 Shoppers
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -230,14 +234,21 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
     fetchCustomerList(selectedSegment, searchQuery, 1, pageSize);
   };
 
-  const scrollToDirectory = (segment?: string) => {
+  const openDirectoryView = (segment?: string) => {
     if (segment) {
       setSelectedSegment(segment);
       setCurrentPage(1);
     }
-    const el = document.getElementById("customer-directory-section");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
+    setViewMode("directory");
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const backToCardsView = () => {
+    setViewMode("cards");
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -282,139 +293,195 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
         <div>
           <div className="flex items-center space-x-2">
             <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-bold text-purple-900 border border-purple-200">
-              {t.customers.badge}
+              {viewMode === "cards" ? t.customers.badge : "Customer Ledger"}
             </span>
             <span className="text-xs text-slate-500 font-medium">• 600 Total Profiled Shoppers</span>
           </div>
           <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#0A1120]">
-            {t.customers.title}
+            {viewMode === "cards"
+              ? t.customers.title
+              : `Merchant Customer Directory (${selectedSegment === "All" ? "600 Shoppers" : selectedSegment + " Cohort"})`}
           </h2>
           <p className="text-xs text-slate-500 max-w-2xl">
-            {t.customers.subtitle}
+            {viewMode === "cards"
+              ? t.customers.subtitle
+              : "Search individual customer records, masked VPAs, purchase history, and dispatch 1-click WhatsApp retention offers."}
           </p>
         </div>
-        <button
-          onClick={() => scrollToDirectory("All")}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#002E6E] px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-[#002456] active:scale-95 transition cursor-pointer self-start sm:self-center whitespace-nowrap"
-        >
-          <Users className="h-4 w-4 text-[#00BAF2]" />
-          <span>View All 600 Customers ↓</span>
-        </button>
+        {viewMode === "cards" ? (
+          <button
+            onClick={() => openDirectoryView("All")}
+            className="inline-flex items-center gap-2 rounded-xl bg-[#002E6E] px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-[#002456] active:scale-95 transition cursor-pointer self-start sm:self-center whitespace-nowrap"
+          >
+            <Users className="h-4 w-4 text-[#00BAF2]" />
+            <span>View All 600 Customers →</span>
+          </button>
+        ) : (
+          <button
+            onClick={backToCardsView}
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2.5 text-xs font-bold shadow-sm active:scale-95 transition cursor-pointer self-start sm:self-center whitespace-nowrap"
+          >
+            <ArrowLeft className="h-4 w-4 text-[#002E6E]" />
+            <span>← Back to Cohort Cards</span>
+          </button>
+        )}
       </div>
 
-      {/* 4 Cohort Cards Grid with Explicit Frequency & Criteria */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {cohorts.map((c) => {
-          const isAtRisk = c.segment === "At Risk";
-          const isChampion = c.segment === "Champions" || c.segment === "Champion";
-          const isRegular = c.segment === "Regulars" || c.segment === "Regular";
-          const criteria = COHORT_CRITERIA[c.segment] || {
-            frequency: "1–2 visits/wk",
-            recency: "Active",
-            spend: "Regular spend",
-          };
+      {viewMode === "cards" ? (
+        /* 4 Cohort Cards Grid Overview (Hidden when directory is viewed) */
+        <div className="space-y-6 animate-in fade-in duration-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {cohorts.map((c) => {
+              const isAtRisk = c.segment === "At Risk";
+              const isChampion = c.segment === "Champions" || c.segment === "Champion";
+              const isRegular = c.segment === "Regulars" || c.segment === "Regular";
+              const criteria = COHORT_CRITERIA[c.segment] || {
+                frequency: "1–2 visits/wk",
+                recency: "Active",
+                spend: "Regular spend",
+              };
 
-          return (
-            <div
-              key={c.segment}
-              className={`rounded-2xl border p-5 shadow-sm transition hover:shadow-md flex flex-col justify-between ${
-                isAtRisk
-                  ? "border-red-300 bg-gradient-to-b from-red-50/70 to-white ring-1 ring-red-200"
-                  : isChampion
-                  ? "border-emerald-300 bg-gradient-to-b from-emerald-50/70 to-white ring-1 ring-emerald-200"
-                  : isRegular
-                  ? "border-blue-200 bg-gradient-to-b from-blue-50/40 to-white"
-                  : "border-slate-200 bg-white"
-              }`}
-            >
-              <div>
-                {/* Header row */}
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                    {isChampion && <Crown className="h-4 w-4 text-amber-500" />}
-                    {isAtRisk && <AlertTriangle className="h-4 w-4 text-red-600 animate-pulse" />}
-                    {isRegular && <UserCheck className="h-4 w-4 text-[#002E6E]" />}
-                    {!isChampion && !isAtRisk && !isRegular && <Users className="h-4 w-4 text-slate-500" />}
-                    {c.segment}
-                  </span>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-[12px] font-extrabold ${
-                      isAtRisk
-                        ? "bg-red-200 text-red-900"
-                        : isChampion
-                        ? "bg-emerald-200 text-emerald-900"
-                        : isRegular
-                        ? "bg-blue-100 text-[#002E6E]"
-                        : "bg-slate-100 text-slate-700"
-                    }`}
-                  >
-                    {c.pct}%
-                  </span>
-                </div>
-
-                {/* Counts */}
-                <div className="mt-4 flex items-baseline gap-1">
-                  <span className="text-3xl font-extrabold text-[#0A1120]">
-                    {c.count}
-                  </span>
-                  <span className="text-xs text-slate-500 font-semibold">customers</span>
-                </div>
-
-                <p className="mt-1 text-xs text-slate-600 font-medium">
-                  Average spend: <strong className="text-slate-900">{formatINR(c.avg_spend)}</strong>
-                </p>
-
-                {/* Explicit Frequency & Recency Criteria Box */}
-                <div className="mt-3 rounded-lg bg-slate-50 p-2.5 border border-slate-200/80 space-y-1 text-[11px]">
-                  <div className="flex items-center justify-between text-slate-700">
-                    <span className="font-semibold text-slate-500">Visit Frequency:</span>
-                    <strong className="text-slate-900">{criteria.frequency}</strong>
-                  </div>
-                  <div className="flex items-center justify-between text-slate-700">
-                    <span className="font-semibold text-slate-500">Recency Status:</span>
-                    <span className={`font-semibold ${isAtRisk ? "text-red-700 font-bold" : "text-emerald-700"}`}>
-                      {criteria.recency}
-                    </span>
-                  </div>
-                  <div className="pt-1 text-[10px] text-slate-500 border-t border-slate-200/60 font-mono">
-                    Criteria: {criteria.spend}
-                  </div>
-                </div>
-
-                <p className="mt-3 text-[12px] text-slate-600 leading-snug">
-                  {c.recommended_action}
-                </p>
-              </div>
-
-              {/* Action Buttons: View Cohort in Directory + Launch Campaign */}
-              <div className="mt-4 flex items-center gap-2">
-                <button
-                  onClick={() => scrollToDirectory(c.segment)}
-                  className="flex-1 flex items-center justify-center space-x-1 rounded-xl py-2 px-2 text-[11px] font-bold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition active:scale-95 cursor-pointer shadow-2xs"
-                  title={`View ${c.count} ${c.segment} customers in directory`}
-                >
-                  <Users className="h-3.5 w-3.5 text-[#002E6E]" />
-                  <span>View ({c.count})</span>
-                </button>
-                <button
-                  onClick={() => onTargetSegment(c.segment)}
-                  className={`flex-1 flex items-center justify-center space-x-1 rounded-xl py-2 px-2 text-[11px] font-bold transition active:scale-95 shadow-2xs cursor-pointer ${
+              return (
+                <div
+                  key={c.segment}
+                  className={`rounded-2xl border p-5 shadow-sm transition hover:shadow-md flex flex-col justify-between ${
                     isAtRisk
-                      ? "bg-red-600 text-white hover:bg-red-700"
-                      : "bg-[#002E6E] text-white hover:bg-[#002456]"
+                      ? "border-red-300 bg-gradient-to-b from-red-50/70 to-white ring-1 ring-red-200"
+                      : isChampion
+                      ? "border-emerald-300 bg-gradient-to-b from-emerald-50/70 to-white ring-1 ring-emerald-200"
+                      : isRegular
+                      ? "border-blue-200 bg-gradient-to-b from-blue-50/40 to-white"
+                      : "border-slate-200 bg-white"
                   }`}
                 >
-                  <span>{isAtRisk ? "Recover 42" : "Promo"}</span>
-                  <ArrowRight className="h-3 w-3 text-current" />
-                </button>
+                  <div>
+                    {/* Header row */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                        {isChampion && <Crown className="h-4 w-4 text-amber-500" />}
+                        {isAtRisk && <AlertTriangle className="h-4 w-4 text-red-600 animate-pulse" />}
+                        {isRegular && <UserCheck className="h-4 w-4 text-[#002E6E]" />}
+                        {!isChampion && !isAtRisk && !isRegular && <Users className="h-4 w-4 text-slate-500" />}
+                        {c.segment}
+                      </span>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[12px] font-extrabold ${
+                          isAtRisk
+                            ? "bg-red-200 text-red-900"
+                            : isChampion
+                            ? "bg-emerald-200 text-emerald-900"
+                            : isRegular
+                            ? "bg-blue-100 text-[#002E6E]"
+                            : "bg-slate-100 text-slate-700"
+                        }`}
+                      >
+                        {c.pct}%
+                      </span>
+                    </div>
+
+                    {/* Counts */}
+                    <div className="mt-4 flex items-baseline gap-1">
+                      <span className="text-3xl font-extrabold text-[#0A1120]">
+                        {c.count}
+                      </span>
+                      <span className="text-xs text-slate-500 font-semibold">customers</span>
+                    </div>
+
+                    <p className="mt-1 text-xs text-slate-600 font-medium">
+                      Average spend: <strong className="text-slate-900">{formatINR(c.avg_spend)}</strong>
+                    </p>
+
+                    {/* Explicit Frequency & Recency Criteria Box */}
+                    <div className="mt-3 rounded-lg bg-slate-50 p-2.5 border border-slate-200/80 space-y-1 text-[11px]">
+                      <div className="flex items-center justify-between text-slate-700">
+                        <span className="font-semibold text-slate-500">Visit Frequency:</span>
+                        <strong className="text-slate-900">{criteria.frequency}</strong>
+                      </div>
+                      <div className="flex items-center justify-between text-slate-700">
+                        <span className="font-semibold text-slate-500">Recency Status:</span>
+                        <span className={`font-semibold ${isAtRisk ? "text-red-700 font-bold" : "text-emerald-700"}`}>
+                          {criteria.recency}
+                        </span>
+                      </div>
+                      <div className="pt-1 text-[10px] text-slate-500 border-t border-slate-200/60 font-mono">
+                        Criteria: {criteria.spend}
+                      </div>
+                    </div>
+
+                    <p className="mt-3 text-[12px] text-slate-600 leading-snug">
+                      {c.recommended_action}
+                    </p>
+                  </div>
+
+                  {/* Action Buttons: View Cohort in Directory + Launch Campaign */}
+                  <div className="mt-4 flex items-center gap-2">
+                    <button
+                      onClick={() => openDirectoryView(c.segment)}
+                      className="flex-1 flex items-center justify-center space-x-1 rounded-xl py-2 px-2 text-[11px] font-bold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition active:scale-95 cursor-pointer shadow-2xs"
+                      title={`View ${c.count} ${c.segment} customers in directory`}
+                    >
+                      <Users className="h-3.5 w-3.5 text-[#002E6E]" />
+                      <span>View ({c.count})</span>
+                    </button>
+                    <button
+                      onClick={() => onTargetSegment(c.segment)}
+                      className={`flex-1 flex items-center justify-center space-x-1 rounded-xl py-2 px-2 text-[11px] font-bold transition active:scale-95 shadow-2xs cursor-pointer ${
+                        isAtRisk
+                          ? "bg-red-600 text-white hover:bg-red-700"
+                          : "bg-[#002E6E] text-white hover:bg-[#002456]"
+                      }`}
+                    >
+                      <span>{isAtRisk ? "Recover 42" : "Promo"}</span>
+                      <ArrowRight className="h-3 w-3 text-current" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Quick Nav Banner to Table */}
+          <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-blue-50/40 p-5 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center space-x-3">
+              <div className="h-10 w-10 rounded-2xl bg-[#002E6E] flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0">
+                <Users className="h-5 w-5 text-[#00BAF2]" />
+              </div>
+              <div>
+                <h4 className="font-extrabold text-sm text-[#0A1120]">
+                  Looking for individual customer records or transaction history?
+                </h4>
+                <p className="text-xs text-slate-500">
+                  Search across all 600 profiled shoppers, filter by segment, or dispatch 1-click WhatsApp retention offers.
+                </p>
               </div>
             </div>
-          );
-        })}
-      </div>
+            <button
+              onClick={() => openDirectoryView("All")}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#002E6E] hover:bg-[#002456] text-white text-xs font-bold px-4 py-2.5 shadow-sm transition active:scale-95 cursor-pointer whitespace-nowrap self-start sm:self-auto"
+            >
+              <Users className="h-4 w-4 text-[#00BAF2]" />
+              <span>Open Customer Directory (600) →</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* Real Customer Directory Table with Filters, Search & Pagination (Cards Hidden) */
+        <div id="customer-directory-section" className="space-y-4 animate-in fade-in duration-200">
+          {/* Back button bar */}
+          <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-2.5">
+            <button
+              onClick={backToCardsView}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#002E6E] hover:underline cursor-pointer"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>← Back to Cohort Cards Overview</span>
+            </button>
+            <span className="text-xs text-slate-500 font-medium">
+              Filtered Cohort: <strong className="text-slate-900">{selectedSegment}</strong> ({totalFiltered} shoppers)
+            </span>
+          </div>
 
-      {/* Real Customer Directory Table with Filters, Search & Pagination */}
-      <div id="customer-directory-section" className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h3 className="text-base font-bold text-[#0A1120] flex items-center gap-2">
@@ -708,6 +775,8 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
           </div>
         </div>
       </div>
+    </div>
+  )}
 
       {/* Interactive WhatsApp Direct Modal (100% Free wa.me Link) */}
       {whatsappModalCustomer && (

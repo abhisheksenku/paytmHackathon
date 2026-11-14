@@ -73,6 +73,10 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ onTargetSegment, lan
   const [loadingCohorts, setLoadingCohorts] = useState(true);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
 
+  // Pagination State for All 600 Shoppers
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(20);
+
   // Real-time Free WhatsApp Direct Dispatch State
   const [whatsappModalCustomer, setWhatsappModalCustomer] = useState<CustomerProfile | null>(null);
   const [modalPhone, setModalPhone] = useState<string>("8374360774");
@@ -190,13 +194,20 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
     fetchCohorts();
   }, []);
 
-  const fetchCustomerList = async (segment: string, search: string) => {
+  const fetchCustomerList = async (
+    segment: string,
+    search: string,
+    page: number = 1,
+    size: number = 20
+  ) => {
     setLoadingCustomers(true);
     try {
+      const offset = (page - 1) * size;
       const res = await apiEndpoints.getCustomers({
         segment: segment === "All" ? undefined : segment,
         search: search.trim() || undefined,
-        limit: 15,
+        limit: size,
+        offset: offset,
       });
       if (res.data?.success) {
         setCustomers(res.data.data || []);
@@ -210,12 +221,24 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
   };
 
   useEffect(() => {
-    fetchCustomerList(selectedSegment, searchQuery);
-  }, [selectedSegment]);
+    fetchCustomerList(selectedSegment, searchQuery, currentPage, pageSize);
+  }, [selectedSegment, currentPage, pageSize]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchCustomerList(selectedSegment, searchQuery);
+    setCurrentPage(1);
+    fetchCustomerList(selectedSegment, searchQuery, 1, pageSize);
+  };
+
+  const scrollToDirectory = (segment?: string) => {
+    if (segment) {
+      setSelectedSegment(segment);
+      setCurrentPage(1);
+    }
+    const el = document.getElementById("customer-directory-section");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   const getSegmentBadge = (segment: string) => {
@@ -248,22 +271,35 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
     );
   };
 
+  const totalPages = Math.max(1, Math.ceil(totalFiltered / pageSize));
+  const startIdx = totalFiltered === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const endIdx = Math.min(currentPage * pageSize, totalFiltered);
+
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
-      <div>
-        <div className="flex items-center space-x-2">
-          <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-bold text-purple-900 border border-purple-200">
-            {t.customers.badge}
-          </span>
-          <span className="text-xs text-slate-500 font-medium">• 600 Total Profiled Shoppers</span>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center space-x-2">
+            <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-bold text-purple-900 border border-purple-200">
+              {t.customers.badge}
+            </span>
+            <span className="text-xs text-slate-500 font-medium">• 600 Total Profiled Shoppers</span>
+          </div>
+          <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#0A1120]">
+            {t.customers.title}
+          </h2>
+          <p className="text-xs text-slate-500 max-w-2xl">
+            {t.customers.subtitle}
+          </p>
         </div>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#0A1120]">
-          {t.customers.title}
-        </h2>
-        <p className="text-xs text-slate-500 max-w-2xl">
-          {t.customers.subtitle}
-        </p>
+        <button
+          onClick={() => scrollToDirectory("All")}
+          className="inline-flex items-center gap-2 rounded-xl bg-[#002E6E] px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-[#002456] active:scale-95 transition cursor-pointer self-start sm:self-center whitespace-nowrap"
+        >
+          <Users className="h-4 w-4 text-[#00BAF2]" />
+          <span>View All 600 Customers ↓</span>
+        </button>
       </div>
 
       {/* 4 Cohort Cards Grid with Explicit Frequency & Criteria */}
@@ -350,51 +386,35 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
                 </p>
               </div>
 
-              {/* Target with Promo CTA */}
-              <button
-                onClick={() => onTargetSegment(c.segment)}
-                className={`mt-4 flex items-center justify-center space-x-1.5 rounded-xl py-2 px-3 text-xs font-bold transition active:scale-95 shadow-sm cursor-pointer ${
-                  isAtRisk
-                    ? "bg-red-600 text-white hover:bg-red-700"
-                    : "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50"
-                }`}
-              >
-                <span>{isAtRisk ? "Recover 42 Customers" : "Target with Promo"}</span>
-                <ArrowRight className="h-3.5 w-3.5 text-current" />
-              </button>
+              {/* Action Buttons: View Cohort in Directory + Launch Campaign */}
+              <div className="mt-4 flex items-center gap-2">
+                <button
+                  onClick={() => scrollToDirectory(c.segment)}
+                  className="flex-1 flex items-center justify-center space-x-1 rounded-xl py-2 px-2 text-[11px] font-bold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition active:scale-95 cursor-pointer shadow-2xs"
+                  title={`View ${c.count} ${c.segment} customers in directory`}
+                >
+                  <Users className="h-3.5 w-3.5 text-[#002E6E]" />
+                  <span>View ({c.count})</span>
+                </button>
+                <button
+                  onClick={() => onTargetSegment(c.segment)}
+                  className={`flex-1 flex items-center justify-center space-x-1 rounded-xl py-2 px-2 text-[11px] font-bold transition active:scale-95 shadow-2xs cursor-pointer ${
+                    isAtRisk
+                      ? "bg-red-600 text-white hover:bg-red-700"
+                      : "bg-[#002E6E] text-white hover:bg-[#002456]"
+                  }`}
+                >
+                  <span>{isAtRisk ? "Recover 42" : "Promo"}</span>
+                  <ArrowRight className="h-3 w-3 text-current" />
+                </button>
+              </div>
             </div>
           );
         })}
       </div>
 
-      {/* Real-time Free WhatsApp Retention Banner (Merchant Abhishek -> Customer Rajeshwari) */}
-      <div className="rounded-2xl border-2 border-emerald-400 bg-gradient-to-r from-emerald-50 via-teal-50 to-white p-5 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="rounded-full bg-emerald-600 text-white text-[10px] font-extrabold px-2.5 py-0.5 uppercase tracking-wider flex items-center gap-1 shadow-2xs">
-                <Sparkles className="h-3 w-3" /> 100% Free wa.me Link
-              </span>
-              <span className="text-xs font-bold text-emerald-950">
-                Real-Time WhatsApp Customer Retention Dispatcher
-              </span>
-            </div>
-            <p className="text-xs text-slate-700 leading-relaxed">
-              Zero paid API charges. Merchant <strong>Abhishek (8919581022)</strong> can instantly dispatch personalized ₹30 win-back coupons directly to customer <strong>Rajeshwari (8374360774)</strong> using WhatsApp deep-links.
-            </p>
-          </div>
-          <button
-            onClick={openRajeshwariDemo}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-emerald-700 active:scale-95 transition cursor-pointer whitespace-nowrap"
-          >
-            <MessageSquare className="h-4 w-4" />
-            <span>Send Offer to Rajeshwari (8374360774) 🚀</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Real Customer Directory Table with Filters & Search */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+      {/* Real Customer Directory Table with Filters, Search & Pagination */}
+      <div id="customer-directory-section" className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h3 className="text-base font-bold text-[#0A1120] flex items-center gap-2">
@@ -424,7 +444,10 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setSelectedSegment(tab.id)}
+                onClick={() => {
+                  setSelectedSegment(tab.id);
+                  setCurrentPage(1);
+                }}
                 className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                   selectedSegment === tab.id
                     ? "bg-[#002E6E] text-white shadow-sm font-bold"
@@ -578,6 +601,111 @@ Get 10% OFF on all grocery & dairy essentials today between 1:00 PM and 5:00 PM:
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Customer Directory Pagination Controls */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100 text-xs">
+          {/* Summary */}
+          <div className="text-slate-500 font-medium">
+            Showing <strong className="text-slate-900">{startIdx}</strong> to{" "}
+            <strong className="text-slate-900">{endIdx}</strong> of{" "}
+            <strong className="text-slate-900">{totalFiltered}</strong> customers
+            {selectedSegment !== "All" && (
+              <span className="ml-1 text-slate-400">
+                (filtered by {selectedSegment})
+              </span>
+            )}
+          </div>
+
+          {/* Controls: Page size selector + Page navigation buttons */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-1.5 text-slate-500 font-medium">
+              <span>Per page:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-bold text-slate-700 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#002E6E] cursor-pointer"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
+
+            {/* Page number buttons */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1 || loadingCustomers}
+                className="px-2.5 py-1 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-medium text-xs transition cursor-pointer"
+                title="First Page"
+              >
+                «
+              </button>
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1 || loadingCustomers}
+                className="px-2.5 py-1 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-medium text-xs transition cursor-pointer"
+                title="Previous Page"
+              >
+                ‹ Prev
+              </button>
+
+              {/* Dynamic Numbered Page Pills */}
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => {
+                  return (
+                    p === 1 ||
+                    p === totalPages ||
+                    Math.abs(p - currentPage) <= 2
+                  );
+                })
+                .map((p, idx, arr) => {
+                  const prev = arr[idx - 1];
+                  const showEllipsis = prev && p - prev > 1;
+
+                  return (
+                    <React.Fragment key={p}>
+                      {showEllipsis && (
+                        <span className="px-1 text-slate-400 select-none">...</span>
+                      )}
+                      <button
+                        onClick={() => setCurrentPage(p)}
+                        disabled={loadingCustomers}
+                        className={`h-7 min-w-7 px-2 rounded-lg font-bold text-xs transition cursor-pointer ${
+                          currentPage === p
+                            ? "bg-[#002E6E] text-white shadow-xs"
+                            : "border border-slate-200 text-slate-700 hover:bg-slate-100"
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    </React.Fragment>
+                  );
+                })}
+
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages || loadingCustomers}
+                className="px-2.5 py-1 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-medium text-xs transition cursor-pointer"
+                title="Next Page"
+              >
+                Next ›
+              </button>
+              <button
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages || loadingCustomers}
+                className="px-2.5 py-1 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-medium text-xs transition cursor-pointer"
+                title="Last Page"
+              >
+                »
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

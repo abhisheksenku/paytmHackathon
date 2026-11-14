@@ -21,8 +21,16 @@ export const apiEndpoints = {
   getCustomers: (params?: { segment?: string; search?: string; limit?: number; offset?: number }) =>
     api.get("/analytics/customers", { params }),
   getCampaigns: () => api.get("/campaigns"),
-  generateCampaign: (data: { target_segment: string; objective: string; discount_pct: number }) =>
-    api.post("/campaigns/generate", data),
+  generateCampaign: (data: {
+    target_segment: string;
+    objective: string;
+    discount_pct: number;
+    category?: string;
+    language?: string;
+    custom_instruction?: string;
+    recipient_name?: string;
+    recipient_phone?: string;
+  }) => api.post("/campaigns/generate", data),
   approveCampaign: (id: string) => api.post(`/campaigns/${id}/approve`),
   sendChatMessage: (data: { message: string; conversation_id?: string; language?: string }) =>
     api.post("/ai/chat", data),

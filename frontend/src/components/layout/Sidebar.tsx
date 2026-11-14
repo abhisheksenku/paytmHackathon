@@ -89,11 +89,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className="hidden lg:flex w-72 flex-col border-r border-slate-200 bg-white min-h-[calc(100vh-4rem)] p-4 justify-between">
-      <div className="space-y-6">
+    <aside className="hidden lg:flex w-64 flex-col border-r border-slate-200/80 bg-white min-h-[calc(100vh-4rem)] p-3.5 justify-between shrink-0">
+      <div className="space-y-5">
         {/* Navigation Section */}
         <div>
-          <p className="px-3 text-[13px] font-bold uppercase tracking-wider text-slate-400">
+          <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">
             Dukaan Navigation
           </p>
           <nav className="mt-2 space-y-1">

@@ -6,7 +6,7 @@ import {
   TrendingDown,
   ShoppingBag,
   Users,
-  CreditCard,
+  Wallet,
   ArrowUpRight,
   ShieldCheck,
   Zap,
@@ -298,7 +298,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           <div className="flex items-center justify-between text-slate-500">
             <span className="text-xs font-semibold uppercase tracking-wider">{content.kpiNetRevenue}</span>
             <div className="rounded-lg bg-blue-50 p-2 text-[#002E6E]">
-              <CreditCard className="h-4 w-4" />
+              <Wallet className="h-4 w-4" />
             </div>
           </div>
           <div className="mt-3">

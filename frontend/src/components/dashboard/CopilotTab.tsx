@@ -446,14 +446,14 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
       {/* Suggested Chips */}
       <div className="border-t border-slate-200 bg-white px-4 py-2.5">
         <p className="text-[12px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1">
-          <HelpCircle className="h-3 w-3" /> Quick Hinglish Questions:
+          <HelpCircle className="h-3 w-3" /> Quick {language} Questions:
         </p>
         <div className="flex flex-wrap gap-1.5">
           {suggestedQuestions.map((q, idx) => (
             <button
               key={idx}
               onClick={() => handleSendQuery(q)}
-              className="rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-[13px] font-medium text-slate-700 hover:border-[#002E6E] hover:bg-blue-50 hover:text-[#002E6E] transition active:scale-95 text-left"
+              className="rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-[13px] font-medium text-slate-700 hover:border-[#002E6E] hover:bg-blue-50 hover:text-[#002E6E] transition active:scale-95 text-left cursor-pointer"
             >
               {q}
             </button>
@@ -474,12 +474,12 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
           <button
             type="button"
             onClick={toggleVoiceInput}
-            className={`rounded-xl p-2.5 transition active:scale-95 ${
+            className={`rounded-xl p-2.5 transition active:scale-95 cursor-pointer ${
               isListening
                 ? "bg-red-500 text-white animate-pulse"
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
-            title={isListening ? "Listening... click to stop" : "Speak in Hinglish or English"}
+            title={isListening ? "Listening... click to stop" : `Speak in ${language}`}
           >
             {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
           </button>
@@ -490,7 +490,17 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
             onChange={(e) => setInput(e.target.value)}
             placeholder={
               isListening
-                ? "Listening... bolna shuru kijiye..."
+                ? `Listening... speak in ${language} now...`
+                : language === "Telugu"
+                ? "తెలుగులో ప్రశ్న అడగండి (ఉదా: 'ఈ రోజు కలెక్షన్ ఎంత?')..."
+                : language === "Hindi"
+                ? "हिंदी में सवाल पूछें (उदा: 'आज का कुल कलेक्शन कितना हुआ?')..."
+                : language === "Tamil"
+                ? "தமிழில் கேள்வி கேளுங்கள் (उदा: 'இன்று மொத்த வசூல் எவ்வளவு?')..."
+                : language === "Kannada"
+                ? "ಕನ್ನಡದಲ್ಲಿ ಪ್ರಶ್ನೆ ಕೇಳಿ (ಉದಾ: 'ಇಂದು ಒಟ್ಟು ಎಷ್ಟು ಕಲೆಕ್ಷನ್ ಆಗಿದೆ?')..."
+                : language === "English"
+                ? "Type your question (e.g. 'How is today's collection vs last week?')..."
                 : "Type in Hinglish or English (e.g. 'Pichle hafte se aaj dhandha kaisa hai?')..."
             }
             className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-xs focus:border-[#002E6E] focus:bg-white focus:outline-none transition"
@@ -499,7 +509,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="rounded-xl bg-[#002E6E] p-2.5 text-white hover:bg-[#002456] transition active:scale-95 disabled:opacity-50"
+            className="rounded-xl bg-[#002E6E] p-2.5 text-white hover:bg-[#002456] transition active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             <Send className="h-4 w-4" />
           </button>

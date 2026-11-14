@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   Languages,
 } from "lucide-react";
+import { getTranslation } from "@/lib/translations";
 
 export type AppLanguage = "English" | "Hinglish" | "Hindi" | "Telugu" | "Tamil" | "Kannada";
 
@@ -29,18 +30,20 @@ const LANGUAGES: { code: AppLanguage; label: string; native: string; flag: strin
 ];
 
 export const ProfileTab: React.FC<ProfileTabProps> = ({ language, onLanguageChange }) => {
+  const t = getTranslation(language);
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
         <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-bold text-purple-800 border border-purple-200">
-          Merchant Profile & Settings
+          {t.profile.badge}
         </span>
         <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#0A1120]">
-          Store Profile & Preferences
+          {t.profile.title}
         </h2>
         <p className="mt-1 text-sm text-slate-500">
-          Manage your store details and AI copilot language preference.
+          {t.profile.subtitle}
         </p>
       </div>
 
@@ -52,18 +55,18 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ language, onLanguageChan
               <Store className="h-7 w-7 text-[#00BAF2]" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-[#0A1120]">Sharma General Store</h3>
+              <h3 className="text-lg font-bold text-[#0A1120]">{t.navbar.storeName}</h3>
               <p className="text-xs text-slate-500">Paytm Registered Merchant</p>
             </div>
           </div>
 
           <div className="space-y-3 pt-2 border-t border-slate-100">
             {[
-              { icon: Store,      label: "Business Type",  value: "Kirana & General Retail" },
-              { icon: MapPin,     label: "City",           value: "Hyderabad, Telangana" },
-              { icon: Phone,      label: "Contact",        value: "+91 98765-43210" },
-              { icon: CreditCard, label: "UPI / VPA",      value: "sharmakirana@paytm" },
-              { icon: Globe,      label: "Registered On",  value: "Paytm for Business v2.0" },
+              { icon: Store,      label: t.profile.bizType,  value: t.profile.bizTypeValue },
+              { icon: MapPin,     label: t.profile.city,     value: t.profile.cityValue },
+              { icon: Phone,      label: t.profile.contact,  value: "+91 98765-43210" },
+              { icon: CreditCard, label: t.profile.upiVpa,   value: "sharmakirana@paytm" },
+              { icon: Globe,      label: t.profile.regOn,    value: "Paytm for Business v2.0" },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label} className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 text-slate-500">
@@ -78,13 +81,13 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ language, onLanguageChan
           {/* Verification Badges */}
           <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
             <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
-              <CheckCircle className="h-3 w-3" /> KYC Verified
+              <CheckCircle className="h-3 w-3" /> {t.profile.kycVerified}
             </span>
             <span className="flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-[#002E6E] border border-blue-200">
-              <ShieldCheck className="h-3 w-3" /> DPDP Compliant
+              <ShieldCheck className="h-3 w-3" /> {t.profile.dpdpCompliant}
             </span>
             <span className="flex items-center gap-1 rounded-full bg-cyan-50 px-3 py-1 text-xs font-bold text-cyan-800 border border-cyan-200">
-              <CreditCard className="h-3 w-3" /> Soundbox Active
+              <CreditCard className="h-3 w-3" /> {t.profile.soundboxActive}
             </span>
           </div>
         </div>
@@ -93,11 +96,10 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ language, onLanguageChan
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
           <div className="flex items-center space-x-2">
             <Languages className="h-5 w-5 text-[#00BAF2]" />
-            <h3 className="text-base font-bold text-[#0A1120]">AI Copilot Language</h3>
+            <h3 className="text-base font-bold text-[#0A1120]">{t.profile.langCardTitle}</h3>
           </div>
           <p className="text-xs text-slate-500 leading-relaxed">
-            Select your preferred language. The AI copilot will respond in this language across
-            all queries — including sales insights, customer analytics, and retention campaigns.
+            {t.profile.langCardSubtitle}
           </p>
 
           <div className="grid grid-cols-2 gap-3 pt-2">
@@ -107,7 +109,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ language, onLanguageChan
                 <button
                   key={lang.code}
                   onClick={() => onLanguageChange(lang.code)}
-                  className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left transition-all active:scale-95 ${
+                  className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left transition-all active:scale-95 cursor-pointer ${
                     isSelected
                       ? "border-[#002E6E] bg-[#002E6E] text-white shadow-md"
                       : "border-slate-200 bg-slate-50 hover:border-[#00BAF2] hover:bg-blue-50"
@@ -122,7 +124,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ language, onLanguageChan
                     </p>
                   </div>
                   {isSelected && (
-                    <CheckCircle className="h-4 w-4 text-[#00BAF2] shrink-0" />
+                    <div className="h-2 w-2 rounded-full bg-[#00BAF2]" />
                   )}
                 </button>
               );
@@ -143,15 +145,6 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ language, onLanguageChan
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Demo Data Disclaimer */}
-      <div className="rounded-xl border border-amber-200 bg-amber-50/60 px-5 py-4">
-        <p className="text-xs font-semibold text-amber-800">
-          ⚠️ Demo Mode: Store details and all analytics are calculated from a simulated 180-day
-          merchant dataset for the Paytm Build for India AI Hackathon.
-          In production, this profile would sync directly from your Paytm for Business account.
-        </p>
       </div>
     </div>
   );

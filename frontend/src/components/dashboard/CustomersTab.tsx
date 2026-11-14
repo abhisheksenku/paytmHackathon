@@ -17,9 +17,11 @@ import {
 import { apiEndpoints } from "@/lib/api";
 import { CustomerCohort, CustomerProfile } from "@/lib/types";
 import { formatINR } from "@/lib/utils";
+import { getTranslation } from "@/lib/translations";
 
 interface CustomersTabProps {
   onTargetSegment: (segment: string) => void;
+  language?: string;
 }
 
 const COHORT_CRITERIA: Record<string, { frequency: string; recency: string; spend: string }> = {
@@ -55,7 +57,8 @@ const COHORT_CRITERIA: Record<string, { frequency: string; recency: string; spen
   },
 };
 
-export const CustomersTab: React.FC<CustomersTabProps> = ({ onTargetSegment }) => {
+export const CustomersTab: React.FC<CustomersTabProps> = ({ onTargetSegment, language = "Hinglish" }) => {
+  const t = getTranslation(language);
   const [cohorts, setCohorts] = useState<CustomerCohort[]>([]);
   const [customers, setCustomers] = useState<CustomerProfile[]>([]);
   const [totalFiltered, setTotalFiltered] = useState<number>(0);
@@ -144,15 +147,15 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ onTargetSegment }) =
       <div>
         <div className="flex items-center space-x-2">
           <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-bold text-purple-900 border border-purple-200">
-            RFM Customer Segmentation Engine
+            {t.customers.badge}
           </span>
           <span className="text-xs text-slate-500 font-medium">• 600 Total Profiled Shoppers</span>
         </div>
         <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#0A1120]">
-          Customer Retention & Loyalty Intelligence
+          {t.customers.title}
         </h2>
         <p className="text-xs text-slate-500 max-w-2xl">
-          Segments shoppers by <strong>Recency</strong> (last visit), <strong>Frequency</strong> (visits per week/month), and <strong>Monetary value</strong> (spend). Detect churn before customers switch to quick commerce!
+          {t.customers.subtitle}
         </p>
       </div>
 
@@ -280,16 +283,16 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ onTargetSegment }) =
           {/* Segment Pills */}
           <div className="flex flex-wrap items-center gap-1.5 text-xs font-semibold">
             {[
-              { id: "All", label: "All Customers (600)" },
-              { id: "Champions", label: "👑 Champions (54)" },
-              { id: "Regulars", label: "🤝 Regulars (102)" },
-              { id: "At Risk", label: "⚠️ At Risk (42)" },
-              { id: "Occasional Walk-in", label: "🚶 Walk-ins (402)" },
+              { id: "All", label: `${t.customers.filterAll} (600)` },
+              { id: "Champions", label: `👑 ${t.customers.champions} (54)` },
+              { id: "Regulars", label: `🤝 ${t.customers.regulars} (102)` },
+              { id: "At Risk", label: `⚠️ ${t.customers.atRisk} (42)` },
+              { id: "Occasional Walk-in", label: `🚶 ${t.customers.occasional} (402)` },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setSelectedSegment(tab.id)}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                   selectedSegment === tab.id
                     ? "bg-[#002E6E] text-white shadow-sm font-bold"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -306,7 +309,7 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ onTargetSegment }) =
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name, VPA or phone..."
+              placeholder={t.customers.searchPlaceholder}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#002E6E]"
             />
             <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
@@ -318,13 +321,13 @@ export const CustomersTab: React.FC<CustomersTabProps> = ({ onTargetSegment }) =
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
-                <th className="py-3 px-4">Customer Name</th>
+                <th className="py-3 px-4">{t.customers.tableCustomer}</th>
                 <th className="py-3 px-4">Masked Phone / VPA</th>
-                <th className="py-3 px-4">Segment</th>
-                <th className="py-3 px-4">Visit Frequency & Recency</th>
-                <th className="py-3 px-4 text-center">Total Bills</th>
-                <th className="py-3 px-4 text-right">Lifetime Collection</th>
-                <th className="py-3 px-4 text-center">Action</th>
+                <th className="py-3 px-4">{t.customers.tableSegment}</th>
+                <th className="py-3 px-4">{t.customers.tableLastVisit}</th>
+                <th className="py-3 px-4 text-center">{t.customers.tableOrders}</th>
+                <th className="py-3 px-4 text-right">{t.customers.tableSpend}</th>
+                <th className="py-3 px-4 text-center">{t.customers.tableAction}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">

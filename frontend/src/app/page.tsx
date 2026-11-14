@@ -113,13 +113,13 @@ export default function Home() {
             />
           )}
 
-          {currentTab === "sales" && <SalesTab />}
+          {currentTab === "sales" && <SalesTab language={language} />}
 
           {currentTab === "customers" && (
-            <CustomersTab onTargetSegment={handleTargetSegmentInCampaigns} />
+            <CustomersTab onTargetSegment={handleTargetSegmentInCampaigns} language={language} />
           )}
 
-          {currentTab === "campaigns" && <CampaignsTab />}
+          {currentTab === "campaigns" && <CampaignsTab language={language} />}
 
           {currentTab === "profile" && (
             <ProfileTab language={language} onLanguageChange={handleLanguageChange} />

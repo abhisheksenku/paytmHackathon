@@ -15,8 +15,14 @@ import {
 } from "lucide-react";
 import { apiEndpoints } from "@/lib/api";
 import { Campaign } from "@/lib/types";
+import { getTranslation } from "@/lib/translations";
 
-export const CampaignsTab: React.FC = () => {
+interface CampaignsTabProps {
+  language?: string;
+}
+
+export const CampaignsTab: React.FC<CampaignsTabProps> = ({ language = "Hinglish" }) => {
+  const t = getTranslation(language);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [targetSegment, setTargetSegment] = useState("At Risk Inactive Customers");
   const [objective, setObjective] = useState("Retention");
@@ -86,15 +92,15 @@ export const CampaignsTab: React.FC = () => {
       <div>
         <div className="flex items-center space-x-2">
           <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 border border-emerald-200">
-            WhatsApp Growth Marketing Engine
+            {t.campaigns.badge}
           </span>
-          <span className="text-xs text-slate-500">• 1-Click Customer Re-engagement</span>
+          <span className="text-xs text-slate-500">• {t.campaigns.subBadge}</span>
         </div>
         <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#0A1120]">
-          Targeted WhatsApp Micro-Campaigns
+          {t.campaigns.title}
         </h2>
         <p className="text-xs text-slate-500">
-          Transform transaction data anomalies into personalized WhatsApp discount broadcasts.
+          {t.campaigns.subtitle}
         </p>
       </div>
 
@@ -104,24 +110,23 @@ export const CampaignsTab: React.FC = () => {
         <div className="lg:col-span-7 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
           <h3 className="text-sm font-bold text-[#0A1120] uppercase tracking-wider flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-[#00BAF2]" />
-            Generate New Campaign
+            {t.campaigns.createTitle}
           </h3>
 
           <div className="space-y-4">
             {/* Target Segment */}
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
-                <Users className="h-3.5 w-3.5 text-slate-400" /> Target Customer Segment
+                <Users className="h-3.5 w-3.5 text-slate-400" /> {t.campaigns.targetLabel}
               </label>
               <select
                 value={targetSegment}
                 onChange={(e) => setTargetSegment(e.target.value)}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-800 focus:border-[#002E6E] focus:outline-none"
               >
-                <option value="At Risk Inactive Customers">At-Risk Inactive Customers (Haven't visited in 25+ days)</option>
-                <option value="Regular Weekend Shoppers">Regular Weekend Shoppers (High weekend basket spenders)</option>
-                <option value="Evening Rush Footfall">Evening Rush Crowd (5:00 PM - 9:00 PM tea & snack buyers)</option>
-                <option value="VIP Champions">VIP Champions (Top 10% highest spenders)</option>
+                {t.campaigns.targetOptions.map((opt) => (
+                  <option key={opt.id} value={opt.id}>{opt.label}</option>
+                ))}
               </select>
             </div>
 
@@ -129,23 +134,23 @@ export const CampaignsTab: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Campaign Objective
+                  {t.campaigns.objectiveLabel}
                 </label>
                 <select
                   value={objective}
                   onChange={(e) => setObjective(e.target.value)}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-800 focus:border-[#002E6E] focus:outline-none"
                 >
-                  <option value="Retention">Customer Retention & Win-back</option>
-                  <option value="Weekend Spurt">Weekend Evening Flash Boost</option>
-                  <option value="Clearance">Tuesday Slow-Hour Booster</option>
+                  {t.campaigns.objectiveOptions.map((opt) => (
+                    <option key={opt.id} value={opt.id}>{opt.label}</option>
+                  ))}
                 </select>
               </div>
 
               {/* Discount Percentage */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
-                  <Tag className="h-3.5 w-3.5 text-slate-400" /> Discount Offer (%)
+                  <Tag className="h-3.5 w-3.5 text-slate-400" /> {t.campaigns.discountLabel}
                 </label>
                 <div className="flex space-x-2">
                   {[10, 15, 20].map((pct) => (
@@ -153,7 +158,7 @@ export const CampaignsTab: React.FC = () => {
                       key={pct}
                       type="button"
                       onClick={() => setDiscountPct(pct)}
-                      className={`flex-1 rounded-xl py-2 text-xs font-bold transition ${
+                      className={`flex-1 rounded-xl py-2 text-xs font-bold transition cursor-pointer ${
                         discountPct === pct
                           ? "bg-[#002E6E] text-white shadow-sm"
                           : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
@@ -169,10 +174,10 @@ export const CampaignsTab: React.FC = () => {
             <button
               onClick={handleGenerateCampaign}
               disabled={isGenerating}
-              className="w-full rounded-xl bg-[#002E6E] py-3 text-xs font-bold text-white hover:bg-[#002456] transition shadow-sm active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2"
+              className="w-full rounded-xl bg-[#002E6E] py-3 text-xs font-bold text-white hover:bg-[#002456] transition shadow-sm active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
             >
               <Sparkles className="h-4 w-4 text-[#00BAF2]" />
-              <span>{isGenerating ? "Synthesizing AI Copy..." : "Generate AI WhatsApp Message"}</span>
+              <span>{isGenerating ? t.campaigns.generatingBtn : t.campaigns.generateBtn}</span>
             </button>
           </div>
 
@@ -193,17 +198,17 @@ export const CampaignsTab: React.FC = () => {
               {activePreviewCampaign.status !== "APPROVED" ? (
                 <button
                   onClick={() => handleApproveCampaign(activePreviewCampaign.id)}
-                  className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-sm active:scale-95 flex items-center gap-1.5"
+                  className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-sm active:scale-95 flex items-center gap-1.5 cursor-pointer"
                 >
                   <Check className="h-3.5 w-3.5" />
-                  <span>Approve Campaign</span>
+                  <span>{t.campaigns.approveBtn}</span>
                 </button>
               ) : (
                 <a
                   href={`https://wa.me/?text=${encodeURIComponent(activePreviewCampaign.message_text)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-sm active:scale-95 flex items-center gap-1.5"
+                  className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-sm active:scale-95 flex items-center gap-1.5 cursor-pointer"
                 >
                   <Share2 className="h-3.5 w-3.5" />
                   <span>Send via WhatsApp</span>
@@ -217,7 +222,7 @@ export const CampaignsTab: React.FC = () => {
         <div className="lg:col-span-5 flex flex-col items-center">
           <div className="text-center mb-2">
             <span className="text-[13px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-center gap-1">
-              <Smartphone className="h-3.5 w-3.5" /> Live Smartphone Customer Preview
+              <Smartphone className="h-3.5 w-3.5" /> {t.campaigns.previewTitle}
             </span>
           </div>
 
@@ -231,7 +236,7 @@ export const CampaignsTab: React.FC = () => {
                   SG
                 </div>
                 <div>
-                  <p className="text-xs font-bold leading-tight">Sharma General Store</p>
+                  <p className="text-xs font-bold leading-tight">{t.navbar.storeName}</p>
                   <p className="text-[12px] text-emerald-200">Official Paytm Verified Merchant</p>
                 </div>
               </div>

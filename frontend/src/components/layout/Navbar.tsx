@@ -3,6 +3,7 @@
 import React from "react";
 import { Store, Sparkles, RefreshCw, Languages, MapPin } from "lucide-react";
 import type { AppLanguage } from "@/components/dashboard/ProfileTab";
+import { getTranslation } from "@/lib/translations";
 
 interface NavbarProps {
   onRefresh?: () => void;
@@ -17,6 +18,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   language = "Hinglish",
   onLanguageChange,
 }) => {
+  const t = getTranslation(language);
+
   const langOptions: { code: AppLanguage; label: string; flag: string }[] = [
     { code: "Hinglish", label: "Hinglish", flag: "🇮🇳" },
     { code: "Hindi", label: "हिंदी", flag: "🇮🇳" },
@@ -38,7 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             Vyapaar<span className="text-[#00BAF2] ml-0.5">AI</span>
           </span>
           <span className="hidden sm:inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#002E6E] border border-blue-200/60">
-            Paytm Edition
+            {t.navbar.brandSubtitle}
           </span>
         </div>
       </div>
@@ -47,11 +50,11 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="hidden md:flex items-center space-x-2 rounded-full border border-slate-200/80 bg-slate-50/80 px-3.5 py-1.5 shadow-xs">
         <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
         <span className="text-xs font-bold text-slate-800">
-          Sharma General Store
+          {t.navbar.storeName}
         </span>
         <span className="text-slate-300">•</span>
         <span className="flex items-center gap-1 text-[11px] font-medium text-slate-500">
-          <MapPin className="h-3 w-3 text-slate-400" /> Hyderabad
+          <MapPin className="h-3 w-3 text-slate-400" /> {t.navbar.city}
         </span>
       </div>
 
@@ -77,7 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Gemini Flash AI Badge */}
         <div className="hidden sm:flex items-center space-x-1.5 rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-1.5 text-xs font-semibold text-[#002E6E] shadow-xs">
           <Sparkles className="h-3.5 w-3.5 text-[#00BAF2]" />
-          <span>Gemini Flash</span>
+          <span>{t.navbar.geminiBadge}</span>
         </div>
 
         {/* Refresh Action */}
@@ -89,7 +92,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="Refresh live metrics"
           >
             <RefreshCw className={`h-3.5 w-3.5 text-slate-500 ${isRefreshing ? "animate-spin text-[#002E6E]" : ""}`} />
-            <span>Refresh</span>
+            <span>{isRefreshing ? t.navbar.refreshing : t.navbar.refresh}</span>
           </button>
         )}
       </div>

@@ -14,8 +14,14 @@ import {
 } from "lucide-react";
 import { apiEndpoints } from "@/lib/api";
 import { formatINR } from "@/lib/utils";
+import { getTranslation } from "@/lib/translations";
 
-export const SalesTab: React.FC = () => {
+interface SalesTabProps {
+  language?: string;
+}
+
+export const SalesTab: React.FC<SalesTabProps> = ({ language = "Hinglish" }) => {
+  const t = getTranslation(language);
   const [peakData, setPeakData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState<"60d" | "30d" | "7d">("60d");
@@ -39,7 +45,8 @@ export const SalesTab: React.FC = () => {
     fetchPeakData(timeframe);
   }, [timeframe]);
 
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const rawDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const days = t.sales.days || rawDays;
   const hours = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
 
   // Specific calendar dates for 7-day single week mode (04 Nov 2026 – 10 Nov 2026)
@@ -68,7 +75,7 @@ export const SalesTab: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2">
             <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-[#002E6E] border border-blue-200">
-              Dukaan Footfall Matrix
+              {t.sales.badge}
             </span>
             <span className="text-xs text-slate-500 font-medium flex items-center gap-1">
               <CalendarDays className="h-3.5 w-3.5 text-blue-600" />
@@ -76,30 +83,30 @@ export const SalesTab: React.FC = () => {
             </span>
           </div>
           <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#0A1120]">
-            Sales Velocity & Peak Hours Intelligence
+            {t.sales.title}
           </h2>
           <p className="text-xs text-slate-500 max-w-2xl">
-            Analyzes your Paytm Soundbox payment timestamps by <strong>Hour of Day</strong> and <strong>Day of Week</strong> to pinpoint when to prep fast-moving stock and schedule extra counter helpers.
+            {t.sales.subtitle}
           </p>
         </div>
 
         {/* Date Timeframe Selector Pills */}
         <div className="flex items-center space-x-1.5 rounded-xl border border-slate-200 bg-white p-1 shadow-xs text-xs font-semibold self-start md:self-auto">
           {[
-            { id: "60d" as const, label: "60-Day Season (Sep–Nov 2026)" },
-            { id: "30d" as const, label: "Last 30 Days" },
-            { id: "7d" as const, label: "7-Day Week (Nov 2026)" },
-          ].map((t) => (
+            { id: "60d" as const, label: t.sales.timeframe60d },
+            { id: "30d" as const, label: t.sales.timeframe30d },
+            { id: "7d" as const, label: t.sales.timeframe7d },
+          ].map((tItem) => (
             <button
-              key={t.id}
-              onClick={() => setTimeframe(t.id)}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
-                timeframe === t.id
+              key={tItem.id}
+              onClick={() => setTimeframe(tItem.id)}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                timeframe === tItem.id
                   ? "bg-[#002E6E] text-white shadow-sm font-bold"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
               }`}
             >
-              {t.label}
+              {tItem.label}
             </button>
           ))}
         </div>
@@ -169,36 +176,36 @@ export const SalesTab: React.FC = () => {
             <div className="flex items-center rounded-lg bg-slate-100 p-1 text-[11px] font-bold">
               <button
                 onClick={() => setMetricView("footfall")}
-                className={`px-2.5 py-1 rounded-md transition-all ${
+                className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
                   metricView === "footfall"
                     ? "bg-white text-[#002E6E] shadow-xs"
                     : "text-slate-500 hover:text-slate-800"
                 }`}
               >
-                Show Bills Count
+                {t.sales.viewFootfall}
               </button>
               <button
                 onClick={() => setMetricView("revenue")}
-                className={`px-2.5 py-1 rounded-md transition-all ${
+                className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
                   metricView === "revenue"
                     ? "bg-white text-[#002E6E] shadow-xs"
                     : "text-slate-500 hover:text-slate-800"
                 }`}
               >
-                Show Revenue (₹)
+                {t.sales.viewRevenue}
               </button>
             </div>
 
             {/* Legend */}
             <div className="flex items-center space-x-1.5 text-[11px] font-semibold text-slate-500 pl-2 border-l border-slate-200">
-              <span>Slump</span>
+              <span>{t.sales.legendLow}</span>
               <div className="flex space-x-0.5">
                 <div className="h-3 w-3 rounded bg-slate-100 border border-slate-200" title="0-3 bills" />
                 <div className="h-3 w-3 rounded bg-cyan-100" title="4-8 bills" />
                 <div className="h-3 w-3 rounded bg-[#00BAF2]" title="9-19 bills" />
                 <div className="h-3 w-3 rounded bg-[#002E6E]" title="20+ bills (Peak)" />
               </div>
-              <span className="font-bold text-[#002E6E]">Peak</span>
+              <span className="font-bold text-[#002E6E]">{t.sales.legendPeak}</span>
             </div>
           </div>
         </div>
@@ -209,7 +216,7 @@ export const SalesTab: React.FC = () => {
             <thead>
               <tr>
                 <th className="p-2.5 text-left text-xs font-bold text-slate-600 min-w-[150px]">
-                  Day & Date
+                  {t.sales.gridDayLabel}
                 </th>
                 {hours.map((h) => (
                   <th key={h} className="p-1.5 text-[11px] font-mono text-slate-500 font-semibold min-w-[42px]">
@@ -219,24 +226,25 @@ export const SalesTab: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {days.map((day) => {
+              {days.map((dayLabel, idx) => {
+                const rawDay = rawDays[idx] || dayLabel;
                 const dateLabel =
                   timeframe === "7d"
-                    ? CALENDAR_DATES_7D[day]
+                    ? CALENDAR_DATES_7D[rawDay] || CALENDAR_DATES_7D[dayLabel]
                     : `Sep–Nov 2026`;
 
                 return (
-                  <tr key={day} className="border-t border-slate-100 hover:bg-slate-50/50 transition">
+                  <tr key={rawDay} className="border-t border-slate-100 hover:bg-slate-50/50 transition">
                     {/* Day + Explicit Date Column */}
                     <td className="p-2.5 text-left">
-                      <div className="text-xs font-bold text-slate-900">{day}</div>
+                      <div className="text-xs font-bold text-slate-900">{dayLabel}</div>
                       <div className="text-[10px] text-slate-400 font-mono">{dateLabel}</div>
                     </td>
 
                     {/* Hourly Cells */}
                     {hours.map((h) => {
                       const match = peakData?.heatmap?.find(
-                        (item: any) => item.day === day && item.hour === h
+                        (item: any) => item.day === rawDay && item.hour === h
                       );
                       const footfall = match ? match.footfall : 0;
                       const revenue = match ? match.revenue : 0;
@@ -245,7 +253,7 @@ export const SalesTab: React.FC = () => {
                       const isPeak = footfall >= 20;
                       const isSlump = footfall <= 4;
 
-                      const tooltipText = `${day}, ${h}:00 - ${h + 1}:00 (${dateLabel})\n• Footfall: ${footfall} UPI bills\n• Collection: ₹${Math.round(revenue).toLocaleString("en-IN")}\n• Status: ${
+                      const tooltipText = `${dayLabel}, ${h}:00 - ${h + 1}:00 (${dateLabel})\n• Footfall: ${footfall} UPI bills\n• Collection: ₹${Math.round(revenue).toLocaleString("en-IN")}\n• Status: ${
                         isPeak
                           ? "🔥 Peak Rush Hour! Prep inventory & assign extra counter staff."
                           : isSlump

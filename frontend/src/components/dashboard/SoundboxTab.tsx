@@ -26,6 +26,7 @@ import {
 import { SoundboxBriefing } from "@/lib/types";
 import { speakText, stopSpeech } from "@/lib/speech";
 import { apiEndpoints } from "@/lib/api";
+import { getTranslation } from "@/lib/translations";
 
 interface SoundboxTabProps {
   briefing: SoundboxBriefing | null;
@@ -567,6 +568,7 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
   isLoading,
   language = "Hinglish",
 }) => {
+  const t = getTranslation(language);
   const [activeMode, setActiveMode] = useState<SoundboxTimelineMode>("morning");
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasDispatchedRetention, setHasDispatchedRetention] = useState(false);
@@ -855,15 +857,15 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
       <div>
         <div className="flex items-center space-x-2">
           <span className="rounded-full bg-cyan-100 px-3 py-1 text-xs font-bold text-[#002E6E] border border-cyan-200">
-            Paytm Soundbox 5.0 AI Edition
+            {t.soundbox.headerBadge}
           </span>
-          <span className="text-xs text-slate-500">• 3-Stage Daily dukaan Audio Routine</span>
+          <span className="text-xs text-slate-500">• {t.soundbox.headerSub}</span>
         </div>
         <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#0A1120]">
-          Merchant Daily Voice Intelligence
+          {t.soundbox.headerTitle}
         </h2>
         <p className="text-xs text-slate-500">
-          How the Soundbox assists the merchant throughout the day without audio spam or screen dependence.
+          {t.soundbox.headerDesc}
         </p>
       </div>
 
@@ -888,10 +890,10 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
             )}
           </div>
           <p className="mt-2 text-sm font-extrabold text-slate-900">
-            1. 30-Sec Morning Briefing
+            {t.soundbox.stage1Tab}
           </p>
           <p className="mt-1 text-[11px] text-slate-500 leading-tight">
-            Yesterday collection, peak rush hours & morning dhandha motivation.
+            {t.soundbox.stage1Desc}
           </p>
         </button>
 
@@ -914,10 +916,10 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
             )}
           </div>
           <p className="mt-2 text-sm font-extrabold text-slate-900">
-            2. Proactive Retention Alert
+            {t.soundbox.stage2Tab}
           </p>
           <p className="mt-1 text-[11px] text-slate-500 leading-tight">
-            Quiet afternoon warning: 42 at-risk regulars inactive 22d • 1-word approval.
+            {t.soundbox.stage2Desc}
           </p>
         </button>
 
@@ -940,10 +942,10 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
             )}
           </div>
           <p className="mt-2 text-sm font-extrabold text-slate-900">
-            3. On-Demand Spoken Query
+            {t.soundbox.stage3Tab}
           </p>
           <p className="mt-1 text-[11px] text-slate-500 leading-tight">
-            Speak directly with mic or tap queries • Displays both question &amp; answer aloud.
+            {t.soundbox.stage3Desc}
           </p>
         </button>
       </div>
@@ -1328,11 +1330,11 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
             <Clock className="h-3.5 w-3.5 text-[#00BAF2]" />
-            Morning 8:00 AM Metric
+            {t.soundbox.morningMetricTitle}
           </p>
           <p className="mt-2 text-2xl font-black text-[#0A1120]">₹18,450</p>
           <p className="mt-1 text-xs text-emerald-600 font-bold flex items-center gap-1">
-            <Zap className="h-3.5 w-3.5" /> +12.5% vs last week same day
+            <Zap className="h-3.5 w-3.5" /> {t.soundbox.morningMetricGrowth}
           </p>
         </div>
 
@@ -1340,11 +1342,11 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
             <Radio className="h-3.5 w-3.5 text-[#00BAF2]" />
-            Peak Rush Window
+            {t.soundbox.peakMetricTitle}
           </p>
           <p className="mt-2 text-2xl font-black text-[#0A1120]">7:00 PM - 8:00 PM</p>
           <p className="mt-1 text-xs text-slate-500 font-medium">
-            34 verified Soundbox UPI bills
+            {t.soundbox.peakMetricDesc}
           </p>
         </div>
 
@@ -1352,13 +1354,13 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
         <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-5 shadow-sm">
           <p className="text-xs font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1">
             <Users className="h-3.5 w-3.5 text-amber-600" />
-            Customer Retention Alert
+            {t.soundbox.retentionMetricTitle}
           </p>
           <p className="mt-2 text-2xl font-black text-amber-950">
-            42 At-Risk Regulars
+            {t.soundbox.retentionMetricCount}
           </p>
           <p className="mt-1 text-xs text-amber-800 font-medium">
-            Inactive &gt;21 days • ₹14,200 monthly recoverable
+            {t.soundbox.retentionMetricDesc}
           </p>
         </div>
       </div>

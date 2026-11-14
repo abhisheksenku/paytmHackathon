@@ -103,7 +103,13 @@ export default function Home() {
             />
           )}
 
-          {currentTab === "soundbox" && <SoundboxTab briefing={briefing} language={language} />}
+          {currentTab === "soundbox" && (
+            <SoundboxTab
+              briefing={briefing}
+              language={language}
+              onOpenCustomers={() => setCurrentTab("customers")}
+            />
+          )}
 
           {currentTab === "copilot" && (
             <CopilotTab

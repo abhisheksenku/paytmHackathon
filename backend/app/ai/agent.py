@@ -256,6 +256,44 @@ def generate_multilingual_response(
                 f"Aap **'WhatsApp Campaigns'** tab par jakar 1-click mein is campaign ko approve karke broadcast kar sakte hain!"
             )
 
+    elif intent == "greeting":
+        if lang == "Hindi":
+            return (
+                f"नमस्ते {business_name} के शर्मा जी! 🙏 मैं आपका **Vyapaar AI Copilot** हूँ। "
+                f"आज आपकी दुकान का व्यापार बहुत अच्छा चल रहा है। आप मुझसे आज का कुल कलेक्शन, "
+                f"शाम की भीड़ का समय (Peak Hours), या नियमित ग्राहकों की स्थिति के बारे में कुछ भी पूछ सकते हैं।"
+            )
+        elif lang == "Telugu":
+            return (
+                f"నమస్కారం శర్మ గారూ! 🙏 నేను మీ **Vyapaar AI Copilot** ని. "
+                f"ఈ రోజు {business_name} వ్యాపారం ఎలా సాగుతోంది? మీరు నేటి మొత్తం కలెక్షన్, "
+                f"సాయంత్రం రద్దీ వేళలు, లేదా కస్టమర్ల వివరాల గురించి నన్ను అడగవచ్చు."
+            )
+        elif lang == "Tamil":
+            return (
+                f"வணக்கம் சர்மா அவர்களே! 🙏 நான் உங்கள் **Vyapaar AI Copilot**. "
+                f"இன்று உங்கள் {business_name} வியாபாரம் எப்படி உள்ளது? இன்றைய மொத்த வசூல், "
+                f"மாலை நேர பீக் ஹவர்ஸ், அல்லது வாடிக்கையாளர்கள் குறித்து என்னிடம் கேட்கலாம்."
+            )
+        elif lang == "Kannada":
+            return (
+                f"ನಮಸ್ಕಾರ ಶರ್ಮಾ ಅವರೇ! 🙏 ನಾನು ನಿಮ್ಮ **Vyapaar AI Copilot**. "
+                f"ಇಂದು ನಿಮ್ಮ {business_name} ಅಂಗಡಿಯ ವ್ಯಾಪಾರ ಹೇಗಿದೆ? ಇಂದಿನ ಒಟ್ಟು ಕಲೆಕ್ಷನ್, "
+                f"ಸಂಜೆಯ ಗರಿಷ್ಠ ವ್ಯಾಪಾರದ ಸಮಯ, ಅಥವಾ ನಿಯಮಿತ ಗ್ರಾಹಕರ ಬಗ್ಗೆ ನೀವು ಕೇಳಬಹುದು."
+            )
+        elif lang == "English":
+            return (
+                f"Namaste Sharma-ji! 🙏 I am your **Vyapaar AI Copilot** for {business_name}. "
+                f"How is business today? You can ask me anytime about today's collection, "
+                f"evening rush hours, customer retention, or sales comparisons."
+            )
+        else: # Hinglish
+            return (
+                f"Namaste Sharma-ji! 🙏 Main aapka **Vyapaar AI Copilot** hoon {business_name} ke liye. "
+                f"Aaj aapka dhandha kaisa chal raha hai? Aap mujhse aaj ka total collection, "
+                f"shaam ki bheed (peak rush), ya inactive regular customers ke baare mein pooch sakte hain."
+            )
+
     else: # general welcome / assistant
         if lang == "Hindi":
             return (
@@ -365,7 +403,20 @@ def run_agentic_query(db: Session, merchant_id: str, query: str, language: str =
         "ಕೊಡುಗೆ", "ರಿಯಾಯಿತಿ", "ಪ್ರಚಾರ"
     ]
 
-    if any(k in query_lower for k in sales_keywords):
+    greeting_keywords = [
+        "hello", "hi", "hey", "namaste", "namaskar", "namaskara", "vanakkam", "kem cho", "kaun ho", "who are you",
+        "नमस्ते", "नमस्कार", "हैलो", "हाय", "कौन हो",
+        "నమస్కారం", "హలో", "హాయ్", "ఎవరు మీరు",
+        "வணக்கம்", "ஹலோ", "யார் நீங்கள்",
+        "ನಮಸ್ಕಾರ", "ಹಲೋ", "ನೀವು ಯಾರು"
+    ]
+
+    if any(k in query_lower for k in greeting_keywords) and len(query_lower.strip().split()) <= 4:
+        intent = "greeting"
+        tool_executed = "merchant_assistant_greeting"
+        tool_data = {}
+
+    elif any(k in query_lower for k in sales_keywords):
         intent = "sales_overview"
         tool_executed = "compare_sales_periods(timeframe='30d')"
         tool_data = compute_overview(db, merchant_id, timeframe="30d")
@@ -395,10 +446,11 @@ def run_agentic_query(db: Session, merchant_id: str, query: str, language: str =
     response_text = generate_multilingual_response(intent, tool_data, business_name, language)
 
     # Step 3: Optional Gemini Flash enrichment if API key is active
-    if settings.GEMINI_API_KEY and settings.GEMINI_API_KEY.startswith("AIzaSy"):
+    if settings.GEMINI_API_KEY and len(settings.GEMINI_API_KEY.strip()) > 10:
         try:
             import urllib.request
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={settings.GEMINI_API_KEY}"
+            model_name = getattr(settings, "GEMINI_MODEL", "gemini-1.5-flash") or "gemini-1.5-flash"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={settings.GEMINI_API_KEY}"
             payload = json.dumps({
                 "contents": [{
                     "parts": [{

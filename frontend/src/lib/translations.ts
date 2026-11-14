@@ -53,6 +53,11 @@ export interface AppTranslation {
     retentionMetricTitle: string;
     retentionMetricCount: string;
     retentionMetricDesc: string;
+    retentionRedirectTitle: string;
+    retentionRedirectDesc: string;
+    retentionRedirectBtn: string;
+    aiAnalyzing: string;
+    aiAnalyzingSub: string;
   };
   sales: {
     badge: string;
@@ -174,6 +179,11 @@ export const TRANSLATIONS: Record<AppLanguage, AppTranslation> = {
       retentionMetricTitle: "Customer Retention Alert",
       retentionMetricCount: "42 At-Risk Regulars",
       retentionMetricDesc: "Inactive >21 days • ₹14,200 monthly recoverable",
+      retentionRedirectTitle: "Customer Retention Management",
+      retentionRedirectDesc: "Rajesh-ji and 41 regular customers haven't visited in >21 days. Review RFM cohorts and launch targeted retention campaigns in Customer Loyalty.",
+      retentionRedirectBtn: "View & Manage in Customer Loyalty →",
+      aiAnalyzing: "Soundbox AI is analyzing store ledger...",
+      aiAnalyzingSub: "Synthesizing grounded response in English",
     },
     sales: {
       badge: "Dukaan Footfall Matrix",
@@ -302,6 +312,11 @@ export const TRANSLATIONS: Record<AppLanguage, AppTranslation> = {
       retentionMetricTitle: "Customer Retention Alert",
       retentionMetricCount: "42 At-Risk Regulars",
       retentionMetricDesc: "21+ dino se inactive • ₹14,200 monthly recovery",
+      retentionRedirectTitle: "Customer Retention Management",
+      retentionRedirectDesc: "Rajesh-ji aur 41 regular grahak pichle 22 dino se nahi aaye hain. RFM cohorts review karke Customer Loyalty tab mein unhe retention offer bhejein.",
+      retentionRedirectBtn: "Customer Loyalty mein dekhein →",
+      aiAnalyzing: "Soundbox AI dukaan ka khata dekh raha hai...",
+      aiAnalyzingSub: "Hinglish mein grounded jawaab taiyaar ho raha hai",
     },
     sales: {
       badge: "Dukaan Footfall Matrix",
@@ -430,6 +445,11 @@ export const TRANSLATIONS: Record<AppLanguage, AppTranslation> = {
       retentionMetricTitle: "ग्राहक वापसी अलर्ट",
       retentionMetricCount: "42 नियमित ग्राहक जोखिम में",
       retentionMetricDesc: "21+ दिनों से नहीं आए • ₹14,200 मासिक रिकवरी",
+      retentionRedirectTitle: "ग्राहक प्रतिधारण (Retention) प्रबंधन",
+      retentionRedirectDesc: "राजेश जी और 41 नियमित ग्राहक पिछले 22 दिनों से दुकान पर नहीं आए हैं। कस्टमर लॉयल्टी सेक्शन में जाकर उनके लिए लक्षित ऑफर शुरू करें।",
+      retentionRedirectBtn: "कस्टमर लॉयल्टी में देखें व प्रबंधित करें →",
+      aiAnalyzing: "साउंडबॉक्स AI दुकान का बहीखाता देख रहा है...",
+      aiAnalyzingSub: "हिंदी में सटीक और वास्तविक उत्तर तैयार हो रहा है",
     },
     sales: {
       badge: "दुकान फुटफॉल मैट्रिक्स",
@@ -558,6 +578,11 @@ export const TRANSLATIONS: Record<AppLanguage, AppTranslation> = {
       retentionMetricTitle: "కస్టమర్ రిటెన్షన్ అలర్ట్",
       retentionMetricCount: "42 మంది రిస్క్‌లో ఉన్న కస్టమర్లు",
       retentionMetricDesc: "21+ రోజులుగా రాలేదు • ₹14,200 నెలవారీ రికవరీ",
+      retentionRedirectTitle: "కస్టమర్ నిలుపుదల (Retention) నిర్వహణ",
+      retentionRedirectDesc: "రాజేష్ గారు మరియు 41 మంది రెగ్యులర్ కస్టమర్లు గత 22 రోజులుగా రాలేదు. కస్టమర్ లాయల్టీ విభాగంలో వారిని పరిశీలించి ఆఫర్లు పంపండి.",
+      retentionRedirectBtn: "కస్టమర్ లాయల్టీలో చూడండి →",
+      aiAnalyzing: "సౌండ్‌బాక్స్ AI లెడ్జర్ పరిశీలిస్తోంది...",
+      aiAnalyzingSub: "తెలుగులో సమాధానం సిద్ధం చేస్తోంది",
     },
     sales: {
       badge: "దుకాణం కస్టమర్ రద్దీ మ్యాట్రిక్స్",
@@ -686,6 +711,11 @@ export const TRANSLATIONS: Record<AppLanguage, AppTranslation> = {
       retentionMetricTitle: "வாடிக்கையாளர் தக்கவைப்பு எச்சரிக்கை",
       retentionMetricCount: "42 வரத் தவறிய வாடிக்கையாளர்கள்",
       retentionMetricDesc: "21+ நாட்களாக வரவில்லை • ₹14,200 மீட்பு",
+      retentionRedirectTitle: "வாடிக்கையாளர் தக்கவைப்பு மேலாண்மை",
+      retentionRedirectDesc: "ராஜேஷ் மற்றும் 41 வழக்கமான வாடிக்கையாளர்கள் கடந்த 22 நாட்களாக வரவில்லை. வாடிக்கையாளர் விசுவாசம் பகுதியில் அவர்களை நிர்வகிக்கவும்.",
+      retentionRedirectBtn: "வாடிக்கையாளர் விசுவாசத்தில் பார்க்கவும் →",
+      aiAnalyzing: "சவுண்ட்பாக்ஸ் AI கணக்கை பகுப்பாய்வு செய்கிறது...",
+      aiAnalyzingSub: "தமிழில் பதில் தயாராகிறது",
     },
     sales: {
       badge: "கடை வாடிக்கையாளர் வருகை",
@@ -814,6 +844,11 @@ export const TRANSLATIONS: Record<AppLanguage, AppTranslation> = {
       retentionMetricTitle: "ಗ್ರಾಹಕರ ರಿಟೆನ್ಷನ್ ಎಚ್ಚರಿಕೆ",
       retentionMetricCount: "42 ಅಪಾಯದಲ್ಲಿರುವ ನಿಯಮಿತ ಗ್ರಾಹಕರು",
       retentionMetricDesc: "21+ ದಿನಗಳಿಂದ ಬಂದಿಲ್ಲ • ₹14,200 ಮಾಸಿಕ ರಿಕವರಿ",
+      retentionRedirectTitle: "ಗ್ರಾಹಕರ ಉಳಿಸಿಕೊಳ್ಳುವಿಕೆ ನಿರ್ವಹಣೆ",
+      retentionRedirectDesc: "ರಾಜೇಶ್ ಮತ್ತು 41 ನಿಯಮಿತ ಗ್ರಾಹಕರು ಕಳೆದ 22 ದಿನಗಳಿಂದ ಅಂಗಡಿಗೆ ಬಂದಿಲ್ಲ. ಗ್ರಾಹಕ ಲಾಯಲ್ಟಿ ವಿಭಾಗದಲ್ಲಿ ಪರಿಶೀಲಿಸಿ ಆಫರ್ ಕಳುಹಿಸಿ.",
+      retentionRedirectBtn: "ಗ್ರಾಹಕ ಲಾಯಲ್ಟಿಯಲ್ಲಿ ನೋಡಿ →",
+      aiAnalyzing: "ಸೌಂಡ್‌ಬಾಕ್ಸ್ AI ಲೆಡ್ಜರ್ ವಿಶ್ಲೇಷಿಸುತ್ತಿದೆ...",
+      aiAnalyzingSub: "ಕನ್ನಡದಲ್ಲಿ ನಿಖರ ಉತ್ತರ ಸಿದ್ಧವಾಗುತ್ತಿದೆ",
     },
     sales: {
       badge: "ಅಂಗಡಿ ಗ್ರಾಹಕರ ರಶ್ ಮ್ಯಾಟ್ರಿಕ್ಸ್",

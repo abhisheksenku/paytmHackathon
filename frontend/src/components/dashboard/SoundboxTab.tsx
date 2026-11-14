@@ -32,6 +32,7 @@ interface SoundboxTabProps {
   briefing: SoundboxBriefing | null;
   isLoading?: boolean;
   language?: string;
+  onOpenCustomers?: () => void;
 }
 
 export type SoundboxTimelineMode = "morning" | "afternoon" | "ondemand";
@@ -405,6 +406,46 @@ const SPEECH_LANG_CODE: Record<string, string> = {
 export function resolveQueryAnswer(queryText: string, lang: string): { ans: string; phonetic: string } {
   const q = (queryText || "").toLowerCase().trim();
 
+  // 0. Greetings / Welcome / Hello / Hi / Who are you
+  if (
+    q === "hello" || q === "hi" || q === "hey" || q === "namaste" || q === "namaskar" ||
+    q.includes("who are you") || q.includes("kaun ho") || q.includes("namaskara") ||
+    q.includes("vanakkam") || q.includes("kem cho") || q.includes("నమస్కారం") ||
+    q.includes("హలో") || q.includes("नमस्ते") || q.includes("வணக்கம்") || q.includes("ನಮಸ್ಕಾರ")
+  ) {
+    if (lang === "Telugu") {
+      return {
+        ans: "నమస్కారం శర్మ గారూ! నేను మీ వ్యాపార్ AI బిజినెస్ పార్ట్‌నర్. ఈ రోజు దుకాణం వ్యాపారం ఎలా ఉంది? మీరు నేటి కలెక్షన్, రద్దీ సమయం లేదా కస్టమర్ల వివరాలను అడగవచ్చు.",
+        phonetic: "Sharma gaaru, namaskaram! Nenu mee Vyapaar AI business partner.",
+      };
+    } else if (lang === "Hindi") {
+      return {
+        ans: "नमस्ते शर्मा जी! मैं आपका व्यापार AI साथी हूँ। आज आपकी दुकान का धंधा कैसा चल रहा है? आप मुझसे आज के कलेक्शन, शाम के पीक रश या नियमित ग्राहकों के बारे में कुछ भी पूछ सकते हैं।",
+        phonetic: "Namaste Sharma ji! Main aapka Vyapaar AI saathi hoon. Aaj aapki dukaan ka dhandha kaisa chal raha hai?",
+      };
+    } else if (lang === "English") {
+      return {
+        ans: "Namaste Sharma-ji! I am your Vyapaar AI business partner. How is business today? You can ask me about today's collection, evening peak rush, or inactive regular customers.",
+        phonetic: "Namaste Sharma-ji! I am your Vyapaar AI business partner. How is business today?",
+      };
+    } else if (lang === "Tamil") {
+      return {
+        ans: "வணக்கம் சர்மா அவர்களே! நான் உங்கள் வியாபார் AI. இன்று கடை வியாபாரம் எப்படி உள்ளது? இன்றைய வசூல், மாலை நேர கூட்டம் அல்லது வாடிக்கையாளர்கள் பற்றி என்னிடம் கேட்கலாம்.",
+        phonetic: "Sharma avargale vanakkam! Naan ungal Vyapaar AI business partner.",
+      };
+    } else if (lang === "Kannada") {
+      return {
+        ans: "ನಮಸ್ಕಾರ ಶರ್ಮಾ ಅವರೇ! ನಾನು ನಿಮ್ಮ ವ್ಯಾಪಾರ್ AI. ಇಂದು ನಿಮ್ಮ ಅಂಗಡಿಯ ವ್ಯಾಪಾರ ಹೇಗಿದೆ? ಇಂದಿನ ಸಂಗ್ರಹ, ಸಂಜೆಯ ಗರಿಷ್ಠ ವ್ಯಾಪಾರ ಅಥವಾ ಗ್ರಾಹಕರ ಬಗ್ಗೆ ಕೇಳಬಹುದು.",
+        phonetic: "Sharma avare namaskara! Naanu nimma Vyapaar AI business partner.",
+      };
+    } else {
+      return {
+        ans: "Namaste Sharma-ji! Main aapka Vyapaar AI Copilot hoon. Aaj aapka dhandha kaisa chal raha hai? Aap mujhse aaj ki collection, peak rush ya regular customers ke baare mein pooch sakte hain.",
+        phonetic: "Namaste Sharma-ji! Main aapka Vyapaar AI Copilot hoon. Aaj aapka dhandha kaisa chal raha hai?",
+      };
+    }
+  }
+
   // 1. Collection / Sales / Revenue / Aaj / Today / Dhandha / Kamai
   if (
     q.includes("collection") || q.includes("sale") || q.includes("revenue") || q.includes("kamaai") ||
@@ -567,10 +608,12 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
   briefing,
   isLoading,
   language = "Hinglish",
+  onOpenCustomers,
 }) => {
   const t = getTranslation(language);
   const [activeMode, setActiveMode] = useState<SoundboxTimelineMode>("morning");
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
   const [hasDispatchedRetention, setHasDispatchedRetention] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [interimSpokenText, setInterimSpokenText] = useState("");
@@ -690,8 +733,8 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
     }
   };
 
-  // Universal query execution: updates both Merchant Question & Soundbox Answer, then speaks aloud!
-  const handleExecuteQuery = (rawQuery: string) => {
+  // Universal query execution: invokes dynamic AI backend, updates both Merchant Question & Soundbox Answer, then speaks aloud!
+  const handleExecuteQuery = async (rawQuery: string) => {
     const query = rawQuery.trim();
     if (!query) return;
 
@@ -704,35 +747,49 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
     setInterimSpokenText("");
     setMicStatusMsg(null);
 
-    const resolved = resolveQueryAnswer(query, language);
+    // Immediately reflect the merchant's query in Step 1 UI
+    setOndemandState((prev) => ({
+      ...prev,
+      query: query,
+    }));
+    setIsGeneratingAi(true);
 
+    try {
+      const res = await apiEndpoints.sendChatMessage({ message: query, language });
+      if (res.data?.success && res.data?.data?.content) {
+        const rawContent = res.data.data.content;
+        const cleanSpoken = rawContent
+          .replace(/[*#`_~•]/g, "")
+          .replace(/\n+/g, ". ")
+          .trim();
+
+        setOndemandState({
+          query: query,
+          response: rawContent,
+          phonetic: cleanSpoken,
+        });
+        setIsGeneratingAi(false);
+        playAudio(rawContent, cleanSpoken, language);
+        return;
+      }
+    } catch (err) {
+      console.warn("AI chat request failed, falling back to ledger synthesis:", err);
+    }
+
+    // Grounded fallback if network/endpoint issues
+    const resolved = resolveQueryAnswer(query, language);
     setOndemandState({
       query: query,
       response: resolved.ans,
       phonetic: resolved.phonetic,
     });
-
+    setIsGeneratingAi(false);
     playAudio(resolved.ans, resolved.phonetic, language);
   };
 
-  // Handle Preset Quick-Tap Query: Updates BOTH Question text AND Answer text, then speaks!
+  // Handle Preset Quick-Tap Query: invokes dynamic AI or preset, then speaks!
   const handleSelectPresetQuery = (item: PresetQueryItem) => {
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch (e) {}
-    }
-    setIsListening(false);
-    setInterimSpokenText("");
-    setMicStatusMsg(null);
-
-    setOndemandState({
-      query: item.q,
-      response: item.ans,
-      phonetic: item.phonetic || item.ans,
-    });
-
-    playAudio(item.ans, item.phonetic || item.ans, language);
+    handleExecuteQuery(item.q);
   };
 
   // Web Speech API: Bulletproof Microphone Speech Recognition from the merchant!
@@ -779,7 +836,7 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
 
       recognition.onstart = () => {
         setIsListening(true);
-        setMicStatusMsg("🎙️ Listening to your voice... Speak your question now!");
+        setMicStatusMsg(null);
       };
 
       recognition.onresult = (event: any) => {
@@ -813,7 +870,7 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
       };
 
       recognition.onerror = (event: any) => {
-        console.warn("Speech recognition error:", event?.error);
+        console.warn("Speech recognition event:", event?.error);
         const captured = transcriptRef.current.trim();
         if (!hasProcessedQueryRef.current && captured.length > 1) {
           hasProcessedQueryRef.current = true;
@@ -824,13 +881,10 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
         }
 
         setIsListening(false);
-        if (event?.error === "no-speech") {
-          setMicStatusMsg("No voice detected. Please speak closer to your mic or tap any sample query below.");
-        } else if (event?.error === "not-allowed") {
-          setMicStatusMsg("Microphone permission denied. Please allow microphone access in your browser or tap any sample query below.");
-        } else {
-          setMicStatusMsg("Microphone paused. You can also type your question or tap any sample query below.");
+        if (event?.error === "not-allowed") {
+          setMicStatusMsg("Microphone permission denied. Please allow microphone access in your browser settings.");
         }
+        // Do NOT set error messages on 'no-speech' or 'aborted' - silent graceful pause
       };
 
       recognition.onend = () => {
@@ -1114,10 +1168,32 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
                           </div>
                         </div>
                       )}
+                      {isGeneratingAi && (
+                        <div className="flex items-center gap-1.5 bg-cyan-950/90 border border-cyan-500/40 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-cyan-300 animate-pulse">
+                          <Bot className="h-3 w-3 animate-spin text-[#00BAF2]" />
+                          <span>AI Analyzing Ledger...</span>
+                        </div>
+                      )}
                     </div>
-                    <p className="text-sm md:text-base leading-relaxed text-slate-100 font-semibold">
-                      &ldquo;{ondemandState.response}&rdquo;
-                    </p>
+
+                    {isGeneratingAi ? (
+                      <div className="py-2.5 flex items-center gap-3">
+                        <div className="h-5 w-5 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin shrink-0" />
+                        <div>
+                          <p className="text-sm font-bold text-white">
+                            {t.soundbox.aiAnalyzing}
+                          </p>
+                          <p className="text-xs text-cyan-400/90 mt-0.5">
+                            {t.soundbox.aiAnalyzingSub}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm md:text-base leading-relaxed text-slate-100 font-semibold whitespace-pre-line">
+                        &ldquo;{ondemandState.response}&rdquo;
+                      </p>
+                    )}
+
                     <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
                       <span className="flex items-center gap-1 text-cyan-300 font-medium">
                         <CheckCircle2 className="h-3.5 w-3.5 text-cyan-400" />
@@ -1125,7 +1201,8 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
                       </span>
                       <button
                         onClick={() => playAudio(ondemandState.response, ondemandState.phonetic, language)}
-                        className="flex items-center gap-1 text-cyan-400 hover:text-white font-bold cursor-pointer transition"
+                        disabled={isGeneratingAi}
+                        className="flex items-center gap-1 text-cyan-400 hover:text-white font-bold cursor-pointer transition disabled:opacity-50"
                       >
                         <RotateCcw className="h-3 w-3" /> Replay Voice
                       </button>
@@ -1134,38 +1211,28 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
                 </div>
               )}
 
-              {/* Interactive Sub-Action for Mode 2: Afternoon Slump Retention */}
+              {/* Customer Retention Management Redirection for Mode 2: Afternoon Slump */}
               {activeMode === "afternoon" && (
-                <div className="mt-4 rounded-xl bg-amber-950/40 border border-amber-500/30 p-4">
-                  <div className="flex items-center justify-between gap-3">
+                <div className="mt-4 rounded-xl bg-gradient-to-r from-amber-950/70 via-slate-900 to-amber-950/50 border border-amber-500/40 p-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div>
-                      <span className="text-[11px] font-bold text-amber-300 uppercase tracking-wider block">
-                        Merchant 1-Word Audio Action:
+                      <span className="text-[11px] font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Users className="h-3.5 w-3.5 text-amber-400" />
+                        {t.soundbox.retentionRedirectTitle}
                       </span>
-                      <p className="text-xs text-amber-100 mt-0.5">
-                        Say &ldquo;Yes, send it&rdquo; or click to dispatch ₹30 WhatsApp coupon
+                      <p className="text-xs text-slate-200 mt-1 max-w-xl leading-relaxed">
+                        {t.soundbox.retentionRedirectDesc}
                       </p>
                     </div>
 
                     <button
-                      onClick={handleApproveRetention}
-                      disabled={hasDispatchedRetention}
-                      className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition active:scale-95 shadow-md cursor-pointer ${
-                        hasDispatchedRetention
-                          ? "bg-emerald-500 text-slate-950 cursor-default"
-                          : "bg-emerald-400 hover:bg-emerald-300 text-slate-950"
-                      }`}
+                      onClick={() => onOpenCustomers && onOpenCustomers()}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 transition active:scale-95 shadow-md cursor-pointer shrink-0"
                     >
-                      <CheckCircle2 className="h-4 w-4" />
-                      {hasDispatchedRetention ? "Dispatched to 42 Customers!" : currentContent.followupPrompt?.actionLabel || "Yes, Send It"}
+                      <Users className="h-4 w-4" />
+                      <span>{t.soundbox.retentionRedirectBtn}</span>
                     </button>
                   </div>
-
-                  {hasDispatchedRetention && (
-                    <div className="mt-3 text-xs bg-emerald-950/80 border border-emerald-500/40 p-2.5 rounded-lg text-emerald-200">
-                      ✅ <strong>WhatsApp Offer Broadcast:</strong> Dispatched to Rajesh-ji (98****3210) and 41 at-risk regular customers. Estimated 65% win-back rate!
-                    </div>
-                  )}
                 </div>
               )}
 

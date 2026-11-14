@@ -9,7 +9,6 @@ import { CopilotTab } from "@/components/dashboard/CopilotTab";
 import { SalesTab } from "@/components/dashboard/SalesTab";
 import { CustomersTab } from "@/components/dashboard/CustomersTab";
 import { CampaignsTab } from "@/components/dashboard/CampaignsTab";
-import { IngestTab } from "@/components/dashboard/IngestTab";
 import { ProfileTab, AppLanguage } from "@/components/dashboard/ProfileTab";
 import { apiEndpoints } from "@/lib/api";
 import { OverviewSummary, RevenueTrendPoint, SoundboxBriefing } from "@/lib/types";
@@ -88,7 +87,6 @@ export default function Home() {
         <Sidebar
           currentTab={currentTab}
           onSelectTab={setCurrentTab}
-          loanScore={overview?.loan_readiness_score ?? 810}
           language={language}
         />
 
@@ -122,8 +120,6 @@ export default function Home() {
           )}
 
           {currentTab === "campaigns" && <CampaignsTab />}
-
-          {currentTab === "ingest" && <IngestTab onRefreshData={fetchDashboardData} />}
 
           {currentTab === "profile" && (
             <ProfileTab language={language} onLanguageChange={handleLanguageChange} />

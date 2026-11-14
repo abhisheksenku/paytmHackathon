@@ -16,7 +16,6 @@ export const apiEndpoints = {
   getOverview: (timeframe = "30d") => api.get(`/analytics/overview?timeframe=${timeframe}`),
   getTrends: (timeframe = "30d") => api.get(`/analytics/trends?timeframe=${timeframe}`),
   getPeakHours: (timeframe = "60d") => api.get(`/analytics/peak-hours?timeframe=${timeframe}`),
-  getLoanReadiness: () => api.get("/analytics/loan-readiness"),
   getSoundboxBriefing: () => api.get("/soundbox/briefing"),
   getCohorts: () => api.get("/analytics/cohorts"),
   getCustomers: (params?: { segment?: string; search?: string; limit?: number; offset?: number }) =>
@@ -29,5 +28,4 @@ export const apiEndpoints = {
     api.post("/ai/chat", data),
   generateTTS: (data: { text: string; language?: string }) =>
     api.post("/ai/tts", data),
-  seedDemoData: () => api.post("/ingest/seed-demo"),
 };

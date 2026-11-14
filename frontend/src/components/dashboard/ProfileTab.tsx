@@ -97,7 +97,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ language, onLanguageChan
           </div>
           <p className="text-xs text-slate-500 leading-relaxed">
             Select your preferred language. The AI copilot will respond in this language across
-            all queries — including sales insights, customer analytics, and loan readiness.
+            all queries — including sales insights, customer analytics, and retention campaigns.
           </p>
 
           <div className="grid grid-cols-2 gap-3 pt-2">

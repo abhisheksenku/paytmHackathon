@@ -6,7 +6,6 @@ from app.core.config import settings
 from app.models.models import Merchant, Conversation, Message, Product
 from app.analytics.sales_engine import compute_overview, compute_peak_hours
 from app.analytics.customer_engine import compute_customer_cohorts
-from app.analytics.credit_engine import compute_paytm_loan_readiness
 
 def format_inr(val: float) -> str:
     return f"₹{int(val):,}"
@@ -149,124 +148,6 @@ def generate_multilingual_response(
                 f"⚠️ **Opportunity Alert:** Tuesday aur Wednesday dopehar 1:00 PM se 4:30 PM ke beech footfall sabse kam rehta hai. Combo offer run karke sales badhayein!"
             )
 
-    elif intent == "loan_readiness":
-        score = data.get("credit_score", 810)
-        limit = data.get("pre_approved_limit", 250000)
-        risk = data.get("risk_band", "Low Risk")
-
-        if lang == "Hindi":
-            return (
-                f"💳 **Paytm वर्किंग कैपिटल लोन पात्रता स्कोर:**\n\n"
-                f"• **आपका AI क्रेडिट स्कोर:** `{score}/900` ({risk} श्रेणी - बहुत अच्छा)\n"
-                f"• **अनुमानित प्री-अप्रूव्ड लोन लिमिट:** **₹{limit:,}** (बिना गारंटी)\n"
-                f"• **दैनिक न्यूनतम कलेक्शन फ्लोर:** ₹12,000+ प्रति दिन\n\n"
-                f"📈 **लोन लिमिट और बढ़ाने का तरीका:**\n"
-                f"Paytm Soundbox पर रोजाना लगातार डिजिटल पेमेंट्स स्वीकार करने से बैंक पार्टनर बहुत तेजी से लोन प्रोसेस करते हैं!"
-            )
-        elif lang == "Telugu":
-            return (
-                f"💳 **Paytm వర్కింగ్ క్యాపిటల్ లోన్ అర్హత స్కోరు:**\n\n"
-                f"• **మీ AI క్రెడిట్ రెడీనెస్ స్కోరు:** `{score}/900` ({risk} శ్రేణి - అద్భుతం)\n"
-                f"• **ప్రీ-అప్రూవ్డ్ కొలేటరల్-ఫ్రీ లిమిట్:** **₹{limit:,}**\n"
-                f"• **రోజువారీ సగటు కలెక్షన్:** ₹12,000+ ప్రతిరోజూ\n\n"
-                f"📈 **లిమిట్ ఎలా పెంచుకోవాలి:**\n"
-                f"Paytm సౌండ్‌బాక్స్ ద్వారా నిరంతరం యూపీఐ పేమెంట్లు స్వీకరించడం వల్ల బ్యాంక్ భాగస్వాములు వేగంగా లోన్ మంజూరు చేస్తారు!"
-            )
-        elif lang == "Tamil":
-            return (
-                f"💳 **Paytm வணிக கடன் தகுதி மதிப்பெண்:**\n\n"
-                f"• **உங்கள் AI கிரெடிட் ஸ்கோர்:** `{score}/900` ({risk} - சிறந்தது)\n"
-                f"• **முன்-அங்கீகரிக்கப்பட்ட கடன் வரம்பு:** **₹{limit:,}** (பிணையில்லா கடன்)\n\n"
-                f"📈 **வரம்பை எவ்வாறு உயர்த்துவது:**\n"
-                f"Paytm சவுண்ட்பாக்ஸ் மூலம் தினசரி UPI பரிவர்த்தனைகளைத் தொடர்ந்து ஏற்பதன் மூலம் கடன் விரைவாக அங்கீகரிக்கப்படும்!"
-            )
-        elif lang == "Kannada":
-            return (
-                f"💳 **Paytm ದುಡಿಯುವ ಬಂಡವಾಳ ಸಾಲದ ಅರ್ಹತೆ ಸ್ಕೋರ್:**\n\n"
-                f"• **ನಿಮ್ಮ AI ಕ್ರೆಡಿಟ್ ಸ್ಕೋರ್:** `{score}/900` ({risk} - ಅತ್ಯುತ್ತಮ)\n"
-                f"• **ಪೂರ್ವ-ಅನುಮೋದಿತ ಸಾಲದ ಮಿತಿ:** **₹{limit:,}** (ಯಾವುದೇ ಗ್ಯಾರಂಟಿ ಇಲ್ಲದೆ)\n\n"
-                f"📈 **ಸಾಲದ ಮಿತಿ ಹೆಚ್ಚಿಸಲು ಸಲಹೆ:**\n"
-                f"Paytm ಸೌಂಡ್‌ಬಾಕ್ಸ್ ಮೂಲಕ ನಿರಂತರವಾಗಿ UPI ಪಾವತಿಗಳನ್ನು ಸ್ವೀಕರಿಸುವುದರಿಂದ ಸುಲಭವಾಗಿ ಸಾಲ ಲಭ್ಯವಾಗುತ್ತದೆ!"
-            )
-        elif lang == "English":
-            return (
-                f"💳 **Paytm Growth Capital & Working Capital Score:**\n\n"
-                f"• **Your AI Credit Readiness Score:** `{score}/900` ({risk} Tier - Prime)\n"
-                f"• **Pre-Approved Collateral-Free Limit:** **₹{limit:,}**\n"
-                f"• **Daily Average Floor:** ₹12,000+ consistent collection\n\n"
-                f"📈 **How to unlock a higher limit:**\n"
-                f"Maintaining daily transaction velocity on Paytm QR Soundbox accelerates automated pre-qualification from partner NBFCs and banks!"
-            )
-        else: # Hinglish
-            return (
-                f"💳 **Paytm Growth Capital & Working Capital Score:**\n\n"
-                f"• **Your AI Credit Readiness Score:** `{score}/900` ({risk} Tier)\n"
-                f"• **Pre-Approved Collateral-Free Limit:** **₹{limit:,}**\n"
-                f"• **Daily Average Floor:** ₹12,000+\n\n"
-                f"📈 **How to unlock higher limit:**\n"
-                f"Paytm Soundbox se steady UPI acceptance aapke loan approval ko 2x fast karta hai!"
-            )
-
-    elif intent == "stock_inventory":
-        total_skus = data.get("total_skus", 35)
-        low_items = data.get("low_stock_items", [])
-        
-        if low_items:
-            items_text_en = "\n".join([f"• ⚠️ **{it['name']}**: Only `{it['stock_qty']} units` left (Safety buffer: {it['reorder_level']})" for it in low_items[:4]])
-            items_text_hi = "\n".join([f"• ⚠️ **{it['name']}**: केवल `{it['stock_qty']} पैकेट` बचे हैं (रीऑर्डर सीमा: {it['reorder_level']})" for it in low_items[:4]])
-            items_text_te = "\n".join([f"• ⚠️ **{it['name']}**: కేవలం `{it['stock_qty']} యూనిట్లు` మాత్రమే మిగిలి ఉన్నాయి (కనీస నిల్వ: {it['reorder_level']})" for it in low_items[:4]])
-            items_text_ta = "\n".join([f"• ⚠️ **{it['name']}**: வெறும் `{it['stock_qty']} அலகுகள்` மட்டுமே உள்ளன (மறுவரிசை: {it['reorder_level']})" for it in low_items[:4]])
-            items_text_kn = "\n".join([f"• ⚠️ **{it['name']}**: ಕೇವಲ `{it['stock_qty']} ಯೂನಿಟ್‌ಗಳು` ಉಳಿದಿವೆ (ಮರುಆದೇಶ ಮಿತಿ: {it['reorder_level']})" for it in low_items[:4]])
-        else:
-            items_text_en = "• ✅ All fast-moving staples (Milk, Bread, Atta, Oil, Sugar) are healthy in stock."
-            items_text_hi = "• ✅ सभी जरूरी सामान (दूध, ब्रेड, आटा, तेल, चीनी) पर्याप्त स्टॉक में हैं।"
-            items_text_te = "• ✅ అన్ని నిత్యావసర సరుకులు (పాలు, బ్రెడ్, నూనె, పిండి) తగినంత నిల్వ ఉన్నాయి."
-            items_text_ta = "• ✅ பால், ரொட்டி, எண்ணெய் உள்ளிட்ட அனைத்து அத்தியாவசிய பொருட்களும் போதுமான அளவில் உள்ளன."
-            items_text_kn = "• ✅ ಹಾಲು, ಬ್ರೆಡ್, ಎಣ್ಣೆ ಸೇರಿದಂತೆ ಎಲ್ಲಾ ಅಗತ್ಯ ವಸ್ತುಗಳು ಸಾಕಷ್ಟು ದಾಸ್ತಾನು ಇವೆ."
-
-        if lang == "Hindi":
-            return (
-                f"📦 **{business_name} के लिए स्टॉक व इन्वेंटरी स्थिति:**\n\n"
-                f"आपकी दुकान में कुल **{total_skus} जरूरी FMCG प्रोडक्ट्स** ट्रैक हो रहे हैं।\n\n"
-                f"{items_text_hi}\n\n"
-                f"💡 **सलाह:** शाम के 7:00 PM पीक रश से पहले कम स्टॉक वाले सामान को डिस्ट्रीब्यूटर से तुरंत रिऑर्डर कर लें ताकि बिक्री का नुकसान न हो!"
-            )
-        elif lang == "Telugu":
-            return (
-                f"📦 **{business_name} స్టాక్ & ఇన్వెಂಟరీ నివేదిక:**\n\n"
-                f"మీ దుకాణంలో మొత్తం **{total_skus} రకాల వస్తువులు** ట్రాక్ చేయబడుతున్నాయి.\n\n"
-                f"{items_text_te}\n\n"
-                f"💡 **సూచన:** సాయంత్రం 7 గంటల రద్దీకి ముందే తక్కువగా ఉన్న వస్తువులను రీ-ఆర్డర్ చేసుకోండి!"
-            )
-        elif lang == "Tamil":
-            return (
-                f"📦 **{business_name} சரக்கு & இருப்பு அறிக்கை:**\n\n"
-                f"உங்கள் கடையில் மொத்தம் **{total_skus} பொருட்கள்** கண்காணிக்கப்படுகின்றன.\n\n"
-                f"{items_text_ta}\n\n"
-                f"💡 **ஆலோசனை:** மாலை நேர கூட்டத்திற்கு முன் அத்தியாவசிய பொருட்களை உடனே ஆர்டர் செய்யவும்!"
-            )
-        elif lang == "Kannada":
-            return (
-                f"📦 **{business_name} ದಾಸ್ತಾನು & ಸ್ಟಾಕ್ ವರದಿ:**\n\n"
-                f"ನಿಮ್ಮ ಅಂಗಡಿಯಲ್ಲಿ ಒಟ್ಟು **{total_skus} ಅಗತ್ಯ ವಸ್ತುಗಳನ್ನು** ಟ್ರ್ಯಾಕ್ ಮಾಡಲಾಗುತ್ತಿದೆ.\n\n"
-                f"{items_text_kn}\n\n"
-                f"💡 **ಸಲಹೆ:** ಸಂಜೆಯ ಗರಿಷ್ಠ ವ್ಯಾಪಾರಕ್ಕೆ ಮುನ್ನ ಅಗತ್ಯ ವಸ್ತುಗಳನ್ನು ರೀಆರ್ಡರ್ ಮಾಡಿ!"
-            )
-        elif lang == "English":
-            return (
-                f"📦 **Stock & Inventory Health Report for {business_name}:**\n\n"
-                f"Currently tracking **{total_skus} active SKUs** across your store catalog.\n\n"
-                f"{items_text_en}\n\n"
-                f"💡 **Operational Recommendation:** Reorder depleted items before the 7:00 PM evening rush to prevent lost walk-away sales!"
-            )
-        else: # Hinglish
-            return (
-                f"📦 **Stock & Inventory Status for {business_name}:**\n\n"
-                f"Aapki dukaan mein total **{total_skus} SKUs** track ho rahe hain.\n\n"
-                f"{items_text_en}\n\n"
-                f"💡 **Actionable Tip:** Shaam ke 7 PM rush se pehle depleted items restock kar lein taaki koi customer empty-handed na laute!"
-            )
-
     elif intent == "customers":
         cohorts = data.get("cohorts", [])
         champs = next((c for c in cohorts if "Champ" in c.get("segment", "")), {"count": 50, "avg_spend": 850})
@@ -382,8 +263,8 @@ def generate_multilingual_response(
                 f"आप मुझसे अपनी दुकान के व्यापार से जुड़ा कोई भी सवाल पूछ सकते हैं:\n"
                 f"• *'पिछले महीने की तुलना में आज की बिक्री कैसी है?'*\n"
                 f"• *'मेरी दुकान का सबसे व्यस्त समय (Peak Hours) कौन सा है?'*\n"
-                f"• *'Paytm वर्किंग कैपिटल लोन के लिए मेरा क्रेडिट स्कोर क्या है?'*\n"
-                f"• *'पुराने ग्राहकों को वापस बुलाने के लिए ऑफर बनाओ।'* \n\n"
+                f"• *'42 छूटे हुए (At-Risk) नियमित ग्राहकों को वापस बुलाने का ऑफर बनाओ।'*\n"
+                f"• *'ग्राहक वफादारी (Loyalty) की स्थिति कैसी है?'* \n\n"
                 f"आप माइक दबाकर बोल सकते हैं या नीचे टाइप कर सकते हैं!"
             )
         elif lang == "Telugu":
@@ -392,8 +273,8 @@ def generate_multilingual_response(
                 f"మీరు మీ వ్యాపారానికి సంబంధించిన ఏ ప్రశ్ననైనా నన్ను అడగవచ్చు:\n"
                 f"• *'గత నెలతో పోలిస్తే నా వ్యాపార కలెక్షన్ ఎలా ఉంది?'*\n"
                 f"• *'నా దుకాణంలో రద్దీ ఎక్కువగా ఉండే పీక్ అవర్స్ ఏవి?'*\n"
-                f"• *'Paytm లోన్ కోసం నా క్రెడిట్ స్కోరు ఎంత?'*\n"
-                f"• *'పాత కస్టమర్ల కోసం ఆఫర్ తయారు చేయి.'*\n\n"
+                f"• *'42 మంది పాత కస్టమర్లను మళ్లీ రప్పించడానికి ఆఫర్ తయారు చేయి.'*\n"
+                f"• *'రెగ్యులర్ కస్టమర్ల లాయల్టీ రిపోర్ట్ చూపించు.'*\n\n"
                 f"మీరు మాట్లాడవచ్చు (మైక్ బటన్) లేదా టైప్ చేయవచ్చు!"
             )
         elif lang == "Tamil":
@@ -402,7 +283,7 @@ def generate_multilingual_response(
                 f"உங்கள் கடை வியாபாரம் குறித்து என்னிடம் எந்த கேள்வியும் கேட்கலாம்:\n"
                 f"• *'கடந்த மாதத்தை விட இன்றைய விற்பனை எப்படி உள்ளது?'*\n"
                 f"• *'எனது கடையின் பீக் ஹவர்ஸ் எது?'*\n"
-                f"• *'Paytm கடனுக்கான எனது கிரெடிட் ஸ்கோர் என்ன?'*\n\n"
+                f"• *'42 வாடிக்கையாளர்களை மீண்டும் அழைக்க WhatsApp சலுகை உருவாக்கு.'*\n\n"
                 f"நீங்கள் மைக் மூலம் பேசலாம் அல்லது தட்டச்சு செய்யலாம்!"
             )
         elif lang == "Kannada":
@@ -411,7 +292,7 @@ def generate_multilingual_response(
                 f"ನಿಮ್ಮ ಅಂಗಡಿಯ ವ್ಯಾಪಾರದ ಬಗ್ಗೆ ನೀವು ಯಾವುದೇ ಪ್ರಶ್ನೆ ಕೇಳಬಹುದು:\n"
                 f"• *'ಕಳೆದ ತಿಂಗಳಿಗೆ ಹೋಲಿಸಿದರೆ ನನ್ನ ವ್ಯಾಪಾರ ಹೇಗಿದೆ?'*\n"
                 f"• *'ನನ್ನ ಅಂಗಡಿಯ ಗರಿಷ್ಠ ವ್ಯಾಪಾರದ ಸಮಯ ಯಾವುದು?'*\n"
-                f"• *'Paytm ಸಾಲಕ್ಕಾಗಿ ನನ್ನ ಕ್ರೆಡಿಟ್ ಸ್ಕೋರ್ ಎಷ್ಟು?'*\n\n"
+                f"• *'42 ಅಪಾಯದಲ್ಲಿರುವ ಗ್ರಾಹಕರಿಗೆ ವಾಟ್ಸಾಪ್ ಆಫರ್ ಕಳುಹಿಸು.'*\n\n"
                 f"ನೀವು ಮೈಕ್ ಬಳಸಿ ಮಾತನಾಡಬಹುದು ಅಥವಾ ಟೈಪ್ ಮಾಡಬಹುದು!"
             )
         elif lang == "English":
@@ -420,8 +301,8 @@ def generate_multilingual_response(
                 f"You can ask me any question about your retail store performance:\n"
                 f"• *'How does my sales compare to last month?'*\n"
                 f"• *'What are my top rush hours today?'*\n"
-                f"• *'What is my Paytm working capital loan readiness score?'*\n"
-                f"• *'Create a discount offer for inactive regular customers.'*\n\n"
+                f"• *'How many regular customers are at-risk, and how do I win them back?'*\n"
+                f"• *'Draft a 10% discount WhatsApp campaign for inactive regulars.'*\n\n"
                 f"Feel free to click the mic to speak or type your question below!"
             )
         else: # Hinglish
@@ -430,8 +311,8 @@ def generate_multilingual_response(
                 f"Aap mujhse apni dukaan ke dhandhe se juda koi bhi sawaal pooch sakte hain:\n"
                 f"• *'Pichle hafte se aaj ka dhandha kaisa hai?'*\n"
                 f"• *'Mera sabse bheed wala time (peak hours) kaun sa hai?'*\n"
-                f"• *'Paytm working capital loan ke liye mera score kya hai?'*\n"
-                f"• *'Inactive grahakon ke liye WhatsApp offer banao.'*\n\n"
+                f"• *'42 At-Risk regular customers ko wapas lane ke liye WhatsApp offer banao.'*\n"
+                f"• *'Champions aur regular grahakon ki report dikhao.'*\n\n"
                 f"Aap bol kar (mic icon) ya type karke pooch sakte hain!"
             )
 
@@ -468,14 +349,6 @@ def run_agentic_query(db: Session, merchant_id: str, query: str, language: str =
         "ರಶ್", "ಸಮಯ", "ಹೆಚ್ಚಿನ", "ಗರಿಷ್ಠ"
     ]
 
-    loan_keywords = [
-        "loan", "credit", "capital", "limit", "karz", "working capital", "paytm loan", "appu", "saala", "score", "eligib",
-        "लोन", "कर्ज", "उधार", "पात्रता", "लिमिट", "क्रेडिट", "स्कोर", "पूंजी",
-        "లోన్", "రుణ", "అర్హత", "స్కోరు", "లిమిట్", "క్రెడిట్",
-        "கடன்", "தகுதி", "மதிப்பெண்", "வரம்பு",
-        "ಸಾಲ", "ಅರ್ಹತೆ", "ಸ್ಕೋರ್", "ಮಿತಿ"
-    ]
-
     customer_keywords = [
         "customer", "grahak", "loyal", "inactive", "repeat", "khata", "lost", "champ", "client",
         "ग्राहक", "पुराने", "नियमित", "लॉयल्टी", "निष्क्रिय",
@@ -492,46 +365,15 @@ def run_agentic_query(db: Session, merchant_id: str, query: str, language: str =
         "ಕೊಡುಗೆ", "ರಿಯಾಯಿತಿ", "ಪ್ರಚಾರ"
     ]
 
-    stock_keywords = [
-        "stock", "inventory", "maal", "item", "product", "milk", "bread", "saman", "khatam", "bacha", "shortage", "reorder", "curd", "sugar", "oil", "sku",
-        "स्टॉक", "माल", "सामान", "खत्म", "बचा", "आइटम", "दूध", "ब्रेड",
-        "స్టాక్", "సరుకు", "వస్తు", "అయిపో", "మిగిలి", "కొరత", "పాలు",
-        "ஸ்டாக்", "சரக்கு", "பொருள்", "முடிந்தது", "இருப்பு",
-        "ಸ್ಟಾಕ್", "ದಾಸ್ತಾನು", "ವಸ್ತು", "ಖಾಲಿಯಾಗಿದೆ", "ಉಳಿದಿದೆ"
-    ]
-
     if any(k in query_lower for k in sales_keywords):
         intent = "sales_overview"
         tool_executed = "compare_sales_periods(timeframe='30d')"
         tool_data = compute_overview(db, merchant_id, timeframe="30d")
 
-    elif any(k in query_lower for k in stock_keywords):
-        intent = "stock_inventory"
-        tool_executed = "check_inventory_levels()"
-        low_items = db.query(Product).filter(
-            Product.merchant_id == merchant_id,
-            Product.stock_qty <= Product.reorder_level
-        ).all()
-        if not low_items:
-            low_items = db.query(Product).filter(Product.merchant_id == merchant_id).order_by(Product.stock_qty.asc()).limit(2).all()
-        total_skus = db.query(Product).filter(Product.merchant_id == merchant_id).count()
-        tool_data = {
-            "total_skus": total_skus,
-            "low_stock_items": [
-                {"name": p.name, "stock_qty": p.stock_qty, "reorder_level": p.reorder_level, "unit_price": p.unit_price}
-                for p in low_items
-            ]
-        }
-
     elif any(k in query_lower for k in rush_keywords):
         intent = "peak_hours"
         tool_executed = "calc_peak_hours_matrix()"
         tool_data = compute_peak_hours(db, merchant_id)
-
-    elif any(k in query_lower for k in loan_keywords):
-        intent = "loan_readiness"
-        tool_executed = "calc_paytm_loan_readiness()"
-        tool_data = compute_paytm_loan_readiness(db, merchant_id)
 
     elif any(k in query_lower for k in customer_keywords):
         intent = "customers"

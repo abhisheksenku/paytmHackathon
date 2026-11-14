@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from app.core.database import SessionLocal, Base, engine
 from app.models.models import Merchant, Transaction, DailyAggregate
 from app.analytics.sales_engine import compute_overview, compute_peak_hours
-from app.analytics.credit_engine import compute_paytm_loan_readiness
 from app.analytics.customer_engine import compute_customer_cohorts
 
 @pytest.fixture(scope="module")
@@ -39,17 +38,6 @@ def test_peak_hours_calculation(db):
     assert len(peak_data["top_rush_hours"]) > 0
     assert "heatmap" in peak_data
     assert len(peak_data["heatmap"]) > 0
-
-def test_paytm_loan_readiness_algorithm(db):
-    merchant = db.query(Merchant).first()
-    loan_info = compute_paytm_loan_readiness(db, merchant.id)
-    
-    assert "credit_score" in loan_info
-    assert 300 <= loan_info["credit_score"] <= 900
-    assert "pre_approved_limit" in loan_info
-    assert loan_info["pre_approved_limit"] >= 25000
-    assert "risk_band" in loan_info
-    assert loan_info["risk_band"] in ["Prime", "Good", "Moderate"]
 
 def test_customer_cohorts_segmentation(db):
     merchant = db.query(Merchant).first()

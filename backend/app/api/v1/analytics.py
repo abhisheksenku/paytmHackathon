@@ -8,7 +8,6 @@ from app.analytics.sales_engine import (
     compute_overview, compute_revenue_trends, compute_peak_hours
 )
 from app.analytics.customer_engine import compute_customer_cohorts
-from app.analytics.credit_engine import compute_paytm_loan_readiness
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
@@ -25,9 +24,6 @@ def get_overview(
 ):
     merchant = get_default_merchant(db)
     overview = compute_overview(db, merchant.id, timeframe)
-    loan_info = compute_paytm_loan_readiness(db, merchant.id)
-    overview["loan_readiness_score"] = loan_info["credit_score"]
-    overview["pre_approved_limit"] = loan_info["pre_approved_limit"]
     return {"success": True, "data": overview}
 
 @router.get("/trends")
@@ -47,12 +43,6 @@ def get_peak_hours_endpoint(
     merchant = get_default_merchant(db)
     peak_data = compute_peak_hours(db, merchant.id, timeframe=timeframe)
     return {"success": True, "data": peak_data}
-
-@router.get("/loan-readiness")
-def get_loan_readiness_endpoint(db: Session = Depends(get_db)):
-    merchant = get_default_merchant(db)
-    loan_data = compute_paytm_loan_readiness(db, merchant.id)
-    return {"success": True, "data": loan_data}
 
 @router.get("/cohorts")
 def get_customer_cohorts_endpoint(db: Session = Depends(get_db)):

@@ -11,13 +11,12 @@
 
 ## 🌟 Executive Overview
 
-**Vyapaar AI** is a purpose-built, India-first business copilot for small & medium retailers (Kiranas, food stalls, pharmacies, clothing stores). 
+**Vyapaar AI** is a purpose-built, India-first voice and retention copilot for small & medium retailers (Kiranas, kiosk owners, tea stalls, pharmacies). 
 
-Rather than overwhelming a busy shopkeeper with corporate dashboards or hallucinating generic AI chatbots, Vyapaar AI:
-1. **Listens to Daily Dukaan Briefings (AI Soundbox):** Synthesizes a 30-second morning audio wrap-up in natural Hinglish before the shop shutters open.
-2. **Answers Voice & Hinglish Queries:** Ask *"Pichle hafte se aaj ka dhandha kaisa hai?"* or *"Mera peak bheed wala time kab hai?"* with zero financial hallucinations.
-3. **Calculates Paytm Loan Readiness:** Evaluates daily cash flow consistency and pre-approves working capital limits (e.g., ₹2.5 Lakhs).
-4. **Generates WhatsApp Micro-Campaigns:** Detects retail slumps (e.g. Tuesday afternoon dip) and drafts localized WhatsApp broadcasts with QR discount codes ready to send in 1 click.
+Rather than overwhelming a busy shopkeeper with complex English dashboards or generic hallucinated chatbots, Vyapaar AI delivers 3 core pillars:
+1. **Customer Retention via Soundbox RFM:** Tracks UPI transaction VPAs to identify regular customers whose visit frequency has dropped. Flags **42 At-Risk regular customers** (e.g. Rajesh-ji, inactive for 22 days) and generates personalized 1-click WhatsApp coupon recovery campaigns.
+2. **AI Business Copilot in 6 Indian Languages:** Full voice conversation in Hindi, Telugu, Tamil, Kannada, English, and Hinglish. Merchants ask queries aloud (*"How much collection today?"*, *"Compare sales with last month"*), powered by deterministic analytics and Sarvam AI / Indian neural audio.
+3. **Scenario 3: Eyes-Free Accessibility (Voice-Only Commerce for Blind & Elderly Merchants):** Complete screen-free operation designed for visually impaired or elderly shopkeepers (e.g. Venkat-ji, 58 yrs, severe low vision). They query the Soundbox directly in Telugu (*"ఈ రోజు మొత్తం ఎంత కలెక్షన్ అయింది?"*), receive native audio answers, and approve customer retention offers with simple spoken affirmations (*"అవును, పంపించు"*).
 
 ---
 
@@ -32,8 +31,8 @@ Rather than overwhelming a busy shopkeeper with corporate dashboards or hallucin
                                     │ HTTP / REST (/api/v1)
 ┌───────────────────────────────────▼────────────────────────────────────┐
 │                        FASTAPI BACKEND                                 │
-│   • Pure Deterministic Analytics     • Edge-TTS Neural Voice Engine    │
-│   • Sales, Cohorts & Loan Engines     • Ingestion & Column Normalizer   │
+│   • Pure Deterministic Analytics     • Sarvam AI & Edge-TTS Voice Engine│
+│   • Sales, Cohorts & Retention       • Eyes-Free Audio Dialog Engine   │
 └──────────────┬──────────────────────────────────────────┬──────────────┘
                │                                          │
 ┌──────────────▼────────────────┐        ┌────────────────▼──────────────┐
@@ -109,23 +108,23 @@ Frontend will be live at: **`http://localhost:3000`**
 
 ## ⏱️ Judges' 3-Minute Winning Demo Script
 
-1. **The Hook (0:00 - 0:30):**
-   * Open `http://localhost:3000`. Show **Sharma General Store** dashboard: ₹4.8 Lakh monthly revenue, 1,420 bills, and a **Paytm Loan Readiness Score of 810/900 (Pre-Approved for ₹2.5 Lakhs)**.
-2. **The AI Soundbox (0:30 - 1:00):**
-   * Click **"AI Soundbox Briefing"** in the sidebar. Click **"Play Briefing"**.
-   * Listen to the natural Hinglish voice summary:  
-     *"Namaste Sharma ji! Kal aapka collection ₹18,450 raha. Shaam 7 baje sabse zyada bheed dekhi gayi..."*
-3. **The Voice/Hinglish Query (1:00 - 1:45):**
-   * Switch to **"AI Business Copilot"**. Click the microphone or select:  
+1. **The Hook & Overview (0:00 - 0:30):**
+   * Open `http://localhost:3000`. Show **Sharma General Store** dashboard: ₹4.8 Lakh monthly revenue, 1,420 bills, 68.4% repeat customer rate, and real-time Soundbox connection status.
+2. **Scenario 3: Eyes-Free Voice Copilot for Accessibility (0:30 - 1:15):**
+   * Click **"🎙️ Launch Eyes-Free Voice Demo (Scenario 3)"** on the main dashboard.
+   * Introduce Venkat-ji (58-year-old shopkeeper with low vision / cataracts).
+   * Demonstrate 100% screen-free voice querying: speak in Telugu (*"ఈ రోజు మొత్తం ఎంత కలెక్షన్ అయింది?"*), hear the authentic audio response (*"85 లావాదేవీలు • ₹9,420 కలెక్షన్..."*), and approve the retention offer for Rajesh-ji with a spoken *"అవును, పంపించు"*.
+3. **The Voice Multilingual Copilot (1:15 - 1:55):**
+   * Switch to **"AI Business Copilot"**. Click the microphone or choose queries in Hindi, Telugu, Tamil, Kannada, or Hinglish:
      *"Pichle hafte se compare karke batao business kaisa hai?"*
    * Point out the **`⚡ Tool Executed: compare_sales_periods()`** badge showing zero financial hallucinations.
-4. **The Retail Anomaly & Action (1:45 - 2:30):**
-   * Open **"Sales & Rush Hours"** to show the Day vs. Hour Heatmap highlighting the Tuesday afternoon slump.
+4. **Soundbox Customer Retention & Slump Recovery (1:55 - 2:30):**
+   * Open **"Customer Loyalty"** to reveal the **42 At-Risk regular customers** identified via Soundbox UPI VPAs.
    * Switch to **"WhatsApp Campaigns"**. Click **"Generate AI WhatsApp Message"**.
    * Inspect the formatted message preview inside the **Smartphone Simulator**.
    * Click **"Approve Campaign"** and click **"Send via WhatsApp"** to launch direct sharing (`wa.me/?text=...`).
 5. **The Conclusion (2:30 - 3:00):**
-   * Conclude: *"Vyapaar AI transforms passive Soundbox alerts into proactive daily dhandha intelligence, customer retention, and loan readiness on a 100% free-tier stack."*
+   * Conclude: *"Vyapaar AI transforms passive Soundbox pings into an active voice copilot, inclusive eyes-free accessibility for blind merchants, and 1-click customer retention on a 100% free-tier stack."*
 
 ---
 

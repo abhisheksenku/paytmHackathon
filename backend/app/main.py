@@ -9,7 +9,6 @@ from app.api.v1.analytics import router as analytics_router
 from app.api.v1.soundbox import router as soundbox_router
 from app.api.v1.campaigns import router as campaigns_router
 from app.api.v1.copilot import router as copilot_router
-from app.api.v1.ingest import router as ingest_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -35,7 +34,6 @@ app.include_router(analytics_router, prefix=settings.API_V1_STR)
 app.include_router(soundbox_router, prefix=settings.API_V1_STR)
 app.include_router(campaigns_router, prefix=settings.API_V1_STR)
 app.include_router(copilot_router, prefix=settings.API_V1_STR)
-app.include_router(ingest_router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 def root():

@@ -8,8 +8,6 @@ export interface OverviewSummary {
   aov_growth_pct: number;
   repeat_customer_rate: number;
   active_customers: number;
-  loan_readiness_score: number;
-  pre_approved_limit: number;
 }
 
 export interface RevenueTrendPoint {

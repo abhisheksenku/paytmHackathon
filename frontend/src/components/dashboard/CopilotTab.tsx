@@ -27,12 +27,12 @@ interface CopilotTabProps {
 }
 
 const WELCOME_MESSAGES: Record<string, string> = {
-  Hindi: "नमस्ते! 🙏 मैं आपका **Vyapaar AI Copilot** हूँ।\n\nआप मुझसे अपनी दुकान की बिक्री (Sales), व्यस्त घंटे (Rush Hours), ग्राहक रिपोर्ट या Paytm लोन पात्रता के बारे में शुद्ध हिंदी में पूछ सकते हैं। बोलने के लिए माइक दबाएँ!",
-  Telugu: "నమస్కారం! 🙏 నేను మీ **Vyapaar AI Copilot** ని.\n\nమీ దుకాణం వ్యాపార అమ్మకాలు, రద్దీ సమయాలు, కస్టమర్ల వివరాలు లేదా Paytm లోన్ అర్హత గురించి తెలుగులో అడగవచ్చు. మాట్లాడటానికి మైక్ బటన్ నొక్కండి!",
-  Tamil: "வணக்கம்! 🙏 நான் உங்கள் **Vyapaar AI Copilot**.\n\nஉங்கள் கடையின் விற்பனை, பீக் ஹவர்ஸ், வாடிக்கையாளர் விவரங்கள் அல்லது Paytm கடன் தகுதி குறித்து தமிழில் கேட்கலாம். பேச மைக் பொத்தானை அழுத்தவும்!",
-  Kannada: "ನಮಸ್ಕಾರ! 🙏 ನಾನು ನಿಮ್ಮ **Vyapaar AI Copilot**.\n\nನಿಮ್ಮ ಅಂಗಡಿಯ ಮಾರಾಟ, ರಶ್ ಅವರ್ಸ್, ಗ್ರಾಹಕರ ವರದಿ ಅಥವಾ Paytm ಸಾಲದ ಅರ್ಹತೆಯ ಬಗ್ಗೆ ಕನ್ನಡದಲ್ಲಿ ಕೇಳಬಹುದು. ಮಾತನಾಡಲು ಮೈಕ್ ಒತ್ತಿ!",
-  English: "Namaste! 🙏 I am your **Vyapaar AI Copilot**.\n\nYou can ask me about your store's sales trends, peak rush hours, customer loyalty, or Paytm working capital eligibility. Click the mic button to speak!",
-  Hinglish: "Namaste! 🙏 Main aapka **Vyapaar AI Copilot** hoon.\n\nAap mujhse apni dukaan ki sales, rush hours, inactive customers, ya loan eligibility ke baare mein pooch sakte hain. Bolne ke liye microphone button dabayein!",
+  Hindi: "नमस्ते! 🙏 मैं आपका **Vyapaar AI Copilot** हूँ।\n\nआप मुझसे अपनी दुकान की बिक्री (Sales), व्यस्त घंटे (Rush Hours), ग्राहक रिपोर्ट या WhatsApp कस्टमर रिटेंशन ऑफर के बारे में शुद्ध हिंदी में पूछ सकते हैं। बोलने के लिए माइक दबाएँ!",
+  Telugu: "నమస్కారం! 🙏 నేను మీ **Vyapaar AI Copilot** ని.\n\nమీ దుకాణం వ్యాపార అమ్మకాలు, రద్దీ సమయాలు, కస్టమర్ల వివరాలు లేదా WhatsApp కస్టమర్ రిటెన్షన్ ఆఫర్ల గురించి తెలుగులో అడగవచ్చు. మాట్లాడటానికి మైక్ బటన్ నొక్కండి!",
+  Tamil: "வணக்கம்! 🙏 நான் உங்கள் **Vyapaar AI Copilot**.\n\nஉங்கள் கடையின் விற்பனை, பீக் ஹவர்ஸ், வாடிக்கையாளர் விவரங்கள் அல்லது WhatsApp வாடிக்கையாளர் சலுகைகள் குறித்து தமிழில் கேட்கலாம். பேச மைக் பொத்தானை அழுத்தவும்!",
+  Kannada: "ನಮಸ್ಕಾರ! 🙏 ನಾನು ನಿಮ್ಮ **Vyapaar AI Copilot**.\n\nನಿಮ್ಮ ಅಂಗಡಿಯ ಮಾರಾಟ, ರಶ್ ಅವರ್ಸ್, ಗ್ರಾಹಕರ ವರದಿ ಅಥವಾ WhatsApp ಗ್ರಾಹಕರ ಆಫರ್‌ಗಳ ಬಗ್ಗೆ ಕನ್ನಡದಲ್ಲಿ ಕೇಳಬಹುದು. ಮಾತನಾಡಲು ಮೈಕ್ ಒತ್ತಿ!",
+  English: "Namaste! 🙏 I am your **Vyapaar AI Copilot**.\n\nYou can ask me about your store's sales trends, peak rush hours, customer loyalty, or WhatsApp customer retention offers. Click the mic button to speak!",
+  Hinglish: "Namaste! 🙏 Main aapka **Vyapaar AI Copilot** hoon.\n\nAap mujhse apni dukaan ki sales, rush hours, inactive customers, ya WhatsApp customer retention offers ke baare mein pooch sakte hain. Bolne ke liye microphone button dabayein!",
 };
 
 const SUGGESTIONS_BY_LANG: Record<string, string[]> = {

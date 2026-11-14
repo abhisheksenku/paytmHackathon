@@ -8,9 +8,8 @@ import {
   TrendingUp,
   Users,
   MessageSquare,
-  UploadCloud,
-  CreditCard,
   UserCircle,
+  Radio,
 } from "lucide-react";
 
 export type NavTab =
@@ -20,13 +19,11 @@ export type NavTab =
   | "sales"
   | "customers"
   | "campaigns"
-  | "ingest"
   | "profile";
 
 interface SidebarProps {
   currentTab: NavTab;
   onSelectTab: (tab: NavTab) => void;
-  loanScore?: number;
   language?: string;
 }
 
@@ -42,13 +39,12 @@ const LANG_NATIVE_BADGE: Record<string, string> = {
 export const Sidebar: React.FC<SidebarProps> = ({
   currentTab,
   onSelectTab,
-  loanScore = 810,
   language = "Hinglish",
 }) => {
   const navItems = [
     {
       id: "overview" as NavTab,
-      label: "Overview & Loan Meter",
+      label: "Store Overview",
       icon: LayoutDashboard,
       badge: "Core",
     },
@@ -82,11 +78,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: MessageSquare,
       badge: "Growth",
       badgeColor: "bg-emerald-100 text-emerald-800",
-    },
-    {
-      id: "ingest" as NavTab,
-      label: "Data Ingestion & Demo",
-      icon: UploadCloud,
     },
     {
       id: "profile" as NavTab,
@@ -144,28 +135,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </nav>
         </div>
 
-        {/* Paytm Growth Capital Card in Sidebar */}
-        <div className="rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50/70 to-cyan-50/50 p-3.5 text-left">
+        {/* Soundbox Voice Copilot & Retention Card in Sidebar */}
+        <div className="rounded-xl border border-cyan-200/80 bg-gradient-to-br from-cyan-50/70 via-blue-50/50 to-slate-50 p-3.5 text-left">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-bold text-[#002E6E] uppercase tracking-wider flex items-center gap-1.5">
-              <CreditCard className="h-3.5 w-3.5 text-[#00BAF2]" />
-              Paytm Growth Loan
+            <span className="text-[12px] font-bold text-[#002E6E] uppercase tracking-wider flex items-center gap-1.5">
+              <Radio className="h-3.5 w-3.5 text-[#00BAF2] animate-pulse" />
+              Soundbox Voice 4G
             </span>
-            <span className="text-xs font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
-              {loanScore}/900
+            <span className="text-[11px] font-bold text-cyan-800 bg-cyan-100/90 px-2 py-0.5 rounded-full">
+              Voice-First
             </span>
           </div>
           <p className="mt-2 text-xs font-semibold text-slate-800">
-            Pre-Approved: <span className="text-[#002E6E] font-bold">₹2,50,000</span>
+            At-Risk Regulars: <span className="text-amber-600 font-bold">42 Tracked</span>
           </p>
-          <div className="mt-2 h-1.5 w-full rounded-full bg-slate-200 overflow-hidden">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-[#002E6E] to-[#00BAF2]"
-              style={{ width: `${(loanScore / 900) * 100}%` }}
-            />
+          <div className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+            <span>Eyes-Free Copilot Ready (6 Langs)</span>
           </div>
-          <p className="mt-2 text-[12px] text-slate-500 leading-tight">
-            Based on 180-day steady UPI collection consistency.
+          <p className="mt-2 text-[11px] text-slate-500 leading-tight">
+            100% screen-free voice intelligence for inclusive retail commerce.
           </p>
         </div>
       </div>

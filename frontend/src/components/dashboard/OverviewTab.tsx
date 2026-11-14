@@ -248,8 +248,6 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
   const totalTxns = overview?.total_transactions ?? 1420;
   const aov = overview?.avg_order_value ?? 340;
   const repeatRate = overview?.repeat_customer_rate ?? 68.4;
-  const loanScore = overview?.loan_readiness_score ?? 810;
-  const loanLimit = overview?.pre_approved_limit ?? 250000;
 
   return (
     <div className="space-y-6">
@@ -380,7 +378,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
         </div>
       </div>
 
-      {/* Main Grid: Revenue Trend Chart + Paytm Loan Readiness Meter */}
+      {/* Main Grid: Revenue Trend Chart + Scenario 3 Eyes-Free Voice Copilot */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 2 Cols: Recharts Daily Revenue Velocity */}
         <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

@@ -16,12 +16,16 @@ import {
   Clock,
   Coffee,
   Mic,
+  MicOff,
   MessageSquare,
   Send,
   Users,
+  User,
+  Bot,
 } from "lucide-react";
 import { SoundboxBriefing } from "@/lib/types";
 import { speakText, stopSpeech } from "@/lib/speech";
+import { apiEndpoints } from "@/lib/api";
 
 interface SoundboxTabProps {
   briefing: SoundboxBriefing | null;
@@ -44,6 +48,12 @@ interface ModeDialogue {
     confirmAudioNative: string;
     confirmAudioPhonetic: string;
   };
+}
+
+interface PresetQueryItem {
+  q: string;
+  ans: string;
+  phonetic?: string;
 }
 
 export const TIMELINE_CONTENT: Record<string, Record<SoundboxTimelineMode, ModeDialogue>> = {
@@ -277,6 +287,120 @@ export const TIMELINE_CONTENT: Record<string, Record<SoundboxTimelineMode, ModeD
   },
 };
 
+const PRESET_QUERIES_BY_LANG: Record<string, PresetQueryItem[]> = {
+  Hinglish: [
+    {
+      q: "Today's collection kitna hua?",
+      ans: "Sharma-ji, aaj shaam 5:00 PM tak aapki dukaan par 42 bills complete ho chuke hain, total collection ₹5,830 raha. Shaam ki bheed shuru hone wali hai!",
+      phonetic: "Sharma-ji, aaj shaam paanch baje tak aapki dukaan par byalees bills complete ho chuke hain, total collection paanch hazaar aath sau tees rupaye raha.",
+    },
+    {
+      q: "Mera peak rush time kab hai?",
+      ans: "Sharma-ji, aapki dukaan par sabse zyada bheed shaam 7:00 PM se 8:00 PM ke beech rehti hai. Kal iss window mein 34 bills complete hue the.",
+      phonetic: "Sharma-ji, aapki dukaan par sabse zyada bheed shaam saat baje se aath baje ke beech rehti hai.",
+    },
+    {
+      q: "Kitne regular customers inactive hain?",
+      ans: "Sharma-ji, kul 42 regular grahak pichle 21 dino se nahi aaye hain. WhatsApp offer bhej kar unme se lagbhag 65% wapas bulaye ja sakte hain.",
+      phonetic: "Sharma-ji, kul byalees regular grahak pichle ikkees dino se nahi aaye hain. WhatsApp offer bhej kar lagbhag painsath percent wapas aa sakte hain.",
+    },
+  ],
+  Hindi: [
+    {
+      q: "आज कुल कितना कलेक्शन हुआ?",
+      ans: "शर्मा जी, आज शाम 5:00 बजे तक आपकी दुकान पर कुल 42 बिल पूरे हुए हैं और कलेक्शन ₹5,830 रहा है। शाम की मुख्य भीड़ अब शुरू हो रही है।",
+      phonetic: "Sharma ji, aaj shaam paanch baje tak aapki dukaan par kul byalees bill poore hue hain aur collection paanch hazaar aath sau tees rupaye raha hai.",
+    },
+    {
+      q: "दुकान का सबसे व्यस्त समय कौन सा है?",
+      ans: "शर्मा जी, आपकी दुकान पर सबसे ज्यादा भीड़ शाम 7:00 बजे से 8:00 बजे के बीच रहती है, जिसमें औसतन 34 बिल बनते हैं।",
+      phonetic: "Sharma ji, aapki dukaan par sabse zyada bheed shaam saat baje se aath baje ke beech rehti hai.",
+    },
+    {
+      q: "कितने नियमित ग्राहक नहीं आए हैं?",
+      ans: "शर्मा जी, कुल 42 नियमित ग्राहक पिछले 21 दिनों से दुकान पर नहीं आए हैं। व्हाट्सएप कूपन भेजने से वे वापस आ सकते हैं।",
+      phonetic: "Sharma ji, kul byalees regular grahak pichle ikkees dino se dukaan par nahi aaye hain.",
+    },
+  ],
+  Telugu: [
+    {
+      q: "ఈ రోజు మొత్తం ఎంత కలెక్షన్ అయింది?",
+      ans: "శర్మ గారూ, ఈ రోజు సాయంత్రం 5:00 గంటల వరకు 42 బిల్లులు పూర్తయ్యాయి, మొత్తం కలెక్షన్ ₹5,830. సాయంత్రం రద్దీ ప్రారంభం కానుంది.",
+      phonetic: "Sharma gaaru, ee roju saayantram aidu gantala varaku nalabhai rendu billulu poorthayyaayi, motham collection aidu vela aenimidi vandhala mupphai rupayalu.",
+    },
+    {
+      q: "రద్దీ ఎక్కువగా ఉండే సమయం ఏది?",
+      ans: "శర్మ గారూ, మీ దుకాణంలో సాయంత్రం 7:00 నుండి 8:00 గంటల వరకు అత్యధిక రద్దీ ఉంటుంది. ఆ సమయంలో 34 బిల్లులు నమోదయ్యాయి.",
+      phonetic: "Sharma gaaru, mee dukaanamlo saayantram yedu nundi enimidi gantala varaku athyadhika raddi untundi.",
+    },
+    {
+      q: "ఎంతమంది రెగ్యులర్ కస్టమర్లు రాలేదు?",
+      ans: "శర్మ గారూ, గత 21 రోజులుగా 42 మంది రెగ్యులర్ కస్టమర్లు రాలేదు. వారికి వాట్సాప్ ఆఫర్ పంపితే తిరిగి వచ్చే అవకాశం ఉంది.",
+      phonetic: "Sharma gaaru, gatha iravai okati rojuluga nalabhai rendu mandi regular customers raaledhu.",
+    },
+  ],
+  English: [
+    {
+      q: "How much is today's collection so far?",
+      ans: "Sharma-ji, as of 5:00 PM today, 42 bills have been completed with a total collection of ₹5,830. Evening peak rush is starting now.",
+      phonetic: "Sharma-ji, as of five PM today, forty-two bills have been completed with a total collection of five thousand eight hundred thirty rupees.",
+    },
+    {
+      q: "What are my top rush hours?",
+      ans: "Sharma-ji, your highest traffic window is 7:00 PM to 8:00 PM in the evening, with an average of 34 verified Soundbox UPI bills.",
+      phonetic: "Sharma-ji, your highest traffic window is seven PM to eight PM in the evening, with an average of thirty-four verified Soundbox bills.",
+    },
+    {
+      q: "How many regular customers are at-risk?",
+      ans: "Sharma-ji, 42 regular customers have not visited in the last 21+ days. Sending a 10% WhatsApp coupon can win back up to 65% of them.",
+      phonetic: "Sharma-ji, forty-two regular customers have not visited in the last twenty-one days.",
+    },
+  ],
+  Tamil: [
+    {
+      q: "இன்று மொத்த வசூல் எவ்வளவு?",
+      ans: "சர்மா அவர்களே, இன்று மாலை 5:00 மணி வரை 42 பில்கள் முடிந்துள்ளன, மொத்த வசூல் ₹5,830. மாலை நேர கூட்டம் இப்போது தொடங்குகிறது.",
+      phonetic: "Sharma avargale, indru maalai aindhu mani varai naarpadhu irandu bills mudinthullana, motha vasool aindhaayirathu ennooru mupphadhu roobai.",
+    },
+    {
+      q: "கடையின் பீக் ஹவர்ஸ் எது?",
+      ans: "சர்மா அவர்களே, உங்கள் கடையில் மாலை 7:00 மணி முதல் 8:00 மணி வரை அதிக கூட்டம் இருக்கும்.",
+      phonetic: "Sharma avargale, ungal kadaiyil maalai yezhu mani mudhal ettu mani varai adhigam koottam irukkum.",
+    },
+    {
+      q: "எத்தனை வாடிக்கையாளர்கள் வரவில்லை?",
+      ans: "சர்மா அவர்களே, கடந்த 21 நாட்களாக 42 வழக்கமான வாடிக்கையாளர்கள் கடைக்கு வரவில்லை.",
+      phonetic: "Sharma avargale, kadandha irubathi oru naatkalaga naarpadhu irandu vaadikkaiyaalargal varavillai.",
+    },
+  ],
+  Kannada: [
+    {
+      q: "ಇಂದು ಒಟ್ಟು ಎಷ್ಟು ಕಲೆಕ್ಷನ್ ಆಗಿದೆ?",
+      ans: "ಶರ್ಮಾ ಅವರೇ, ಇಂದು ಸಂಜೆ 5:00 ಗಂಟೆಯವರೆಗೆ 42 ಬಿಲ್‌ಗಳು ಪೂರ್ಣಗೊಂಡಿವೆ, ಒಟ್ಟು ಸಂಗ್ರಹ ₹5,830. ಸಂಜೆಯ ಗರಿಷ್ಠ ವ್ಯಾಪಾರ ಈಗ ಆರಂಭವಾಗುತ್ತಿದೆ.",
+      phonetic: "Sharma avare, indu sanje aidu gantege nalavattheradu billugalu poornagondive, ottu sangraha aidu saavirada entanoora moovatthu roopayi.",
+    },
+    {
+      q: "ಗರಿಷ್ಠ ವ್ಯಾಪಾರದ ಸಮಯ ಯಾವುದು?",
+      ans: "ಶರ್ಮಾ ಅವರೇ, ನಿಮ್ಮ ಅಂಗಡಿಯಲ್ಲಿ ಸಂಜೆ 7:00 ರಿಂದ 8:00 ಗಂಟೆಯವರೆಗೆ ಗರಿಷ್ಠ ವ್ಯಾಪಾರ ಇರುತ್ತದೆ.",
+      phonetic: "Sharma avare, nimma angadiyalli sanje yelu ninda entu gantege garishtha vyaapaara irutthede.",
+    },
+    {
+      q: "ಎಷ್ಟು ಗ್ರಾಹಕರು ಬಂದಿಲ್ಲ?",
+      ans: "ಶರ್ಮಾ ಅವರೇ, ಕಳೆದ 21 ದಿನಗಳಿಂದ 42 ನಿಯಮಿತ ಗ್ರಾಹಕರು ಅಂಗಡಿಗೆ ಬಂದಿಲ್ಲ.",
+      phonetic: "Sharma avare, kaledha iravatthiondu dinagalinda nalavattheradu regular grahakaru bandilla.",
+    },
+  ],
+};
+
+const SPEECH_LANG_CODE: Record<string, string> = {
+  Hindi: "hi-IN",
+  Telugu: "te-IN",
+  Tamil: "ta-IN",
+  Kannada: "kn-IN",
+  English: "en-IN",
+  Hinglish: "hi-IN",
+};
+
 export const SoundboxTab: React.FC<SoundboxTabProps> = ({
   briefing,
   isLoading,
@@ -285,11 +409,24 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
   const [activeMode, setActiveMode] = useState<SoundboxTimelineMode>("morning");
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasDispatchedRetention, setHasDispatchedRetention] = useState(false);
-  const [activeQueryInput, setActiveQueryInput] = useState<string>("Today's collection kitna hua?");
+  const [isListening, setIsListening] = useState(false);
+  const [isProcessingQuery, setIsProcessingQuery] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const langKey = TIMELINE_CONTENT[language] ? language : "Hinglish";
   const currentContent = TIMELINE_CONTENT[langKey][activeMode];
+  const presetQueries = PRESET_QUERIES_BY_LANG[langKey] || PRESET_QUERIES_BY_LANG.Hinglish;
+
+  // Dynamic Stage 3 Q&A state: tracks both what was asked AND what the soundbox answers!
+  const [ondemandState, setOndemandState] = useState<{
+    query: string;
+    response: string;
+    phonetic: string;
+  }>({
+    query: presetQueries[0].q,
+    response: presetQueries[0].ans,
+    phonetic: presetQueries[0].phonetic || presetQueries[0].ans,
+  });
 
   // Stop playback when unmounting
   useEffect(() => {
@@ -299,13 +436,22 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
     };
   }, []);
 
-  // Stop audio when changing mode or language
+  // Update defaults when changing mode or language
   useEffect(() => {
     if (audioRef.current) audioRef.current.pause();
     stopSpeech();
     setIsPlaying(false);
+    setIsListening(false);
     setHasDispatchedRetention(false);
-  }, [activeMode, language]);
+
+    // Synchronize Stage 3 default with the active language
+    const currentPresets = PRESET_QUERIES_BY_LANG[langKey] || PRESET_QUERIES_BY_LANG.Hinglish;
+    setOndemandState({
+      query: currentPresets[0].q,
+      response: currentPresets[0].ans,
+      phonetic: currentPresets[0].phonetic || currentPresets[0].ans,
+    });
+  }, [activeMode, language, langKey]);
 
   const handleTogglePlay = (customNative?: string, customPhonetic?: string) => {
     if (isPlaying) {
@@ -315,8 +461,8 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
       return;
     }
 
-    const textToSpeak = customNative || currentContent.native;
-    const phoneticToSpeak = customPhonetic || currentContent.phonetic;
+    const textToSpeak = customNative || (activeMode === "ondemand" ? ondemandState.response : currentContent.native);
+    const phoneticToSpeak = customPhonetic || (activeMode === "ondemand" ? ondemandState.phonetic : currentContent.phonetic);
 
     setIsPlaying(true);
     speakText(
@@ -335,6 +481,103 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
         currentContent.followupPrompt.confirmAudioNative,
         currentContent.followupPrompt.confirmAudioPhonetic
       );
+    }
+  };
+
+  // Handle Preset Quick-Tap Query: Updates BOTH Question text AND Answer text, then speaks!
+  const handleSelectPresetQuery = (item: PresetQueryItem) => {
+    stopSpeech();
+    setIsPlaying(false);
+    setOndemandState({
+      query: item.q,
+      response: item.ans,
+      phonetic: item.phonetic || item.ans,
+    });
+    handleTogglePlay(item.ans, item.phonetic || item.ans);
+  };
+
+  // Web Speech API: Real Microphone Speech Recognition from the merchant!
+  const handleToggleMic = () => {
+    if (typeof window === "undefined") return;
+
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRec) {
+      alert("Microphone recognition is supported in Google Chrome and Microsoft Edge.");
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRec();
+      recognition.lang = SPEECH_LANG_CODE[language] || "hi-IN";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        stopSpeech();
+        setIsPlaying(false);
+        setIsListening(true);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onresult = async (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        if (!transcript) return;
+
+        setIsProcessingQuery(true);
+        setOndemandState((prev) => ({
+          ...prev,
+          query: transcript,
+          response: "Searching store ledger and synthesizing response...",
+          phonetic: "Searching store ledger and synthesizing response...",
+        }));
+
+        try {
+          const res = await apiEndpoints.sendChatMessage({
+            message: transcript,
+            language: language,
+          });
+
+          const botReply = res.data?.data?.content || res.data?.content;
+          if (botReply) {
+            setOndemandState({
+              query: transcript,
+              response: botReply,
+              phonetic: botReply,
+            });
+            handleTogglePlay(botReply, botReply);
+          } else {
+            throw new Error("No response content");
+          }
+        } catch (e) {
+          // Fallback to deterministic response
+          const fallbackAns = `Sharma-ji, as of 5:00 PM today, 42 bills completed, total collection ₹5,830. Evening peak rush starting now.`;
+          setOndemandState({
+            query: transcript,
+            response: fallbackAns,
+            phonetic: fallbackAns,
+          });
+          handleTogglePlay(fallbackAns, fallbackAns);
+        } finally {
+          setIsProcessingQuery(false);
+        }
+      };
+
+      recognition.start();
+    } catch (e) {
+      setIsListening(false);
+      console.error("Speech recognition error:", e);
     }
   };
 
@@ -361,7 +604,7 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
         {/* Mode 1: Morning Briefing */}
         <button
           onClick={() => setActiveMode("morning")}
-          className={`flex flex-col text-left p-4 rounded-2xl border-2 transition-all active:scale-98 ${
+          className={`flex flex-col text-left p-4 rounded-2xl border-2 transition-all active:scale-98 cursor-pointer ${
             activeMode === "morning"
               ? "border-[#002E6E] bg-gradient-to-br from-blue-50/80 to-cyan-50/60 shadow-md ring-2 ring-[#00BAF2]/30"
               : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80"
@@ -387,7 +630,7 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
         {/* Mode 2: Afternoon Slump */}
         <button
           onClick={() => setActiveMode("afternoon")}
-          className={`flex flex-col text-left p-4 rounded-2xl border-2 transition-all active:scale-98 ${
+          className={`flex flex-col text-left p-4 rounded-2xl border-2 transition-all active:scale-98 cursor-pointer ${
             activeMode === "afternoon"
               ? "border-amber-600 bg-gradient-to-br from-amber-50/90 to-orange-50/60 shadow-md ring-2 ring-amber-400/40"
               : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80"
@@ -413,7 +656,7 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
         {/* Mode 3: Anytime On-Demand */}
         <button
           onClick={() => setActiveMode("ondemand")}
-          className={`flex flex-col text-left p-4 rounded-2xl border-2 transition-all active:scale-98 ${
+          className={`flex flex-col text-left p-4 rounded-2xl border-2 transition-all active:scale-98 cursor-pointer ${
             activeMode === "ondemand"
               ? "border-cyan-600 bg-gradient-to-br from-cyan-50/90 to-blue-50/60 shadow-md ring-2 ring-cyan-400/40"
               : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80"
@@ -432,7 +675,7 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
             3. On-Demand Spoken Query
           </p>
           <p className="mt-1 text-[11px] text-slate-500 leading-tight">
-            Ask &ldquo;Today&apos;s collection?&rdquo; aloud • Zero-screen for blind &amp; elderly.
+            Speak directly with mic or tap queries • Displays both question &amp; answer aloud.
           </p>
         </button>
       </div>
@@ -474,11 +717,15 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
               <div className="absolute bottom-2 flex items-center space-x-1.5">
                 <div
                   className={`h-2 w-2 rounded-full ${
-                    isPlaying ? "bg-emerald-400 animate-ping" : "bg-cyan-400"
+                    isListening
+                      ? "bg-red-500 animate-ping"
+                      : isPlaying
+                      ? "bg-emerald-400 animate-ping"
+                      : "bg-cyan-400"
                   }`}
                 />
                 <span className="text-[10px] text-slate-400 font-mono">
-                  {isPlaying ? "SPEAKING ALOUD" : "STANDBY READY"}
+                  {isListening ? "LISTENING MIC" : isPlaying ? "SPEAKING ALOUD" : "STANDBY READY"}
                 </span>
               </div>
             </div>
@@ -491,15 +738,15 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
                   setIsPlaying(false);
                   setTimeout(() => handleTogglePlay(), 100);
                 }}
-                className="rounded-full bg-slate-800 p-2.5 text-slate-300 hover:bg-slate-700 hover:text-white transition shadow-sm active:scale-95"
-                title="Restart Audio"
+                className="rounded-full bg-slate-800 p-2.5 text-slate-300 hover:bg-slate-700 hover:text-white transition shadow-sm active:scale-95 cursor-pointer"
+                title="Replay Audio"
               >
                 <RotateCcw className="h-4 w-4" />
               </button>
 
               <button
                 onClick={() => handleTogglePlay()}
-                className={`flex items-center space-x-2 rounded-full px-6 py-2.5 text-xs font-bold transition shadow-lg active:scale-95 ${
+                className={`flex items-center space-x-2 rounded-full px-6 py-2.5 text-xs font-bold transition shadow-lg active:scale-95 cursor-pointer ${
                   isPlaying
                     ? "bg-amber-400 text-slate-950 hover:bg-amber-300 ring-2 ring-amber-400/50"
                     : "bg-gradient-to-r from-cyan-400 via-[#00BAF2] to-blue-500 text-slate-950 hover:brightness-110 ring-2 ring-[#00BAF2]/50 font-black"
@@ -516,7 +763,7 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
                     <span>
                       {activeMode === "morning" && "Play 30s Morning Briefing"}
                       {activeMode === "afternoon" && "Hear Retention Voice Prompt"}
-                      {activeMode === "ondemand" && "Ask & Hear Spoken Answer"}
+                      {activeMode === "ondemand" && "Hear Spoken Answer"}
                     </span>
                   </>
                 )}
@@ -539,20 +786,55 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
                 </span>
               </div>
 
-              {/* Spoken Message Quote */}
-              <div className="mt-4 rounded-xl bg-slate-900/80 border border-slate-800 p-4">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">
-                  Soundbox Speaks Aloud:
-                </span>
-                <p className="text-sm leading-relaxed text-slate-100 font-semibold whitespace-pre-line">
-                  &ldquo;{currentContent.native}&rdquo;
-                </p>
-              </div>
+              {/* Mode 1 & Mode 2 Display */}
+              {activeMode !== "ondemand" && (
+                <div className="mt-4 rounded-xl bg-slate-900/80 border border-slate-800 p-4">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">
+                    Soundbox Speaks Aloud:
+                  </span>
+                  <p className="text-sm leading-relaxed text-slate-100 font-semibold whitespace-pre-line">
+                    &ldquo;{currentContent.native}&rdquo;
+                  </p>
+                </div>
+              )}
+
+              {/* Mode 3 Display: Shows BOTH Merchant's Spoken Query AND Soundbox Spoken Answer */}
+              {activeMode === "ondemand" && (
+                <div className="mt-4 space-y-3">
+                  {/* Merchant Query Bubble */}
+                  <div className="rounded-xl bg-blue-950/50 border border-blue-500/30 p-3.5">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-[#00BAF2] flex items-center gap-1.5 mb-1">
+                      <User className="h-3 w-3" />
+                      Merchant Spoke into Mic:
+                    </span>
+                    <p className="text-sm font-bold text-white">
+                      &ldquo;{ondemandState.query}&rdquo;
+                    </p>
+                  </div>
+
+                  {/* Soundbox Spoken Answer Bubble */}
+                  <div className="rounded-xl bg-slate-900/90 border border-slate-700/80 p-4">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-400 flex items-center gap-1.5 mb-1">
+                      <Radio className="h-3 w-3" />
+                      Soundbox Spoke Aloud:
+                    </span>
+                    <p className="text-sm leading-relaxed text-slate-100 font-semibold">
+                      {isProcessingQuery ? (
+                        <span className="text-cyan-300 animate-pulse">
+                          Thinking &amp; calculating from store ledger...
+                        </span>
+                      ) : (
+                        `“${ondemandState.response}”`
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Interactive Sub-Action for Mode 2: Afternoon Slump Retention */}
               {activeMode === "afternoon" && (
                 <div className="mt-4 rounded-xl bg-amber-950/40 border border-amber-500/30 p-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-3">
                     <div>
                       <span className="text-[11px] font-bold text-amber-300 uppercase tracking-wider block">
                         Merchant 1-Word Audio Action:
@@ -565,7 +847,7 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
                     <button
                       onClick={handleApproveRetention}
                       disabled={hasDispatchedRetention}
-                      className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition active:scale-95 shadow-md ${
+                      className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition active:scale-95 shadow-md cursor-pointer ${
                         hasDispatchedRetention
                           ? "bg-emerald-500 text-slate-950 cursor-default"
                           : "bg-emerald-400 hover:bg-emerald-300 text-slate-950"
@@ -584,39 +866,54 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
                 </div>
               )}
 
-              {/* Interactive Query Chips for Mode 3: On-Demand Voice Query */}
+              {/* Interactive Controls for Mode 3: Live Microphone + Preset Taps */}
               {activeMode === "ondemand" && (
-                <div className="mt-4 space-y-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                    Tap to speak question aloud:
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      {
-                        q: "Today's collection kitna hua?",
-                        ans: "Sharma-ji, aaj shaam 5:00 PM tak aapki dukaan par 42 bills complete ho chuke hain, total collection ₹5,830 raha.",
-                      },
-                      {
-                        q: "Mera peak rush time kab hai?",
-                        ans: "Sharma-ji, aapki dukaan par sabse zyada bheed shaam 7:00 PM se 8:00 PM ke beech dekhi jaati hai.",
-                      },
-                      {
-                        q: "Kitne regular customers inactive hain?",
-                        ans: "Sharma-ji, kul 42 regular grahak pichle 21 dino se nahi aaye hain. WhatsApp offer bhejne se wo wapas aa sakte hain.",
-                      },
-                    ].map((item, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          setActiveQueryInput(item.q);
-                          handleTogglePlay(item.ans, item.ans);
-                        }}
-                        className="text-xs bg-slate-900 hover:bg-slate-800 text-cyan-200 border border-slate-700/80 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 active:scale-95"
-                      >
-                        <Mic className="h-3 w-3 text-[#00BAF2]" />
-                        &ldquo;{item.q}&rdquo;
-                      </button>
-                    ))}
+                <div className="mt-4 space-y-3 pt-3 border-t border-slate-800">
+                  {/* Live Microphone Button for the Merchant */}
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={handleToggleMic}
+                      className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black transition shadow-lg active:scale-95 cursor-pointer ${
+                        isListening
+                          ? "bg-red-500 text-white ring-4 ring-red-400/50 animate-pulse"
+                          : "bg-gradient-to-r from-blue-600 to-[#002E6E] hover:from-blue-500 hover:to-[#002E6E] text-white border border-[#00BAF2]/40"
+                      }`}
+                    >
+                      {isListening ? (
+                        <>
+                          <MicOff className="h-4 w-4" />
+                          <span>Listening to your voice... Speak now!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Mic className="h-4 w-4 text-[#00BAF2]" />
+                          <span>🎙️ Click to Speak Directly with Your Mic</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Preset Tap-to-Speak Queries */}
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
+                      Or tap any sample query (Updates text and speaks aloud):
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {presetQueries.map((item, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleSelectPresetQuery(item)}
+                          className={`text-xs px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 active:scale-95 cursor-pointer border ${
+                            ondemandState.query === item.q
+                              ? "bg-[#00BAF2]/20 border-[#00BAF2] text-cyan-200 font-bold"
+                              : "bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700/80 font-medium"
+                          }`}
+                        >
+                          <Volume2 className="h-3 w-3 text-[#00BAF2]" />
+                          &ldquo;{item.q}&rdquo;
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -670,7 +967,7 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
           </p>
         </div>
 
-        {/* Afternoon Retention Alert (Replaces obsolete inventory stock card) */}
+        {/* Afternoon Retention Alert */}
         <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-5 shadow-sm">
           <p className="text-xs font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1">
             <Users className="h-3.5 w-3.5 text-amber-600" />

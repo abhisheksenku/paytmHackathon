@@ -30,13 +30,13 @@ class Settings(BaseSettings):
     
     # Free-Tier AI (Google Gemini)
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    GEMINI_MODEL: str = "gemini-1.5-flash"
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest")
     
     # Audio Synthesis (Edge-TTS Indian Voices)
-    DEFAULT_TTS_VOICE: str = "hi-IN-MadhurNeural"
+    DEFAULT_TTS_VOICE: str = os.getenv("DEFAULT_TTS_VOICE", "hi-IN-MadhurNeural")
     
     # Security
-    SECRET_KEY: str = "vyapaar_ai_super_secret_hackathon_key_2026_change_in_prod"
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "vyapaar_ai_super_secret_hackathon_key_2026_change_in_prod")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
     

@@ -253,12 +253,11 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
       return;
     }
 
-    // Warm up microphone hardware via getUserMedia
-    let stream: MediaStream | null = null;
+    // 1. Verify microphone permission via getUserMedia and immediately release the track
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaStreamRef.current = stream;
+        const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        testStream.getTracks().forEach((track) => track.stop());
       } catch (e: any) {
         console.warn("getUserMedia error:", e);
       }
@@ -290,19 +289,19 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
       };
 
       recognition.onresult = (event: any) => {
-        let interim = "";
-        let final = "";
+        let finalTranscript = "";
+        let interimTranscript = "";
 
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          const text = event.results[i][0].transcript;
+        for (let i = 0; i < event.results.length; ++i) {
+          const chunk = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
-            final += text;
+            finalTranscript += chunk + " ";
           } else {
-            interim += text;
+            interimTranscript += chunk;
           }
         }
 
-        const words = (final || interim || "").trim();
+        const words = (finalTranscript + interimTranscript).trim();
         if (words) {
           transcriptRef.current = words;
           setInput(words);
@@ -336,7 +335,12 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
             setInput("");
             handleSendQuery(captured);
           } else {
-            cleanupListening();
+            // Keep listening across initial breath pauses
+            try {
+              recognition.start();
+            } catch (e) {
+              cleanupListening();
+            }
           }
         }
       };

@@ -850,12 +850,12 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
     transcriptRef.current = "";
     hasProcessedQueryRef.current = false;
 
-    // 1. Warm up audio hardware via getUserMedia (ensures active microphone stream)
-    let stream: MediaStream | null = null;
+    // 1. Verify microphone permission via getUserMedia and IMMEDIATELY release the track
+    // (Crucial: holding an open MediaStreamTrack locks the hardware and causes SpeechRecognition to abort in 500ms!)
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaStreamRef.current = stream;
+        const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        testStream.getTracks().forEach((track) => track.stop());
       } catch (err: any) {
         console.warn("getUserMedia failed or denied:", err);
         if (err?.name === "NotAllowedError" || err?.name === "PermissionDeniedError") {
@@ -875,8 +875,8 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
     try {
       const recognition = new SpeechRec();
       recognitionRef.current = recognition;
-      recognition.lang = micLang || "en-IN";
-      recognition.continuous = true; // Crucial: prevents early termination on 500ms silence!
+      recognition.lang = micLang || SPEECH_LANG_CODE[language] || "en-IN";
+      recognition.continuous = true; // Keep listening across breath pauses
       recognition.interimResults = true; // Stream words in real-time
       recognition.maxAlternatives = 1;
 
@@ -890,27 +890,28 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
       };
 
       recognition.onresult = (event: any) => {
-        let interim = "";
-        let final = "";
+        let finalTranscript = "";
+        let interimTranscript = "";
 
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          const text = event.results[i][0].transcript;
+        // Iterate through all results from 0 to preserve accumulated speech
+        for (let i = 0; i < event.results.length; ++i) {
+          const chunk = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
-            final += text;
+            finalTranscript += chunk + " ";
           } else {
-            interim += text;
+            interimTranscript += chunk;
           }
         }
 
-        const currentWords = (final || interim || "").trim();
-        if (currentWords) {
-          transcriptRef.current = currentWords;
-          setInterimSpokenText(currentWords);
+        const fullSpoken = (finalTranscript + interimTranscript).trim();
+        if (fullSpoken) {
+          transcriptRef.current = fullSpoken;
+          setInterimSpokenText(fullSpoken);
 
-          // Reset silence timer on every new word
+          // Reset silence timer on every new detected word
           if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
 
-          // Auto-submit after 1.8 seconds of silence once words are spoken
+          // Auto-submit after 1.8 seconds of natural silence once words are spoken
           silenceTimerRef.current = setTimeout(() => {
             if (isListeningRef.current && transcriptRef.current.trim().length > 1 && !hasProcessedQueryRef.current) {
               stopListeningAndSubmit(transcriptRef.current.trim());
@@ -922,21 +923,40 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
       recognition.onerror = (event: any) => {
         console.warn("Speech recognition event:", event?.error);
         if (event?.error === "no-speech") {
-          // In continuous mode, harmless pause event - keep listening!
+          // Harmless pause event in continuous mode - keep listening!
           return;
         }
-        if (event?.error === "not-allowed") {
-          setMicStatusMsg("Microphone permission denied. Please click the lock/settings icon in your browser to allow microphone.");
+        if (event?.error === "not-allowed" || event?.error === "service-not-allowed") {
+          setMicStatusMsg("Microphone permission denied. Please allow microphone access in your browser address bar.");
           cleanupListening();
+          return;
+        }
+        if (event?.error === "audio-capture") {
+          setMicStatusMsg("Microphone hardware is busy or unavailable. Please check your mic connection.");
+          cleanupListening();
+          return;
+        }
+        if (event?.error === "network") {
+          setMicStatusMsg("Voice recognition network timeout. You can also type your question or tap sample queries.");
+          cleanupListening();
+          return;
         }
       };
 
       recognition.onend = () => {
-        // If recognition closed but user spoke words and hasn't submitted yet:
+        // If recognition closed while still listening:
         if (isListeningRef.current) {
           const captured = transcriptRef.current.trim();
           if (captured.length > 1 && !hasProcessedQueryRef.current) {
+            // Words were captured: submit them!
             stopListeningAndSubmit(captured);
+          } else if (!hasProcessedQueryRef.current) {
+            // Browser timed out before speech started: restart seamlessly so mic stays open!
+            try {
+              recognition.start();
+            } catch (e) {
+              cleanupListening();
+            }
           } else {
             cleanupListening();
           }

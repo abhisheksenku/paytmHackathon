@@ -454,9 +454,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
         </div>
 
         {/* Right 1 Col: Scenario 3 - Eyes-Free Voice Operating Copilot */}
-        <div className="rounded-2xl border-2 border-cyan-500/50 bg-gradient-to-b from-slate-900 via-slate-900 to-[#002E6E] p-6 text-white shadow-xl flex flex-col justify-between relative overflow-hidden">
+        <div className="rounded-3xl border border-cyan-500/30 bg-gradient-to-b from-[#09152B] via-[#0B1A35] to-[#002E6E] p-6 text-white shadow-xl flex flex-col justify-between relative overflow-hidden">
           {/* Ambient Glow */}
-          <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-cyan-500/10 blur-2xl pointer-events-none" />
+          <div className="absolute -top-12 -right-12 h-36 w-36 rounded-full bg-cyan-400/10 blur-2xl pointer-events-none" />
 
           <div>
             <div className="flex items-center justify-between">
@@ -464,43 +464,48 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
                 <EyeOff className="h-4 w-4 text-cyan-400" />
                 {content.eyesFreeTitle}
               </span>
-              <span className="rounded-full bg-cyan-400/20 text-cyan-200 border border-cyan-400/30 px-2.5 py-0.5 text-[11px] font-bold">
+              <span className="rounded-full bg-cyan-400/20 text-cyan-200 border border-cyan-400/40 px-2.5 py-0.5 text-[11px] font-bold shadow-2xs">
                 {content.eyesFreeBadge}
               </span>
             </div>
 
             {/* Persona Tag */}
-            <div className="mt-4 rounded-xl bg-slate-800/80 border border-slate-700/80 p-3">
-              <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400 block">
-                Scenario 3 Store Persona:
-              </span>
-              <p className="mt-0.5 text-xs font-bold text-white">
-                {content.eyesFreePersona}
-              </p>
-              <span className="text-[10px] text-cyan-300 font-semibold mt-1 block">
-                • 100% Screen-Free • Native Audio Only
-              </span>
+            <div className="mt-4 rounded-2xl bg-slate-900/80 border border-slate-700/80 p-3.5 flex items-center space-x-3">
+              <div className="h-9 w-9 rounded-xl bg-amber-500 flex items-center justify-center text-slate-950 font-black text-xs shadow-inner">
+                VJ
+              </div>
+              <div>
+                <span className="text-[10px] uppercase tracking-wider font-extrabold text-amber-300 block">
+                  Bharat Accessibility Spotlight:
+                </span>
+                <p className="text-xs font-bold text-white leading-tight">
+                  {content.eyesFreePersona}
+                </p>
+                <span className="text-[10px] text-cyan-300 font-medium">
+                  • 100% Screen-Free • Pure Spoken Audio
+                </span>
+              </div>
             </div>
 
             {/* Audio Dialogue Snippet */}
             <div className="mt-4 space-y-2.5 text-xs">
-              <div className="rounded-xl bg-slate-950/70 border border-slate-800 p-2.5">
-                <span className="text-[10px] text-slate-400 font-semibold flex items-center gap-1">
-                  <Mic className="h-3 w-3 text-cyan-400" /> Merchant Speaks Aloud:
+              <div className="rounded-xl bg-slate-950/80 border border-slate-800 p-2.5">
+                <span className="text-[10px] text-amber-300 font-bold flex items-center gap-1">
+                  <Mic className="h-3 w-3 text-amber-400" /> 1. Merchant Asks Aloud:
                 </span>
                 <p className="mt-1 font-bold text-slate-100">&ldquo;{content.eyesFreeQuery}&rdquo;</p>
               </div>
 
-              <div className="rounded-xl bg-cyan-950/40 border border-cyan-500/30 p-2.5">
-                <span className="text-[10px] text-cyan-300 font-semibold flex items-center gap-1">
-                  <Radio className="h-3 w-3 text-[#00BAF2]" /> Soundbox Voice Answer:
+              <div className="rounded-xl bg-blue-950/50 border border-cyan-500/30 p-2.5">
+                <span className="text-[10px] text-cyan-300 font-bold flex items-center gap-1">
+                  <Radio className="h-3 w-3 text-[#00BAF2]" /> 2. Soundbox Answers:
                 </span>
                 <p className="mt-1 font-semibold text-slate-200">{content.eyesFreeResponse}</p>
               </div>
 
               <div className="rounded-xl bg-amber-950/40 border border-amber-500/30 p-2.5">
                 <span className="text-[10px] text-amber-300 font-bold flex items-center gap-1">
-                  <Sparkles className="h-3 w-3 text-amber-400" /> Retention Prompt:
+                  <Sparkles className="h-3 w-3 text-amber-400" /> 3. Afternoon Slump Alert:
                 </span>
                 <p className="mt-0.5 text-[11px] font-medium text-amber-100">&ldquo;{content.eyesFreeRetentionAlert}&rdquo;</p>
               </div>
@@ -509,10 +514,10 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
 
           <button
             onClick={() => setIsEyesFreeModalOpen(true)}
-            className="mt-6 w-full rounded-xl bg-gradient-to-r from-cyan-400 via-[#00BAF2] to-blue-500 py-3 text-xs font-black text-slate-950 hover:brightness-110 transition shadow-lg shadow-cyan-950/50 active:scale-95 flex items-center justify-center gap-1.5"
+            className="mt-6 w-full rounded-2xl bg-gradient-to-r from-cyan-400 via-[#00BAF2] to-blue-500 py-3.5 px-4 text-xs font-extrabold text-slate-950 hover:brightness-110 transition shadow-lg shadow-cyan-950/60 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
           >
             <Volume2 className="h-4 w-4" />
-            {content.btnLaunchEyesFree}
+            <span>{content.btnLaunchEyesFree}</span>
           </button>
         </div>
       </div>

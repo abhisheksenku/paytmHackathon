@@ -29,11 +29,13 @@ import {
   Activity,
   Plus,
   Minus,
+  EyeOff,
 } from "lucide-react";
 import { SoundboxBriefing } from "@/lib/types";
 import { speakText, stopSpeech } from "@/lib/speech";
 import { apiEndpoints } from "@/lib/api";
 import { getTranslation } from "@/lib/translations";
+import { EyesFreeModal } from "./EyesFreeModal";
 
 interface SoundboxTabProps {
   briefing: SoundboxBriefing | null;
@@ -673,6 +675,7 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
 
   // Mic recognition language (defaults to en-IN / Hinglish for robust multi-accent recognition, switchable with 1-click)
   const [micLang, setMicLang] = useState<string>("en-IN");
+  const [isEyesFreeModalOpen, setIsEyesFreeModalOpen] = useState<boolean>(false);
 
   // Dynamic Stage 3 Q&A state: tracks both what was asked AND what the soundbox answers!
   const [ondemandState, setOndemandState] = useState<{
@@ -1356,6 +1359,22 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
               {/* Mode 3 Display: Shows BOTH Merchant's Spoken Query AND Soundbox Spoken Answer */}
               {activeMode === "ondemand" && (
                 <div className="mt-4 space-y-3.5">
+                  {/* Bharat Accessibility Spotlight Banner */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-gradient-to-r from-amber-950/40 via-slate-900 to-[#002E6E]/40 border border-amber-500/40 rounded-2xl px-4 py-2.5 text-xs shadow-sm">
+                    <span className="text-amber-200 flex items-center gap-2 font-medium">
+                      <EyeOff className="h-4 w-4 text-amber-400 shrink-0" />
+                      <span>
+                        <strong className="text-white">Bharat Accessibility:</strong> Designed for elderly & low-vision merchants (Venkat-ji scenario)
+                      </span>
+                    </span>
+                    <button
+                      onClick={() => setIsEyesFreeModalOpen(true)}
+                      className="rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 font-bold px-3 py-1.5 text-[11px] transition cursor-pointer border border-amber-400/40 flex items-center gap-1.5 self-start sm:self-auto shrink-0 shadow-2xs"
+                    >
+                      <span>Launch Voice Walkthrough 🚀</span>
+                    </button>
+                  </div>
+
                   {/* Step 1: Merchant Query Bubble */}
                   <div className="rounded-2xl bg-gradient-to-r from-blue-950/70 to-slate-900/80 border border-blue-500/40 p-4 shadow-sm">
                     <div className="flex items-center justify-between mb-1.5">
@@ -1645,6 +1664,13 @@ export const SoundboxTab: React.FC<SoundboxTabProps> = ({
           </p>
         </div>
       </div>
+
+      {/* Interactive Scenario 3: Eyes-Free Voice Copilot Modal */}
+      <EyesFreeModal
+        isOpen={isEyesFreeModalOpen}
+        onClose={() => setIsEyesFreeModalOpen(false)}
+        language={language}
+      />
     </div>
   );
 };
